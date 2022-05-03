@@ -1,0 +1,7 @@
+# Packages required for running the app
+#
+# python-dotenv for reading in variables from a .env file
+python-dotenv==0.20.0
+
+# slack-sdk for interacting with the Slack API
+slack-sdk==3.15.2
