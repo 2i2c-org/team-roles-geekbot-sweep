@@ -1,5 +1,5 @@
-import os
 import json
+import os
 from pathlib import Path
 
 from get_slack_team_members import SlackTeamMembers
@@ -13,18 +13,20 @@ class TeamRoles:
 
         # Check the file exists before reading
         if not os.path.exists(self.roles_path):
-            raise FileNotFoundError(
-                f"File must exist to continue! {self.roles_path}"
-            )
+            raise FileNotFoundError(f"File must exist to continue! {self.roles_path}")
 
-        with open(self.roles_path, "r") as stream:
+        with open(self.roles_path) as stream:
             self.team_roles = json.load(stream)
 
     def _find_next_team_member(self, current_member):
         app = SlackTeamMembers()
         team_members = app.get_users_in_team()
 
-        index = next(idx for (idx, team_member) in enumerate(team_members) if team_member == current_member)
+        index = next(
+            idx
+            for (idx, team_member) in enumerate(team_members)
+            if team_member == current_member
+        )
 
         # If we reach the end of the list, we want to wrap around and start again
         if len(team_members) == (index + 1):
@@ -33,15 +35,29 @@ class TeamRoles:
         return team_members[index + 1]
 
     def _update_meeting_facilitator_role(self):
-        self.team_roles["meeting_facilitator"]["outgoing"] = self.team_roles["meeting_facilitator"]["incoming"]
-        self.team_roles["meeting_facilitator"]["incoming"] = self._find_next_team_member(self.team_roles["meeting_facilitator"]["outgoing"])
+        self.team_roles["meeting_facilitator"]["outgoing"] = self.team_roles[
+            "meeting_facilitator"
+        ]["incoming"]
+        self.team_roles["meeting_facilitator"][
+            "incoming"
+        ] = self._find_next_team_member(
+            self.team_roles["meeting_facilitator"]["outgoing"]
+        )
 
     def _update_support_steward_role(self):
-        self.team_roles["support_steward"]["outgoing"] = self.team_roles["support_steward"]["current"]
-        self.team_roles["support_steward"]["current"] = self.team_roles["support_steward"]["incoming"]
-        self.team_roles["support_steward"]["incoming"] = self._find_next_team_member(self.team_roles["support_steward"]["current"])
+        self.team_roles["support_steward"]["outgoing"] = self.team_roles[
+            "support_steward"
+        ]["current"]
+        self.team_roles["support_steward"]["current"] = self.team_roles[
+            "support_steward"
+        ]["incoming"]
+        self.team_roles["support_steward"]["incoming"] = self._find_next_team_member(
+            self.team_roles["support_steward"]["current"]
+        )
 
-    def update_roles(self, update_meeting_facilitator=False, update_support_steward=False):
+    def update_roles(
+        self, update_meeting_facilitator=False, update_support_steward=False
+    ):
         if update_meeting_facilitator:
             self._update_meeting_facilitator_role()
 
