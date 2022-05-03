@@ -102,7 +102,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+# .env -- We want to track our dotenv file in this project
 .venv
 env/
 venv/
