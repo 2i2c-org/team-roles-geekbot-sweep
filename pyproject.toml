@@ -1,8 +1,7 @@
 [tool.poetry]
 name = "team-roles-sweep"
 version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+description = "A tool to automatically assign 2i2c Tech Team members to various Team Roles"
 license = "MIT"
 
 [tool.poetry.dependencies]
