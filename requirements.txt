@@ -1,4 +1,0 @@
-# Packages required for running the app
-#
-# slack-sdk for interacting with the Slack API
-slack-sdk==3.15.2

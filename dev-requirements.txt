@@ -1,4 +1,0 @@
-# Extra packages useful for developing the app
-#
-# rich for pretty printing json data
-rich==12.3.0
