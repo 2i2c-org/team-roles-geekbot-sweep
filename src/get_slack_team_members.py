@@ -2,11 +2,10 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from rich import print_json
 from slack_sdk import WebClient
 
 
-class TeamRolesGeekbotSweep:
+class SlackTeamMembers:
     def __init__(self):
         # Load variables from a .env file
         project_path = Path(__file__).parent.parent
@@ -67,7 +66,5 @@ class TeamRolesGeekbotSweep:
 
 
 if __name__ == "__main__":
-    app = TeamRolesGeekbotSweep()
+    app = SlackTeamMembers()
     usernames = app.get_users_in_team()
-    print(f"Users in {app.team_name}:")
-    print_json(data=usernames)
