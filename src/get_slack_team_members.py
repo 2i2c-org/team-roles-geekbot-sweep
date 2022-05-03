@@ -1,4 +1,5 @@
 import os
+from collections import OrderedDict
 
 from slack_sdk import WebClient
 
@@ -42,20 +43,23 @@ class SlackTeamMembers:
             params={"user": user_id},
         )
 
-        username = response["user"]["profile"]["display_name"]
+        username = response["user"]["profile"]["display_name_normalized"]
         if username == "":
-            username = response["user"]["profile"]["real_name"]
+            username = response["user"]["profile"]["real_name_normalized"]
 
         return username
 
     def get_users_in_team(self):
         self._get_user_ids()
 
-        user_handles = []
+        user_handles_and_ids = {}
         for user_id in self.user_ids:
-            user_handles.append(self._convert_user_id_to_handle(user_id))
+            user_handle = self._convert_user_id_to_handle(user_id)
+            user_handles_and_ids[user_handle] = user_id
 
-        return sorted(user_handles)
+        user_handles_and_ids = OrderedDict(sorted(user_handles_and_ids.items()))
+
+        return user_handles_and_ids
 
 
 if __name__ == "__main__":

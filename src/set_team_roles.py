@@ -7,6 +7,9 @@ from get_slack_team_members import SlackTeamMembers
 
 class TeamRoles:
     def __init__(self):
+        # Instatiate the SlackTeamMembers class
+        self.slack_team_members = SlackTeamMembers()
+
         # Read in who is serving in which role from a JSON file
         project_path = Path(__file__).parent.parent
         self.roles_path = project_path.joinpath("team-roles.json")
@@ -19,20 +22,19 @@ class TeamRoles:
             self.team_roles = json.load(stream)
 
     def _find_next_team_member(self, current_member):
-        app = SlackTeamMembers()
-        team_members = app.get_users_in_team()
+        team_members_dict = self.slack_team_members.get_users_in_team()
 
         index = next(
             idx
-            for (idx, team_member) in enumerate(team_members)
+            for (idx, team_member) in enumerate(team_members_dict.keys())
             if team_member == current_member
         )
 
         # If we reach the end of the list, we want to wrap around and start again
-        if len(team_members) == (index + 1):
+        if len(team_members_dict) == (index + 1):
             index = -1
 
-        return team_members[index + 1]
+        return list(team_members_dict.keys())[index + 1]
 
     def _update_meeting_facilitator_role(self):
         self.team_roles["meeting_facilitator"]["outgoing"] = self.team_roles[
