@@ -3,6 +3,7 @@ name = "team-roles-sweep"
 version = "0.1.0"
 description = "A tool to automatically assign 2i2c Tech Team members to various Team Roles"
 license = "MIT"
+authors = []
 
 [tool.poetry.dependencies]
 python = "^3.9"
