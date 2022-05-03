@@ -1,8 +1,9 @@
 import os
-from dotenv import load_dotenv
-from slack_sdk import WebClient
 from pathlib import Path
+
+from dotenv import load_dotenv
 from rich import print_json
+from slack_sdk import WebClient
 
 
 class TeamRolesGeekbotSweep:
@@ -16,7 +17,7 @@ class TeamRolesGeekbotSweep:
         self.team_name = os.getenv("TEAM_NAME")
 
         # Instantiate a SLACK API client
-        self.client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
+        self.client = WebClient(token=os.environ["SLACK_BOT_TOKEN"])
 
     def _get_team_id(self):
         # Get all usergroups in workspace
@@ -25,7 +26,11 @@ class TeamRolesGeekbotSweep:
         )
 
         # Find IDs for the self.team_name usergroup
-        index = next(idx for (idx, usergroup) in enumerate(response["usergroups"]) if usergroup["handle"] == self.team_name)
+        index = next(
+            idx
+            for (idx, usergroup) in enumerate(response["usergroups"])
+            if usergroup["handle"] == self.team_name
+        )
         self.usergroup_id = response["usergroups"][index]["id"]
         self.team_id = response["usergroups"][index]["team_id"]
 
