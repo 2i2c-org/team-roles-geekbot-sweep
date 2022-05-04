@@ -69,6 +69,16 @@ class GeekbotStandup:
         """
         return question
 
+    def _generate_question_support_steward(self):
+        question = """
+        It is your turn to be the support steward! Please make sure to watch fir any
+        incoming tickets at https://2i2c.freshdesk.com/a/tickets/filters/all_tickets
+        If you are going to be away for a large part or your stewardship, please
+        arrange cover with a member of the Tech Team.
+        Reply 'ok' to this message to acknowledge your role.
+        """
+        return question
+
     def create_meeting_facilitator_standup(self):
         # Set variables
         self.standup_name = "MeetingFacilitatorStandup"
@@ -84,6 +94,30 @@ class GeekbotStandup:
 
         # Generate the standup question
         question = self._generate_question_meeting_facilitator()
+        metadata["questions"] = [{"question": question}]
+
+        # Create the standup
+        response = self.geekbot_session.post(
+            "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
+        )
+        print_json(data=response.json())
+        response.raise_for_status()
+
+    def create_support_steward_standup(self):
+        # Set variables
+        self.standup_name = "SupportStewardStandup"
+        self.standup_day = "Wed"
+        self.broadcast_channel = "#support-freshdesk"
+        self.roles = self.roles["support_steward"]
+
+        # First, delete previous standup
+        self._delete_previous_standup()
+
+        # Generate metadata for the standup
+        metadata = self._generate_standup_metadata()
+
+        # Generate the standup question
+        question = self._generate_question_support_steward()
         metadata["questions"] = [{"question": question}]
 
         # Create the standup
