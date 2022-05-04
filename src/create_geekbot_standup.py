@@ -3,6 +3,7 @@ import json
 import argparse
 from requests import Session
 from pathlib import Path
+from rich import print_json
 
 
 class GeekbotStandup:
@@ -41,7 +42,7 @@ class GeekbotStandup:
     def _delete_previous_standup(self):
         standup = self._get_standup()
         response = self.geekbot_session.delete("/".join([self.geekbot_api_url, "v1", "standups", standup["id"]]))
-        print(response.json())
+        print_json(data=response.json())
         response.raise_for_status()
 
     def _generate_standup_metadata(self):
@@ -89,7 +90,7 @@ class GeekbotStandup:
         response = self.geekbot_session.post(
             "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
         )
-        print(response.json())
+        print_json(data=response.json())
         response.raise_for_status()
 
 
