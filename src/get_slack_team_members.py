@@ -1,3 +1,6 @@
+"""
+Functions to get Slack members who are in a given usergroup (or "team")
+"""
 import os
 from collections import OrderedDict
 
@@ -5,6 +8,10 @@ from slack_sdk import WebClient
 
 
 class SlackTeamMembers:
+    """
+    Find the members of a given Slack usergroup (colloquially known as a "team")
+    """
+
     def __init__(self):
         # Set variables
         self.team_name = os.environ["TEAM_NAME"]
@@ -13,6 +20,9 @@ class SlackTeamMembers:
         self.client = WebClient(token=os.environ["SLACK_BOT_TOKEN"])
 
     def _get_team_id(self):
+        """
+        Retrieve the ID of a given Slack team
+        """
         # Get all usergroups in workspace
         response = self.client.api_call(
             api_method="usergroups.list",
@@ -27,6 +37,9 @@ class SlackTeamMembers:
         self.usergroup_id = response["usergroups"][index]["id"]
 
     def _get_user_ids(self):
+        """
+        Retrieve the user IDs of the members of a given usergroup
+        """
         self._get_team_id()
 
         # Find all user IDs in the self.team_name usergroup
@@ -37,6 +50,14 @@ class SlackTeamMembers:
         self.user_ids = response["users"]
 
     def _convert_user_id_to_handle(self, user_id):
+        """For a given user ID, retrieve their 'real name', or display name is available
+
+        Args:
+            user_id (str): A Slack user ID
+
+        Returns:
+            str: The 'real name' or display name associated with the given user ID
+        """
         # Convert user IDs to 'real names', or 'display names' if available
         response = self.client.api_call(
             api_method="users.info",
@@ -50,6 +71,13 @@ class SlackTeamMembers:
         return username
 
     def get_users_in_team(self):
+        """Retrieve the members of a Slack usergroup
+
+        Returns:
+            dict: A dictionary of members of a Slack usergroup. Keys are the Slack users'
+                'real names', or display names if available, and values are the users'
+                IDs.
+        """
         self._get_user_ids()
 
         user_handles_and_ids = {}
