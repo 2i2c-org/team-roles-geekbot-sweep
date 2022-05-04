@@ -34,28 +34,44 @@ class TeamRoles:
         if len(team_members_dict) == (index + 1):
             index = -1
 
-        return list(team_members_dict.keys())[index + 1]
+        return list(team_members_dict.items())[index + 1]
 
     def _update_meeting_facilitator_role(self):
-        self.team_roles["meeting_facilitator"]["outgoing"] = self.team_roles[
+        self.team_roles["meeting_facilitator"]["outgoing"]["name"] = self.team_roles[
             "meeting_facilitator"
-        ]["incoming"]
-        self.team_roles["meeting_facilitator"][
-            "incoming"
-        ] = self._find_next_team_member(
-            self.team_roles["meeting_facilitator"]["outgoing"]
+        ]["incoming"]["name"]
+        self.team_roles["meeting_facilitator"]["outgoing"]["id"] = self.team_roles[
+            "meeting_facilitator"
+        ]["incoming"]["id"]
+
+        next_member_name, next_member_id = self._find_next_team_member(
+            self.team_roles["meeting_facilitator"]["outgoing"]["name"]
         )
 
+        self.team_roles["meeting_facilitator"]["incoming"]["name"] = next_member_name
+        self.team_roles["meeting_facilitator"]["incoming"]["id"] = next_member_id
+
     def _update_support_steward_role(self):
-        self.team_roles["support_steward"]["outgoing"] = self.team_roles[
+        self.team_roles["support_steward"]["outgoing"]["name"] = self.team_roles[
             "support_steward"
-        ]["current"]
-        self.team_roles["support_steward"]["current"] = self.team_roles[
+        ]["current"]["name"]
+        self.team_roles["support_steward"]["outgoing"]["id"] = self.team_roles[
             "support_steward"
-        ]["incoming"]
-        self.team_roles["support_steward"]["incoming"] = self._find_next_team_member(
-            self.team_roles["support_steward"]["current"]
+        ]["current"]["id"]
+
+        self.team_roles["support_steward"]["current"]["name"] = self.team_roles[
+            "support_steward"
+        ]["incoming"]["name"]
+        self.team_roles["support_steward"]["current"]["id"] = self.team_roles[
+            "support_steward"
+        ]["incoming"]["id"]
+
+        next_member_name, next_member_id = self._find_next_team_member(
+            self.team_roles["support_steward"]["current"]["name"]
         )
+
+        self.team_roles["support_steward"]["incoming"]["name"] = next_member_name
+        self.team_roles["support_steward"]["incoming"]["id"] = next_member_id
 
     def update_roles(
         self, update_meeting_facilitator=False, update_support_steward=False
