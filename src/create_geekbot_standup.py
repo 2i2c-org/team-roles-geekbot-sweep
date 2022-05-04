@@ -86,7 +86,7 @@ class GeekbotStandup:
             "timezone": "",  # By leaving this blank it will trigger in user's timezone
             "wait_time": 10,
             "days": [self.standup_day],
-            "users": [self.roles["incoming"]["id"]],
+            "users": [self.roles["id"]],
             "sync_channel_members": False,
             "personalized": False,
         }
@@ -104,7 +104,7 @@ class GeekbotStandup:
         It is your turn to facilitate this month's team meeting! You can check the team
         calendar for when this month's meeting is scheduled for here:
         https://calendar.google.com/calendar/embed?src=c_4hjjouojd8psql9i1a8nd1uff4%%40group.calendar.google.com
-        Reply 'ok' to this message to acknowledge your role. If you are not able to
+        Reply 'ok' to this message to acknowledge your role. Or if you are not able to
         fulfil this role at this time, please arrange cover with a member of the Tech Team.
         """
         return question
@@ -120,9 +120,9 @@ class GeekbotStandup:
         question = """
         It is your turn to be the support steward! Please make sure to watch fir any
         incoming tickets at https://2i2c.freshdesk.com/a/tickets/filters/all_tickets
-        If you are going to be away for a large part or your stewardship, please
-        arrange cover with a member of the Tech Team.
-        Reply 'ok' to this message to acknowledge your role.
+        Reply 'ok' to this message to acknowledge your role. Or if you are going to be
+        away for a large part or your stewardship, please arrange cover with a member of
+        the Tech Team.
         """
         return question
 
@@ -161,7 +161,7 @@ class GeekbotStandup:
         self.standup_name = "SupportStewardStandup"
         self.standup_day = "Wed"
         self.broadcast_channel = "#support-freshdesk"
-        self.roles = self.roles["support_steward"]
+        self.roles = self.roles["support_steward"]["incoming"]
 
         # First, delete previous standup
         self._delete_previous_standup()

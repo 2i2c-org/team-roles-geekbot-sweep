@@ -39,14 +39,8 @@ For the Support Steward, we track both the current and incoming team members as 
 ```json
 {
     "meeting_facilitator": {
-        "incoming": {
-            "name": "display_name",
-            "id": "slack_id"
-        },
-        "outgoing": {
-            "name": "display_name",
-            "id": "slack_id"
-        }
+        "name": "display_name",
+        "id": "slack_id"
     },
     "support_steward": {
         "incoming": {
@@ -54,10 +48,6 @@ For the Support Steward, we track both the current and incoming team members as 
             "id": "slack_id"
         },
         "current": {
-            "name": "display_name",
-            "id": "slack_id"
-        },
-        "outgoing": {
             "name": "display_name",
             "id": "slack_id"
         }

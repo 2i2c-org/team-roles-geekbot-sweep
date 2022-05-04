@@ -57,35 +57,19 @@ class TeamRoles:
         """
         Iterate the Meeting Facilitator role through the team
         """
-        # The incoming team member becomes the outgoing team member
-        self.team_roles["meeting_facilitator"]["outgoing"]["name"] = self.team_roles[
-            "meeting_facilitator"
-        ]["incoming"]["name"]
-        self.team_roles["meeting_facilitator"]["outgoing"]["id"] = self.team_roles[
-            "meeting_facilitator"
-        ]["incoming"]["id"]
-
         # Work out who is next
         next_member_name, next_member_id = self._find_next_team_member(
-            self.team_roles["meeting_facilitator"]["outgoing"]["name"]
+            self.team_roles["meeting_facilitator"]["name"]
         )
 
-        # The next team member is assigned to "incoming"
-        self.team_roles["meeting_facilitator"]["incoming"]["name"] = next_member_name
-        self.team_roles["meeting_facilitator"]["incoming"]["id"] = next_member_id
+        # Overwrite the meeting facilitator with the next team member
+        self.team_roles["meeting_facilitator"]["name"] = next_member_name
+        self.team_roles["meeting_facilitator"]["id"] = next_member_id
 
     def _update_support_steward_role(self):
         """
         Iterate the Support Steward role through the team
         """
-        # The current team member becomes the outgoing team member
-        self.team_roles["support_steward"]["outgoing"]["name"] = self.team_roles[
-            "support_steward"
-        ]["current"]["name"]
-        self.team_roles["support_steward"]["outgoing"]["id"] = self.team_roles[
-            "support_steward"
-        ]["current"]["id"]
-
         # The incoming team member becomes the current team member
         self.team_roles["support_steward"]["current"]["name"] = self.team_roles[
             "support_steward"
