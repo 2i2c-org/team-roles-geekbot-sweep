@@ -1,8 +1,9 @@
-import os
-import json
 import argparse
-from requests import Session
+import json
+import os
 from pathlib import Path
+
+from requests import Session
 from rich import print_json
 
 
@@ -21,12 +22,10 @@ class GeekbotStandup:
 
         # Check file exists before reading it
         if not os.path.exists(roles_path):
-            raise FileNotFoundError(
-                f"File must exist to continue! {roles_path}"
-            )
+            raise FileNotFoundError(f"File must exist to continue! {roles_path}")
 
         # Read in team-roles.json
-        with open(roles_path, "r") as stream:
+        with open(roles_path) as stream:
             self.roles = json.load(stream)
 
     def _create_geekbot_session(self):
@@ -35,13 +34,17 @@ class GeekbotStandup:
         return geekbot_session
 
     def _get_standup(self):
-        response = self.geekbot_session.get("/".join([self.geekbot_api_url, "v1", "standups"]))
+        response = self.geekbot_session.get(
+            "/".join([self.geekbot_api_url, "v1", "standups"])
+        )
         response.raise_for_status()
         return next(x for x in response.json() if x["name"] == self.standup_name)
 
     def _delete_previous_standup(self):
         standup = self._get_standup()
-        response = self.geekbot_session.delete("/".join([self.geekbot_api_url, "v1", "standups", standup["id"]]))
+        response = self.geekbot_session.delete(
+            "/".join([self.geekbot_api_url, "v1", "standups", standup["id"]])
+        )
         print_json(data=response.json())
         response.raise_for_status()
 
@@ -132,7 +135,9 @@ def main():
     parser = argparse.ArgumentParser()
     subparser = parser.add_subparsers(required=True, dest="command")
 
-    meeting_facilitator_parser = subparser.add_parser("create-meeting-facilitator-standup")
+    meeting_facilitator_parser = subparser.add_parser(
+        "create-meeting-facilitator-standup"
+    )
     support_steward_parser = subparser.add_parser("create-support-steward-standup")
 
     args = parser.parse_args()
