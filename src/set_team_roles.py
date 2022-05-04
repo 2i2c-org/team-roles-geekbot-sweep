@@ -83,7 +83,7 @@ class TeamRoles:
             self._update_support_steward_role()
 
         with open(self.roles_path, "w") as f:
-            json.dump(self.team_roles, f)
+            json.dump(self.team_roles, f, indent=4, sort_keys=False)
 
 
 if __name__ == "__main__":
