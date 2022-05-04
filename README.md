@@ -108,9 +108,10 @@ optional arguments:
 This script reads in [`team-roles.json`](#team-roles-json-file-structure) after it has been modified by [`set_team_roles.py`](#set_team_rolespy) and generates a Geekbot standup to notify the incoming team member for their upcoming role.
 
 The `MeetingFacilitatorStandup` broadcasts to the `team-updates` Slack channel, and the `SupportStewardStandup` broadcasts to the `support-freshdesk` channel.
+The [Geekbot app](https://geekbot.com/) needs to be installed to the Slack workspace and invited to the channels to which it will broadcast.
 
 The script requires the `GEEKBOT_API_KEY` environment variable to be set with a valid API key for communicating with Geekbot's API.
-Command line options are provided to sleect which role a standup should be created for.
+Command line options are provided to select which role a standup should be created for.
 
 **Command line usage:**
 
