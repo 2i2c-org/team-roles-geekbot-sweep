@@ -50,7 +50,7 @@ class SlackTeamMembers:
         self.user_ids = response["users"]
 
     def _convert_user_id_to_handle(self, user_id):
-        """For a given user ID, retrieve their 'real name', or display name is available
+        """For a given user ID, retrieve their 'real name', or display name if available
 
         Args:
             user_id (str): A Slack user ID
