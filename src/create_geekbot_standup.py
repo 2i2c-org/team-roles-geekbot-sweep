@@ -1,3 +1,7 @@
+"""
+Functions to create Geekbot Standups in Slack to aid the transition of our Team Roles
+through the Tech Team
+"""
 import argparse
 import json
 import os
@@ -8,6 +12,10 @@ from rich import print_json
 
 
 class GeekbotStandup:
+    """
+    Mange Geekbot Standups in Slack for transitioning our Team Roles
+    """
+
     def __init__(self):
         # Set variables
         self.geekbot_api_url = "https://api.geekbot.io"
@@ -29,11 +37,23 @@ class GeekbotStandup:
             self.roles = json.load(stream)
 
     def _create_geekbot_session(self):
+        """Create a Session loaded with a Geekbot API key to make requests
+
+        Returns:
+            session obj: A session object loaded with an API key in its headers with
+                permissions to interact with the Geekbot API
+        """
         geekbot_session = Session()
         geekbot_session.headers.update({"Authorization": self.geekbot_api_key})
         return geekbot_session
 
     def _get_standup(self):
+        """Retrieve information about an existing standup
+
+        Returns:
+            dict: Dictionary containing information about a chosen standup that exists
+                in Geekbot
+        """
         response = self.geekbot_session.get(
             "/".join([self.geekbot_api_url, "v1", "standups"])
         )
@@ -41,6 +61,9 @@ class GeekbotStandup:
         return next(x for x in response.json() if x["name"] == self.standup_name)
 
     def _delete_previous_standup(self):
+        """
+        Delete an existing Geekbot standup
+        """
         standup = self._get_standup()
         response = self.geekbot_session.delete(
             "/".join([self.geekbot_api_url, "v1", "standups", standup["id"]])
@@ -49,6 +72,13 @@ class GeekbotStandup:
         response.raise_for_status()
 
     def _generate_standup_metadata(self):
+        """Generate metadata for a new Geekbot standup. This includes information such as:
+        when the standup happens, who will participate in the standup, and which slack
+        channel the result will be broadcast to.
+
+        Returns:
+            dict: The metadata required to describe a new Geekbot standup
+        """
         metadata = {
             "name": self.standup_name,
             "channel": self.broadcast_channel,
@@ -63,6 +93,13 @@ class GeekbotStandup:
         return metadata
 
     def _generate_question_meeting_facilitator(self):
+        """Generate the question that will be asked of the the new Meeting Facilitator
+        in the standup. It will be added to the metadata generated in
+        _generate_standup_metadata.
+
+        Returns:
+            str: The question to be posed to the new Meeting Facilitator
+        """
         question = """
         It is your turn to facilitate this month's team meeting! You can check the team
         calendar for when this month's meeting is scheduled for here:
@@ -73,6 +110,13 @@ class GeekbotStandup:
         return question
 
     def _generate_question_support_steward(self):
+        """Generate the question that will be asked of the the new Support Steward
+        in the standup. It will be added to the metadata generated in
+        _generate_standup_metadata.
+
+        Returns:
+            str: The question to be posed to the new Support Steward
+        """
         question = """
         It is your turn to be the support steward! Please make sure to watch fir any
         incoming tickets at https://2i2c.freshdesk.com/a/tickets/filters/all_tickets
@@ -83,6 +127,9 @@ class GeekbotStandup:
         return question
 
     def create_meeting_facilitator_standup(self):
+        """
+        Create a Geekbot Standup to transition the Meeting Facilitator role
+        """
         # Set variables
         self.standup_name = "MeetingFacilitatorStandup"
         self.standup_day = "Mon"
@@ -107,6 +154,9 @@ class GeekbotStandup:
         response.raise_for_status()
 
     def create_support_steward_standup(self):
+        """
+        Create a Geekbot standup to transition the Support Steward role
+        """
         # Set variables
         self.standup_name = "SupportStewardStandup"
         self.standup_day = "Wed"
@@ -132,18 +182,31 @@ class GeekbotStandup:
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    subparser = parser.add_subparsers(required=True, dest="command")
+    # Create a command line parser
+    parser = argparse.ArgumentParser(
+        description="""
+            Create Geekbot standup apps to manage the transition of Team Roles through the Tech Team
+        """
+    )
+    subparser = parser.add_subparsers(
+        required=True, dest="command", help="Available commands"
+    )
 
     meeting_facilitator_parser = subparser.add_parser(
-        "create-meeting-facilitator-standup"
+        "create-meeting-facilitator-standup",
+        help="Create a Geekbot standup to transition the Meeting Facilitator role",
     )
-    support_steward_parser = subparser.add_parser("create-support-steward-standup")
+    support_steward_parser = subparser.add_parser(
+        "create-support-steward-standup",
+        help="Create a Geekbot standup to transition the Support Steward role",
+    )
 
     args = parser.parse_args()
 
+    # Instantiate the Geekbot Standup class
     standup = GeekbotStandup()
 
+    # Create a standup for the chosen role
     if args.command == "create-meeting-facilitator-standup":
         standup.create_meeting_facilitator_standup()
     elif args.command == "create-support-steward-standup":
