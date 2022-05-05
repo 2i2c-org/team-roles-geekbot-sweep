@@ -8,8 +8,11 @@ on:
 jobs:
   is-four-weeks:
     runs-on: ubuntu-latest
+    outputs:
+      continue-workflow: ${{ steps.decision.outputs.continue-workflow }}
     steps:
-      - name: ""
+      - name: Decide to if 4 weeks have passed and the workflow should continue
+        id: decision
         shell: python
         run: |
           from datetime import date
@@ -25,3 +28,10 @@ jobs:
 
           # Set output variable for use in further jobs
           print(f"::set-output name=continue-job::{is_four_weeks}")
+
+  echo-output:
+    runs-on: ubuntu-latest
+    needs: [is-four-weeks]
+    steps:
+      - run: |
+          echo "${{ needs.is-four-weeks.outputs.continue-worflow }}"
