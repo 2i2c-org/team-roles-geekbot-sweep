@@ -53,6 +53,11 @@ class GeekbotStandup:
         return geekbot_session
 
     def _check_standup_exists(self):
+        """Check if the standup already exists. If it does, return its ID.
+
+        Returns:
+            int: The ID number of the standup, if it exists. None otherwise.
+        """
         response = self.geekbot_session.get(
             "/".join([self.geekbot_api_url, "v1", "standups"])
         )
