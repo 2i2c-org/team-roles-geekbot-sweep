@@ -6,6 +6,8 @@ import json
 import os
 from pathlib import Path
 
+from loguru import logger
+
 from .get_slack_team_members import SlackTeamMembers
 
 
@@ -33,6 +35,8 @@ class TeamRoles:
         """
         Check that the team member allocated as the standup manager has an ID set
         """
+        logger.info("Checking the standup manager has an ID set")
+
         if (self.team_roles["standup_manager"].get("id") is None) or (
             self.team_roles["standup_manager"]["id"] == ""
         ):
@@ -66,6 +70,8 @@ class TeamRoles:
         """
         Iterate the Meeting Facilitator role through the team
         """
+        logger.info("Finding the next team member in the meeting facilitator role")
+
         # Work out who is next
         next_member_name, next_member_id = self._find_next_team_member(
             self.team_roles["meeting_facilitator"]["name"]
@@ -79,6 +85,8 @@ class TeamRoles:
         """
         Iterate the Support Steward role through the team
         """
+        logger.info("Finding the next team member in the support steward role")
+
         # The incoming team member becomes the current team member
         self.team_roles["support_steward"]["current"]["name"] = self.team_roles[
             "support_steward"
@@ -114,12 +122,15 @@ class TeamRoles:
         self._check_managers_id_is_set()
 
         if update_meeting_facilitator:
+            logger.info("Updating the Meeting Facilitator role")
             self._update_meeting_facilitator_role()
 
         if update_support_steward:
+            logger.info("Updating the Support Steward role")
             self._update_support_steward_role()
 
         # Write the updated roles to a JSON file
+        logger.info("Writing roles to team-roles.json")
         with open(self.roles_path, "w") as f:
             json.dump(self.team_roles, f, indent=4, sort_keys=False)
 

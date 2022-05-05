@@ -10,6 +10,7 @@ python = "^3.9"
 slack-sdk = "^3.15"
 requests = "^2.27"
 rich = "^12.3"
+loguru = "^0.6"
 
 [tool.poetry.scripts]
 list-team-members = "src.get_slack_team_members:main"

@@ -4,6 +4,7 @@ Functions to get Slack members who are in a given usergroup (or "team")
 import os
 from collections import OrderedDict
 
+from loguru import logger
 from slack_sdk import WebClient
 
 
@@ -23,6 +24,8 @@ class SlackTeamMembers:
         """
         Retrieve the ID of a given Slack team
         """
+        logger.info(f"Retrieving ID for Slack team: {self.team_name}")
+
         # Get all usergroups in workspace
         response = self.client.api_call(
             api_method="usergroups.list",
@@ -41,6 +44,8 @@ class SlackTeamMembers:
         Retrieve the user IDs of the members of a given usergroup
         """
         self._get_team_id()
+
+        logger.info(f"Retrieving user IDs for members of Slack team: {self.team_name}")
 
         # Find all user IDs in the self.team_name usergroup
         response = self.client.api_call(
@@ -80,11 +85,13 @@ class SlackTeamMembers:
         """
         self._get_user_ids()
 
+        logger.info("Converting user IDs into display names")
         user_handles_and_ids = {}
         for user_id in self.user_ids:
             user_handle = self._convert_user_id_to_handle(user_id)
             user_handles_and_ids[user_handle] = user_id
 
+        # Sort the dictionary alphabetically by key, i.e., display names
         user_handles_and_ids = OrderedDict(sorted(user_handles_and_ids.items()))
 
         return user_handles_and_ids
