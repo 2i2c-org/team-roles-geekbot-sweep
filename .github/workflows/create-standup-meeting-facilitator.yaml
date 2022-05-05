@@ -26,9 +26,9 @@ jobs:
   is-four-weeks:
     runs-on: ubuntu-latest
     outputs:
-      continue-workflow: "True" # ${{ steps.decision.outputs.continue-workflow }}
+      continue-workflow: ${{ steps.decision.outputs.continue-workflow }}
     steps:
-      - name: Decide to if 4 weeks have passed and the workflow should continue
+      - name: Decide if 4 weeks have passed and the workflow should continue
         id: decision
         shell: python
         run: |
@@ -46,18 +46,11 @@ jobs:
           # Set output variable for use in further jobs
           print(f"::set-output name=continue-workflow::{is_four_weeks}")
 
-  echo-output:
-    runs-on: ubuntu-latest
-    needs: [is-four-weeks]
-    steps:
-      - run: |
-          echo "${{ needs.is-four-weeks.outputs.continue-workflow }}"
-
   create-standup:
     runs-on: ubuntu-latest
-    # environment: run-slack-bot
+    environment: run-slack-bot
     needs: [is-four-weeks]
-    if: needs.is-four-weeks.outputs.continue-workflow == 'True'
+    if: needs.is-four-weeks.outputs.continue-workflow == 'True' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -74,14 +67,22 @@ jobs:
           poetry install
 
       - name: Update team member in role
+        if: github.event_name == 'schedule' || github.event.inputs.update-roles
         run: |
-          echo "${TEAM_NAME}"
+          poetry run update-team-role meeting-facilitator
         env:
           TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
-          # SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
+          SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
 
-      # - name: Add and Commit updated team-roles.json file
-      #   uses: EndBug/add-and-commit@v9
-      #   with:
-      #     add: team-roles.json
-      #     message: "Update the Team Roles JSON file"
+      - name: Add and Commit updated team-roles.json file
+        if: github.event_name == 'schedule' || github.event.inputs.update-roles
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: team-roles.json
+          message: "Update the Team Roles JSON file"
+
+      - name: Create a standup for the Meeting Facilitator
+        run: |
+          poetry run create-standup meeting-facilitator
+        env:
+          GEEKBOT_API_KEY: "${{ secrets.GEEKBOT_API_KEY }}"
