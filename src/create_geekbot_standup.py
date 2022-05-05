@@ -21,6 +21,11 @@ class GeekbotStandup:
         self.geekbot_api_url = "https://api.geekbot.io"
         self.geekbot_api_key = os.environ["GEEKBOT_API_KEY"]
 
+        try:
+            self.CI_env = os.environ["CI"]
+        except KeyError:
+            self.CI_env = False
+
         # Open a Geekbot session
         self.geekbot_session = self._create_geekbot_session()
 
@@ -162,7 +167,9 @@ class GeekbotStandup:
                 "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
             )
 
-        print_json(data=response.json())
+        if not self.CI_env:
+            print_json(data=response.json())
+
         response.raise_for_status()
 
     def create_support_steward_standup(self):
@@ -190,7 +197,10 @@ class GeekbotStandup:
         response = self.geekbot_session.post(
             "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
         )
-        print_json(data=response.json())
+
+        if not self.CI_env:
+            print_json(data=response.json())
+
         response.raise_for_status()
 
 
