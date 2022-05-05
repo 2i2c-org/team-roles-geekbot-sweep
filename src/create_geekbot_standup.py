@@ -74,7 +74,10 @@ class GeekbotStandup:
         response = self.geekbot_session.delete(
             "/".join([self.geekbot_api_url, "v1", "standups", standup["id"]])
         )
-        print_json(data=response.json())
+
+        if not self.CI_env:
+            print_json(data=response.json())
+
         response.raise_for_status()
 
     def _generate_standup_metadata(self):
