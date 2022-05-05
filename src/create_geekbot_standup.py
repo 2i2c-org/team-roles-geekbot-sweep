@@ -89,7 +89,7 @@ class GeekbotStandup:
             "name": self.standup_name,
             "channel": self.broadcast_channel,
             "time": "10:00:00",
-            "timezone": "",  # By leaving this blank it will trigger in user's timezone
+            "timezone": "user_local",
             "wait_time": 10,
             "days": [self.standup_day],
             "users": [self.roles["id"]],
