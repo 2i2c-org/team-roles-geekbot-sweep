@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 
-from get_slack_team_members import SlackTeamMembers
+from .get_slack_team_members import SlackTeamMembers
 
 
 class TeamRoles:
@@ -114,15 +114,16 @@ def main():
     parser = argparse.ArgumentParser(
         description="Update our Team Roles by iterating through members of the Tech Team"
     )
+    subparser = parser.add_subparsers(
+        required=True, dest="command", help="Available commands"
+    )
 
-    parser.add_argument(
-        "--update-meeting-facilitator",
-        action="store_true",
+    meeting_facilitator_parser = subparser.add_parser(
+        "meeting-facilitator",
         help="Update the Meeting Facilitator role",
     )
-    parser.add_argument(
-        "--update-support-steward",
-        action="store_true",
+    support_steward_parser = subparser.add_parser(
+        "support-steward",
         help="Update the Support Steward role",
     )
 
@@ -130,11 +131,12 @@ def main():
 
     # Instantiate the TeamRoles class
     roles = TeamRoles()
+
     # Update the Team Roles
-    roles.update_roles(
-        update_meeting_facilitator=args.update_meeting_facilitator,
-        update_support_steward=args.update_support_steward,
-    )
+    if args.command == "meeting_facilitator":
+        roles.update_roles(update_meeting_facilitator=True)
+    elif args.command == "support_steward":
+        roles.update_roles(update_support_steward=True)
 
 
 if __name__ == "__main__":

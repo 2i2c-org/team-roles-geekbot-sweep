@@ -193,11 +193,11 @@ def main():
     )
 
     meeting_facilitator_parser = subparser.add_parser(
-        "create-meeting-facilitator-standup",
+        "meeting-facilitator",
         help="Create a Geekbot standup to transition the Meeting Facilitator role",
     )
     support_steward_parser = subparser.add_parser(
-        "create-support-steward-standup",
+        "support-steward",
         help="Create a Geekbot standup to transition the Support Steward role",
     )
 
@@ -207,9 +207,9 @@ def main():
     standup = GeekbotStandup()
 
     # Create a standup for the chosen role
-    if args.command == "create-meeting-facilitator-standup":
+    if args.command == "meeting-facilitator":
         standup.create_meeting_facilitator_standup()
-    elif args.command == "create-support-steward-standup":
+    elif args.command == "support-steward":
         standup.create_support_steward_standup()
 
 

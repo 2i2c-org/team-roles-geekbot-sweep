@@ -90,9 +90,13 @@ class SlackTeamMembers:
         return user_handles_and_ids
 
 
-if __name__ == "__main__":
+def main():
     from rich import print_json
 
     app = SlackTeamMembers()
     usernames = app.get_users_in_team()
     print_json(data=usernames)
+
+
+if __name__ == "__main__":
+    main()
