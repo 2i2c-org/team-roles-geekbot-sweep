@@ -171,10 +171,17 @@ class GeekbotStandup:
         question = self._generate_question_meeting_facilitator()
         metadata["questions"] = [{"question": question}]
 
-        # Create the standup
-        response = self.geekbot_session.post(
-            "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
-        )
+        if self.standup_exists:
+            # Replace the existing standup
+            response = self.geekbot_session.put(
+                "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)]),
+                json=metadata,
+            )
+        else:
+            # Create the standup
+            response = self.geekbot_session.post(
+                "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
+            )
 
         if not self.CI_env:
             print_json(data=response.json())
@@ -203,10 +210,17 @@ class GeekbotStandup:
         question = self._generate_question_support_steward()
         metadata["questions"] = [{"question": question}]
 
-        # Create the standup
-        response = self.geekbot_session.post(
-            "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
-        )
+        if self.standup_exists:
+            # Replace the existing standup
+            response = self.geekbot_session.put(
+                "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)]),
+                json=metadata,
+            )
+        else:
+            # Create the standup
+            response = self.geekbot_session.post(
+                "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
+            )
 
         if not self.CI_env:
             print_json(data=response.json())
