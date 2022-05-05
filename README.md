@@ -159,7 +159,7 @@ In addition to the two environment variables required by `get_slack_team_members
 - `CURRENT_SUPPORT_STEWARD`: The Slack display name of the team member currently serving in the Support Steward role (i.e. for more than two weeks)
 - `INCOMING_SUPPORT_STEWARD`: The Slack display name of the team member most recently taking up service in the Support Steward role (i.e. for less than two weeks)
 
-This script is paired with the [`populate-current-roles` workflow](#populate-current-rolesyaml) to upload `team-roles.json` as an artifact for future CI/CD runs of the bot.
+This script is paired with the [`populate-current-roles` workflow](#populate-current-rolesyaml) to commit the updated `team-roles.json` file to the repo for future CI/CD runs of the bot.
 
 **Command line usage:**
 
@@ -175,6 +175,6 @@ All our CI/CD workflows are powered by [GitHub Actions](https://docs.github.com/
 
 ### `populate-current-roles.yaml`
 
-This workflow runs the [`set_current_roles.py` script](#set_current_rolespy) to generate an initial `team-roles.json` file and upload it as an artifact for use in future GitHub Actions workflow runs.
+This workflow runs the [`set_current_roles.py` script](#set_current_rolespy) to generate an initial `team-roles.json` file and commit it to the repo for use in future GitHub Actions workflow runs.
 It can be triggered manually and requires the environment variables required by `set_current_roles.py` and [`get_slack_team_members.py`](#get_slack_team_memberspy) to be provided as inputs.
 Note that `SLACK_BOT_TOKEN` is provided via a GitHub Action Environment Secret.
