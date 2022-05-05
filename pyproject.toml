@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "team-roles-sweep"
+name = "src"
 version = "0.1.0"
 description = "A tool to automatically assign 2i2c Tech Team members to various Team Roles"
 license = "MIT"
@@ -10,6 +10,11 @@ python = "^3.9"
 slack-sdk = "^3.15"
 requests = "^2.27"
 rich = "^12.3"
+
+[tool.poetry.scripts]
+list-team-members = "src.get_slack_team_members:main"
+update-team-role = "src.set_team_roles:main"
+create-standup = "src.create_geekbot_standup:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
