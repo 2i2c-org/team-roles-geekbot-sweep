@@ -2,14 +2,34 @@ name: "Create Standup: Meeting Facilitator"
 
 on:
   workflow_dispatch:
+    update-roles:
+      required: false
+      type: boolean
+      default: false
+      description: |
+        Whether or not to update the Team Roles or proceed with those currently saved
+        in the team-roles.json file. If True, the file will be updated and new members
+        will be used in the standup. If False (default), the file will not be updated
+        and the members currently listed there will be used in the standup.
+    team-name:
+      required: false
+      default: tech-team
+      description: |
+        The Slack team our Team Roles are generated from
   schedule:
     - cron: "0 0 * * 3"  # Run at 00:00 UTC every Wednesday (Because meetings happen Tuesdays)
+
+env:
+  TEAM_NAME: tech-team
 
 jobs:
   is-four-weeks:
     runs-on: ubuntu-latest
+    outputs:
+      continue-workflow: ${{ steps.decision.outputs.continue-workflow }}
     steps:
-      - name: ""
+      - name: Decide if 4 weeks have passed and the workflow should continue
+        id: decision
         shell: python
         run: |
           from datetime import date
@@ -24,4 +44,45 @@ jobs:
           is_four_weeks = (n_weeks_since_last_meeting % 4) == 0
 
           # Set output variable for use in further jobs
-          print(f"::set-output name=continue-job::{is_four_weeks}")
+          print(f"::set-output name=continue-workflow::{is_four_weeks}")
+
+  create-standup:
+    runs-on: ubuntu-latest
+    environment: run-slack-bot
+    needs: [is-four-weeks]
+    if: needs.is-four-weeks.outputs.continue-workflow == 'True' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python v3.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+          poetry install
+
+      - name: Update team member in role
+        if: github.event_name == 'schedule' || github.event.inputs.update-roles
+        run: |
+          poetry run update-team-role meeting-facilitator
+        env:
+          TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
+          SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
+
+      - name: Add and Commit updated team-roles.json file
+        if: github.event_name == 'schedule' || github.event.inputs.update-roles
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: team-roles.json
+          message: "Update the Team Roles JSON file"
+
+      - name: Create a standup for the Meeting Facilitator
+        run: |
+          poetry run create-standup meeting-facilitator
+        env:
+          GEEKBOT_API_KEY: "${{ secrets.GEEKBOT_API_KEY }}"
