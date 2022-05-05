@@ -78,21 +78,6 @@ class GeekbotStandup:
         else:
             return None
 
-    def _delete_previous_standup(self, standup_id):
-        """Delete an existing Geekbot standup
-
-        Args:
-            standup_id (int): The ID of the standup to delete
-        """
-        response = self.geekbot_session.delete(
-            "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)])
-        )
-
-        if not self.CI_env:
-            print_json(data=response.json())
-
-        response.raise_for_status()
-
     def _generate_standup_metadata(self):
         """Generate metadata for a new Geekbot standup. This includes information such as:
         when the standup happens, who will participate in the standup, and which slack
@@ -127,18 +112,18 @@ class GeekbotStandup:
         question = dedent(
             f"""\
         {self.roles['name'].split()[0]} - it is your turn to facilitate this month's
-        team meeting! You can check the team calendar for when this month's meeting is
-        scheduled for here:
-        https://calendar.google.com/calendar/embed?src=c_4hjjouojd8psql9i1a8nd1uff4%40group.calendar.google.com
-        Reply 'ok' to this message to acknowledge your role. Or if you are not able to
-        fulfil this role at this time, please arrange cover with another member of the
-        Tech Team.
+         team meeting! You can check the team calendar for when this month's meeting is
+         scheduled for here:
+         https://calendar.google.com/calendar/embed?src=c_4hjjouojd8psql9i1a8nd1uff4%40group.calendar.google.com
+         Reply 'ok' to this message to acknowledge your role. Or if you are not able to
+         fulfil this role at this time, please arrange cover with another member of the
+         Tech Team.
 
         Here are some actions the meeting facilitator is expected to take:
-        - Collect and add agenda items to the meeting hackmd (link is in the calendar event)
-        - Facilitate the meeting
-        - Open up any follow-up issues or discussions and link to the hackmd
-        - Transfer notes from the hackmd into the Team Compass
+         - Collect and add agenda items to the meeting hackmd (link is in the calendar event)
+         - Facilitate the meeting
+         - Open up any follow-up issues or discussions and link to the hackmd
+         - Transfer notes from the hackmd into the Team Compass
         """
         )
         return question
@@ -154,11 +139,11 @@ class GeekbotStandup:
         question = dedent(
             f"""\
         {self.roles['name'].split()[0]} - it is your turn to be the support steward!
-        Please make sure to watch for any incoming tickets here:
-        https://2i2c.freshdesk.com/a/tickets/filters/all_tickets
-        Reply 'ok' to this message to acknowledge your role. Or if you are going to be
-        away for a large part of your stewardship, please arrange cover with another
-        member of the Tech Team.
+         Please make sure to watch for any incoming tickets here:
+         https://2i2c.freshdesk.com/a/tickets/filters/all_tickets
+         Reply 'ok' to this message to acknowledge your role. Or if you are going to be
+         away for a large part of your stewardship, please arrange cover with another
+         member of the Tech Team.
 
         Your support steward buddy is: {self.steward_buddy}
         """
@@ -179,10 +164,6 @@ class GeekbotStandup:
         # First, check if a standup exists
         standup_id = self._check_standup_exists()
 
-        if self.standup_exists:
-            # Delete the existing standup
-            self._delete_previous_standup(standup_id)
-
         # Generate metadata for the standup
         metadata = self._generate_standup_metadata()
 
@@ -190,10 +171,17 @@ class GeekbotStandup:
         question = self._generate_question_meeting_facilitator()
         metadata["questions"] = [{"question": question}]
 
-        # Create the standup
-        response = self.geekbot_session.post(
-            "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
-        )
+        if self.standup_exists:
+            # Replace the existing standup
+            response = self.geekbot_session.put(
+                "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)]),
+                json=metadata,
+            )
+        else:
+            # Create the standup
+            response = self.geekbot_session.post(
+                "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
+            )
 
         if not self.CI_env:
             print_json(data=response.json())
@@ -215,10 +203,6 @@ class GeekbotStandup:
         # First, check if a standup exists
         standup_id = self._check_standup_exists()
 
-        if self.standup_exists:
-            # Delete the existing standup
-            self._delete_previous_standup(standup_id)
-
         # Generate metadata for the standup
         metadata = self._generate_standup_metadata()
 
@@ -226,10 +210,17 @@ class GeekbotStandup:
         question = self._generate_question_support_steward()
         metadata["questions"] = [{"question": question}]
 
-        # Create the standup
-        response = self.geekbot_session.post(
-            "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
-        )
+        if self.standup_exists:
+            # Replace the existing standup
+            response = self.geekbot_session.put(
+                "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)]),
+                json=metadata,
+            )
+        else:
+            # Create the standup
+            response = self.geekbot_session.post(
+                "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
+            )
 
         if not self.CI_env:
             print_json(data=response.json())
