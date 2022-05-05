@@ -2,6 +2,11 @@ name: "Create Standup: Meeting Facilitator"
 
 on:
   workflow_dispatch:
+    team-name:
+      required: false
+      default: tech-team
+      description: |
+        The Slack team our Team Roles are generated from
   schedule:
     - cron: "0 0 * * 3"  # Run at 00:00 UTC every Wednesday (Because meetings happen Tuesdays)
 
