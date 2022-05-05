@@ -61,7 +61,7 @@ jobs:
 
       - name: Update team member in role
         run: |
-          poetry run update-team-role meeting-facilitator
+          echo "${TEAM_NAME}"
         env:
           TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
           # SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
