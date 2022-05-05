@@ -108,7 +108,9 @@ class GeekbotStandup:
             "timezone": "user_local",
             "wait_time": 10,
             "days": [self.standup_day],
-            "users": [self.roles["id"]],
+            "users": [self.roles["id"]]
+            if self.roles["id"] == self.standup_manager["id"]
+            else [self.roles["id"], self.standup_manager["id"]],
             "sync_channel_members": False,
             "personalized": False,
         }
@@ -171,6 +173,7 @@ class GeekbotStandup:
         self.standup_name = "MeetingFacilitatorStandup"
         self.standup_day = "Mon"
         self.broadcast_channel = "#team-updates"
+        self.standup_manager = self.roles["standup_manager"]
         self.roles = self.roles["meeting_facilitator"]
 
         # First, check if a standup exists
@@ -191,8 +194,10 @@ class GeekbotStandup:
         response = self.geekbot_session.post(
             "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
         )
+
         if not self.CI_env:
             print_json(data=response.json())
+
         response.raise_for_status()
 
     def create_support_steward_standup(self):
@@ -203,6 +208,7 @@ class GeekbotStandup:
         self.standup_name = "SupportStewardStandup"
         self.standup_day = "Wed"
         self.broadcast_channel = "#support-freshdesk"
+        self.standup_manager = self.roles["standup_manager"]
         self.steward_buddy = self.roles["support_steward"]["current"]["name"]
         self.roles = self.roles["support_steward"]["incoming"]
 
