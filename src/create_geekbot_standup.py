@@ -139,7 +139,7 @@ class GeekbotStandup:
         Please make sure to watch for any incoming tickets here:
         https://2i2c.freshdesk.com/a/tickets/filters/all_tickets
         Reply 'ok' to this message to acknowledge your role. Or if you are going to be
-        away for a large part or your stewardship, please arrange cover with another
+        away for a large part of your stewardship, please arrange cover with another
         member of the Tech Team.
 
         Your support steward buddy is: {self.steward_buddy}
