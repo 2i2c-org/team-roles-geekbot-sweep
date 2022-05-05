@@ -23,6 +23,14 @@ on:
         default: tech-team
         description: |
           The Slack team our Team Roles are generated from
+      standup-manager:
+        required: false
+        default: "Sarah"
+        description: |
+          The Slack display name of the team member who will manage the standups.
+          They should have generated the API key saved in GEEKBOT_API_KEY.
+          This role is required so that the API can continue to 'see' all standups that
+          it has created.
 
 jobs:
   populate-team-roles:
@@ -51,6 +59,7 @@ jobs:
           CURRENT_SUPPORT_STEWARD: "${{ github.event.inputs.current-support-steward }}"
           INCOMING_SUPPORT_STEWARD: "${{ github.event.inputs.incoming-support-steward }}"
           TEAM_NAME: "${{ github.event.inputs.team-name }}"
+          STANDUP_MANAGER: "${{ github.event.inputs.standup-manager }}"
           SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
 
       - name: Add and Commit updated team-roles.json file

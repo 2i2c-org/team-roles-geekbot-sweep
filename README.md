@@ -36,8 +36,17 @@ This is because interacting with the APIs requires the user ID, but it is more h
 
 For the Support Steward, we track both the current and incoming team members as we have two people overlapping in this role.
 
+We have an extra role here called `standup_manager`.
+This is the team member who created `GEEKBOT_API_KEY` and will be added to all standups.
+This is because Geekbot only provide personal API keys and they do not have permission to see any standups the owner is not a member of.
+:fire: **If you are changing this role, you will need to recreate `GEEKBOT_API_KEY`.** :fire:
+
 ```json
 {
+    "standup_manager": {
+      "name": "display_name",
+      "id": "slack_id"
+    },
     "meeting_facilitator": {
         "name": "display_name",
         "id": "slack_id"
@@ -158,6 +167,9 @@ In addition to the two environment variables required by `get_slack_team_members
 - `CURRENT_MEETING_FACILITATOR`: The Slack display name of the team member currently serving in the Meeting Facilitator role
 - `CURRENT_SUPPORT_STEWARD`: The Slack display name of the team member currently serving in the Support Steward role (i.e. for more than two weeks)
 - `INCOMING_SUPPORT_STEWARD`: The Slack display name of the team member most recently taking up service in the Support Steward role (i.e. for less than two weeks)
+- `STANDUP_MANAGER`: This is the Slack display name of the team member who created `GEEKBOT_API_KEY` and will be added to all standups.
+  This role is required since Geekbot only offers personal API keys and the script won't be able to see any exisitng standups that the owner of the key is not a member of.
+  :fire: **If you are changing this role, you will need to recreate `GEEKBOT_API_KEY`.** :fire:
 
 This script is paired with the [`populate-current-roles` workflow](#populate-current-rolesyaml) to commit the updated `team-roles.json` file to the repo for future CI/CD runs of the bot.
 

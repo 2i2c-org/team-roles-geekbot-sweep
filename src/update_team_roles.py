@@ -16,7 +16,7 @@ class TeamRoles:
 
     def __init__(self):
         # Instatiate the SlackTeamMembers class
-        self.slack_team_members = SlackTeamMembers()
+        self.slack = SlackTeamMembers()
 
         # Read in who is serving in which role from a JSON file
         project_path = Path(__file__).parent.parent
@@ -29,6 +29,17 @@ class TeamRoles:
         with open(self.roles_path) as stream:
             self.team_roles = json.load(stream)
 
+    def _check_managers_id_is_set(self):
+        """
+        Check that the team member allocated as the standup manager has an ID set
+        """
+        if (self.team_roles["standup_manager"].get("id") is None) or (
+            self.team_roles["standup_manager"]["id"] == ""
+        ):
+            self.team_roles["standup_manager"]["id"] = self.team_members[
+                self.team_roles["standup_manager"]["name"]
+            ]
+
     def _find_next_team_member(self, current_member):
         """Based on who is currently serving in a role, work out who is next in line
 
@@ -39,19 +50,17 @@ class TeamRoles:
             tuple(str, str): The next team member to serve in the role. Returns a tuple
                 of (users_name, users_id)
         """
-        team_members_dict = self.slack_team_members.get_users_in_team()
-
         index = next(
             idx
-            for (idx, team_member) in enumerate(team_members_dict.keys())
+            for (idx, team_member) in enumerate(self.team_members.keys())
             if team_member == current_member
         )
 
         # If we reach the end of the list, we want to wrap around and start again
-        if len(team_members_dict) == (index + 1):
+        if len(self.team_members) == (index + 1):
             index = -1
 
-        return list(team_members_dict.items())[index + 1]
+        return list(self.team_members.items())[index + 1]
 
     def _update_meeting_facilitator_role(self):
         """
@@ -98,6 +107,12 @@ class TeamRoles:
             update_support_steward (bool, optional): If True, the Support Steward role
                 will be updated. Defaults to False.
         """
+        # Populate team members
+        self.team_members = self.slack.get_users_in_team()
+
+        # Check the info for the standup manager is complete
+        self._check_managers_id_is_set()
+
         if update_meeting_facilitator:
             self._update_meeting_facilitator_role()
 

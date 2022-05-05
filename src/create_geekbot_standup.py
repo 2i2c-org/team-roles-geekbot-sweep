@@ -6,6 +6,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+from textwrap import dedent
 
 from requests import Session
 from rich import print_json
@@ -13,13 +14,18 @@ from rich import print_json
 
 class GeekbotStandup:
     """
-    Mange Geekbot Standups in Slack for transitioning our Team Roles
+    Manage Geekbot Standups in Slack for transitioning our Team Roles
     """
 
     def __init__(self):
         # Set variables
         self.geekbot_api_url = "https://api.geekbot.io"
         self.geekbot_api_key = os.environ["GEEKBOT_API_KEY"]
+
+        try:
+            self.CI_env = os.environ["CI"]
+        except KeyError:
+            self.CI_env = False
 
         # Open a Geekbot session
         self.geekbot_session = self._create_geekbot_session()
@@ -47,28 +53,44 @@ class GeekbotStandup:
         geekbot_session.headers.update({"Authorization": self.geekbot_api_key})
         return geekbot_session
 
-    def _get_standup(self):
-        """Retrieve information about an existing standup
+    def _check_standup_exists(self):
+        """Check if the standup already exists. Return it's ID if it does.
 
         Returns:
-            dict: Dictionary containing information about a chosen standup that exists
-                in Geekbot
+            int: ID of the existing standup
         """
         response = self.geekbot_session.get(
             "/".join([self.geekbot_api_url, "v1", "standups"])
         )
-        response.raise_for_status()
-        return next(x for x in response.json() if x["name"] == self.standup_name)
 
-    def _delete_previous_standup(self):
-        """
-        Delete an existing Geekbot standup
-        """
-        standup = self._get_standup()
-        response = self.geekbot_session.delete(
-            "/".join([self.geekbot_api_url, "v1", "standups", standup["id"]])
+        if not self.CI_env:
+            print_json(data=response.json())
+
+        response.raise_for_status()
+
+        standup = next(
+            (x for x in response.json() if x["name"] == self.standup_name), None
         )
-        print_json(data=response.json())
+        self.standup_exists = bool(standup)
+
+        if self.standup_exists:
+            return standup["id"]
+        else:
+            return None
+
+    def _delete_previous_standup(self, standup_id):
+        """Delete an existing Geekbot standup
+
+        Args:
+            standup_id (int): The ID of the standup to delete
+        """
+        response = self.geekbot_session.delete(
+            "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)])
+        )
+
+        if not self.CI_env:
+            print_json(data=response.json())
+
         response.raise_for_status()
 
     def _generate_standup_metadata(self):
@@ -83,10 +105,12 @@ class GeekbotStandup:
             "name": self.standup_name,
             "channel": self.broadcast_channel,
             "time": "10:00:00",
-            "timezone": "",  # By leaving this blank it will trigger in user's timezone
+            "timezone": "user_local",
             "wait_time": 10,
             "days": [self.standup_day],
-            "users": [self.roles["id"]],
+            "users": [self.roles["id"]]
+            if self.roles["id"] == self.standup_manager["id"]
+            else [self.roles["id"], self.standup_manager["id"]],
             "sync_channel_members": False,
             "personalized": False,
         }
@@ -100,10 +124,12 @@ class GeekbotStandup:
         Returns:
             str: The question to be posed to the new Meeting Facilitator
         """
-        question = """
-        It is your turn to facilitate this month's team meeting! You can check the team
-        calendar for when this month's meeting is scheduled for here:
-        https://calendar.google.com/calendar/embed?src=c_4hjjouojd8psql9i1a8nd1uff4%%40group.calendar.google.com
+        question = dedent(
+            f"""\
+        {self.roles['name'].split()[0]} - it is your turn to facilitate this month's
+        team meeting! You can check the team calendar for when this month's meeting is
+        scheduled for here:
+        https://calendar.google.com/calendar/embed?src=c_4hjjouojd8psql9i1a8nd1uff4%40group.calendar.google.com
         Reply 'ok' to this message to acknowledge your role. Or if you are not able to
         fulfil this role at this time, please arrange cover with another member of the
         Tech Team.
@@ -114,6 +140,7 @@ class GeekbotStandup:
         - Open up any follow-up issues or discussions and link to the hackmd
         - Transfer notes from the hackmd into the Team Compass
         """
+        )
         return question
 
     def _generate_question_support_steward(self):
@@ -124,15 +151,18 @@ class GeekbotStandup:
         Returns:
             str: The question to be posed to the new Support Steward
         """
-        question = f"""
-        It is your turn to be the support steward! Please make sure to watch for any
-        incoming tickets at https://2i2c.freshdesk.com/a/tickets/filters/all_tickets
+        question = dedent(
+            f"""\
+        {self.roles['name'].split()[0]} - it is your turn to be the support steward!
+        Please make sure to watch for any incoming tickets here:
+        https://2i2c.freshdesk.com/a/tickets/filters/all_tickets
         Reply 'ok' to this message to acknowledge your role. Or if you are going to be
-        away for a large part or your stewardship, please arrange cover with another
+        away for a large part of your stewardship, please arrange cover with another
         member of the Tech Team.
 
         Your support steward buddy is: {self.steward_buddy}
         """
+        )
         return question
 
     def create_meeting_facilitator_standup(self):
@@ -143,10 +173,15 @@ class GeekbotStandup:
         self.standup_name = "MeetingFacilitatorStandup"
         self.standup_day = "Mon"
         self.broadcast_channel = "#team-updates"
+        self.standup_manager = self.roles["standup_manager"]
         self.roles = self.roles["meeting_facilitator"]
 
-        # First, delete previous standup
-        self._delete_previous_standup()
+        # First, check if a standup exists
+        standup_id = self._check_standup_exists()
+
+        if self.standup_exists:
+            # Delete the existing standup
+            self._delete_previous_standup(standup_id)
 
         # Generate metadata for the standup
         metadata = self._generate_standup_metadata()
@@ -159,7 +194,10 @@ class GeekbotStandup:
         response = self.geekbot_session.post(
             "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
         )
-        print_json(data=response.json())
+
+        if not self.CI_env:
+            print_json(data=response.json())
+
         response.raise_for_status()
 
     def create_support_steward_standup(self):
@@ -170,11 +208,16 @@ class GeekbotStandup:
         self.standup_name = "SupportStewardStandup"
         self.standup_day = "Wed"
         self.broadcast_channel = "#support-freshdesk"
+        self.standup_manager = self.roles["standup_manager"]
         self.steward_buddy = self.roles["support_steward"]["current"]["name"]
         self.roles = self.roles["support_steward"]["incoming"]
 
-        # First, delete previous standup
-        self._delete_previous_standup()
+        # First, check if a standup exists
+        standup_id = self._check_standup_exists()
+
+        if self.standup_exists:
+            # Delete the existing standup
+            self._delete_previous_standup(standup_id)
 
         # Generate metadata for the standup
         metadata = self._generate_standup_metadata()
@@ -187,7 +230,10 @@ class GeekbotStandup:
         response = self.geekbot_session.post(
             "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
         )
-        print_json(data=response.json())
+
+        if not self.CI_env:
+            print_json(data=response.json())
+
         response.raise_for_status()
 
 
