@@ -72,16 +72,19 @@ class GeekbotStandup:
             dict: The metadata required to describe a new Geekbot standup
         """
         metadata = {
-            "name": self.standup_name,
-            "channel": self.broadcast_channel,
-            "time": "10:00:00",
-            "timezone": "",  # By leaving this blank it will trigger in user's timezone
             "wait_time": 10,
-            "days": [self.standup_day],
             "users": [self.roles["id"]],
             "sync_channel_members": False,
             "personalized": False,
         }
+
+        if not self.standup_exists:
+            metadata["name"] = self.standup_name
+            metadata["channel"] = self.broadcast_channel
+            metadata["days"] = [self.standup_day]
+            metadata["time"] = "10:00:00"
+            metadata["timezone"] = "user_local"
+
         return metadata
 
     def _generate_question_meeting_facilitator(self):
