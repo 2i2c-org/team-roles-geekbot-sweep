@@ -105,7 +105,14 @@ class GeekbotStandup:
         calendar for when this month's meeting is scheduled for here:
         https://calendar.google.com/calendar/embed?src=c_4hjjouojd8psql9i1a8nd1uff4%%40group.calendar.google.com
         Reply 'ok' to this message to acknowledge your role. Or if you are not able to
-        fulfil this role at this time, please arrange cover with a member of the Tech Team.
+        fulfil this role at this time, please arrange cover with another member of the
+        Tech Team.
+
+        Here are some actions the meeting facilitator is expected to take:
+        - Collect and add agenda items to the meeting hackmd (link is in the calendar event)
+        - Facilitate the meeting
+        - Open up any follow-up issues or discussions and link to the hackmd
+        - Transfer notes from the hackmd into the Team Compass
         """
         return question
 
@@ -117,12 +124,14 @@ class GeekbotStandup:
         Returns:
             str: The question to be posed to the new Support Steward
         """
-        question = """
-        It is your turn to be the support steward! Please make sure to watch fir any
+        question = f"""
+        It is your turn to be the support steward! Please make sure to watch for any
         incoming tickets at https://2i2c.freshdesk.com/a/tickets/filters/all_tickets
         Reply 'ok' to this message to acknowledge your role. Or if you are going to be
-        away for a large part or your stewardship, please arrange cover with a member of
-        the Tech Team.
+        away for a large part or your stewardship, please arrange cover with another
+        member of the Tech Team.
+
+        Your support steward buddy is: {self.steward_buddy}
         """
         return question
 
@@ -161,6 +170,7 @@ class GeekbotStandup:
         self.standup_name = "SupportStewardStandup"
         self.standup_day = "Wed"
         self.broadcast_channel = "#support-freshdesk"
+        self.steward_buddy = self.roles["support_steward"]["current"]["name"]
         self.roles = self.roles["support_steward"]["incoming"]
 
         # First, delete previous standup
