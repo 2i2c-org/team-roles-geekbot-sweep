@@ -13,7 +13,7 @@ rich = "^12.3"
 
 [tool.poetry.scripts]
 list-team-members = "src.get_slack_team_members:main"
-update-team-role = "src.set_team_roles:main"
+update-team-role = "src.update_team_roles:main"
 create-standup = "src.create_geekbot_standup:main"
 
 [build-system]
