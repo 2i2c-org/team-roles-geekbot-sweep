@@ -1,0 +1,27 @@
+name: "Create Standup: Meeting Facilitator"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 3"  # Run at 00:00 UTC every Wednesday (Because meetings happen Tuesdays)
+
+jobs:
+  is-four-weeks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ""
+        shell: python
+        run: |
+          from datetime import date
+
+          # This is a Wednesday after our last team meeting (April 2022), so we'll
+          # calculate is_four_weeks relative to this
+          ref_date = date(2022, 4, 27)
+
+          diff_days = abs(date.today() - ref_date).days
+          n_days_since_last_meeting = diff_days % 28  # Because we have a meeting every 28 days
+          n_weeks_since_last_meeting = (n_days_since_last_meeting // 7) + 1  # Add 1 because we are effectively 0-indexed
+          is_four_weeks = (n_weeks_since_last_meeting % 4) == 0
+
+          # Set output variable for use in further jobs
+          print(f"::set-output name=continue-job::{is_four_weeks}")
