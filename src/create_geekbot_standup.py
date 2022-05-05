@@ -53,18 +53,31 @@ class GeekbotStandup:
         geekbot_session.headers.update({"Authorization": self.geekbot_api_key})
         return geekbot_session
 
-    def _get_standup(self):
-        """Retrieve information about an existing standup
+    def _check_standup_exists(self):
+        """Check if the standup already exists. Return it's ID if it does.
 
         Returns:
-            dict: Dictionary containing information about a chosen standup that exists
-                in Geekbot
+            int: ID of the existing standup
         """
         response = self.geekbot_session.get(
             "/".join([self.geekbot_api_url, "v1", "standups"])
         )
+
+        if not self.CI_env:
+            print_json(data=response.json())
+
         response.raise_for_status()
-        return next(x for x in response.json() if x["name"] == self.standup_name)
+
+        standup = next(
+            (x for x in response.json() if x["name"] == self.standup_name), None
+        )
+        self.standup_exists = bool(standup)
+
+        if self.standup_exists:
+            return standup["id"]
+        else:
+            return None
+
 
     def _delete_previous_standup(self):
         """
