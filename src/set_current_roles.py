@@ -41,4 +41,4 @@ def main():
     }
 
     with open(roles_path, "w") as f:
-        json.dump(team_roles, f)
+        json.dump(team_roles, f, indent=4, sort_keys=False)
