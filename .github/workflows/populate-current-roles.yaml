@@ -53,8 +53,8 @@ jobs:
           TEAM_NAME: "${{ github.event.inputs.team-name }}"
           SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
 
-      - name: Upload team-roles.json as artifact
-        uses: actions/upload-artifact@v3
+      - name: Add and Commit updated team-roles.json file
+        uses: EndBug/add-and-commit@v9
         with:
-          name: team-roles
-          path: team-roles.json
+          add: team-roles.json
+          message: "Update the Team Roles JSON file"
