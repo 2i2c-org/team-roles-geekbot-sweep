@@ -5,8 +5,6 @@ on:
   schedule:
     - cron: "0 0 * * 3"  # Run at 00:00 UTC every Wednesday (Because meetings happen Tuesdays)
 
-env: []
-
 jobs:
   is-four-weeks:
     runs-on: ubuntu-latest
