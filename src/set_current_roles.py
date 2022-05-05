@@ -17,6 +17,7 @@ def main():
     current_meeting_facilitator = os.environ["CURRENT_MEETING_FACILITATOR"]
     current_support_steward = os.environ["CURRENT_SUPPORT_STEWARD"]
     incoming_support_steward = os.environ["INCOMING_SUPPORT_STEWARD"]
+    standup_manager = os.environ["STANDUP_MANAGER"]
 
     # Instantiate SlackTeamMembers class
     slack = SlackTeamMembers()
@@ -24,6 +25,10 @@ def main():
 
     # Write team roles dict
     team_roles = {
+        "standup_manager": {
+            "name": standup_manager,
+            "id": members[standup_manager],
+        },
         "meeting_facilitator": {
             "name": current_meeting_facilitator,
             "id": members[current_meeting_facilitator],
