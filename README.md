@@ -147,3 +147,34 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
 ```
+
+### `set_current_roles.py`
+
+This script is used to initialise the `team-roles.json` file with manual input.
+It depends upon [`get_slack_team_members.py`](#get_slack_team_memberspy) to convert Slack display names into user IDs.
+
+In addition to the two environment variables required by `get_slack_team_members.py`, this script also requires the following environment variables to be set:
+
+- `CURRENT_MEETING_FACILITATOR`: The Slack display name of the team member currently serving in the Meeting Facilitator role
+- `CURRENT_SUPPORT_STEWARD`: The Slack display name of the team member currently serving in the Support Steward role (i.e. for more than two weeks)
+- `INCOMING_SUPPORT_STEWARD`: The Slack display name of the team member most recently taking up service in the Support Steward role (i.e. for less than two weeks)
+
+This script is paired with the [`populate-current-roles` workflow](#populate-current-rolesyaml) to upload `team-roles.json` as an artifact for future CI/CD runs of the bot.
+
+**Command line usage:**
+
+To execute this script, run:
+
+```bash
+poetry run populate-current-roles
+```
+
+## CI/CD workflows
+
+All our CI/CD workflows are powered by [GitHub Actions](https://docs.github.com/en/actions) and the configuration is located in the [`.github/workflows`](.github/workflows/) folder.
+
+### `populate-current-roles.yaml`
+
+This workflow runs the [`set_current_roles.py` script](#set_current_rolespy) to generate an initial `team-roles.json` file and upload it as an artifact for use in future GitHub Actions workflow runs.
+It can be triggered manually and requires the environment variables required by `set_current_roles.py` and [`get_slack_team_members.py`](#get_slack_team_memberspy) to be provided as inputs.
+Note that `SLACK_BOT_TOKEN` is provided via a GitHub Action Environment Secret.
