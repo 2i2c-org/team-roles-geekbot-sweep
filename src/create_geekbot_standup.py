@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 from textwrap import dedent
 
+from loguru import logger
 from requests import Session
 from rich import print_json
 
@@ -59,6 +60,8 @@ class GeekbotStandup:
         Returns:
             int: ID of the existing standup
         """
+        logger.info(f"Checking if standup exists: {self.standup_name}")
+
         response = self.geekbot_session.get(
             "/".join([self.geekbot_api_url, "v1", "standups"])
         )
@@ -74,8 +77,10 @@ class GeekbotStandup:
         self.standup_exists = bool(standup)
 
         if self.standup_exists:
+            logger.info("Standup exists!")
             return standup["id"]
         else:
+            logger.info("Standup doesn't exist...")
             return None
 
     def _generate_standup_metadata(self):
@@ -86,6 +91,8 @@ class GeekbotStandup:
         Returns:
             dict: The metadata required to describe a new Geekbot standup
         """
+        logger.info(f"Generating metadata for standup: {self.standup_name}")
+
         metadata = {
             "name": self.standup_name,
             "channel": self.broadcast_channel,
@@ -109,6 +116,8 @@ class GeekbotStandup:
         Returns:
             str: The question to be posed to the new Meeting Facilitator
         """
+        logger.info(f"Generating question for standup: {self.standup_name}")
+
         question = dedent(
             f"""\
         {self.roles['name'].split()[0]} - it is your turn to facilitate this month's
@@ -136,6 +145,8 @@ class GeekbotStandup:
         Returns:
             str: The question to be posed to the new Support Steward
         """
+        logger.info(f"Generating question for standup: {self.standup_name}")
+
         question = dedent(
             f"""\
         {self.roles['name'].split()[0]} - it is your turn to be the support steward!
@@ -173,12 +184,14 @@ class GeekbotStandup:
 
         if self.standup_exists:
             # Replace the existing standup
+            logger.info(f"Replacing the existing standup: {self.standup_name}")
             response = self.geekbot_session.put(
                 "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)]),
                 json=metadata,
             )
         else:
             # Create the standup
+            logger.info(f"Creating a new standup: {self.standup_name}")
             response = self.geekbot_session.post(
                 "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
             )
@@ -212,12 +225,14 @@ class GeekbotStandup:
 
         if self.standup_exists:
             # Replace the existing standup
+            logger.info(f"Replacing the existing standup: {self.standup_name}")
             response = self.geekbot_session.put(
                 "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)]),
                 json=metadata,
             )
         else:
             # Create the standup
+            logger.info(f"Creating a new standup: {self.standup_name}")
             response = self.geekbot_session.post(
                 "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
             )
