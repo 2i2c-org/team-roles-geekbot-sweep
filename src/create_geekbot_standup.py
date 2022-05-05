@@ -78,21 +78,6 @@ class GeekbotStandup:
         else:
             return None
 
-    def _delete_previous_standup(self, standup_id):
-        """Delete an existing Geekbot standup
-
-        Args:
-            standup_id (int): The ID of the standup to delete
-        """
-        response = self.geekbot_session.delete(
-            "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)])
-        )
-
-        if not self.CI_env:
-            print_json(data=response.json())
-
-        response.raise_for_status()
-
     def _generate_standup_metadata(self):
         """Generate metadata for a new Geekbot standup. This includes information such as:
         when the standup happens, who will participate in the standup, and which slack
@@ -179,10 +164,6 @@ class GeekbotStandup:
         # First, check if a standup exists
         standup_id = self._check_standup_exists()
 
-        if self.standup_exists:
-            # Delete the existing standup
-            self._delete_previous_standup(standup_id)
-
         # Generate metadata for the standup
         metadata = self._generate_standup_metadata()
 
@@ -214,10 +195,6 @@ class GeekbotStandup:
 
         # First, check if a standup exists
         standup_id = self._check_standup_exists()
-
-        if self.standup_exists:
-            # Delete the existing standup
-            self._delete_previous_standup(standup_id)
 
         # Generate metadata for the standup
         metadata = self._generate_standup_metadata()
