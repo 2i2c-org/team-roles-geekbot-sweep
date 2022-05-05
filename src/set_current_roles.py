@@ -26,18 +26,18 @@ def main():
     team_roles = {
         "meeting_facilitator": {
             "name": current_meeting_facilitator,
-            "id": members[current_meeting_facilitator]
+            "id": members[current_meeting_facilitator],
         },
         "support_steward": {
             "incoming": {
                 "name": incoming_support_steward,
-                "id": members[incoming_support_steward]
+                "id": members[incoming_support_steward],
             },
             "current": {
                 "name": current_support_steward,
-                "id": members[current_support_steward]
-            }
-        }
+                "id": members[current_support_steward],
+            },
+        },
     }
 
     with open(roles_path, "w") as f:
