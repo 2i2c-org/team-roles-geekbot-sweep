@@ -1,6 +1,10 @@
 {
+    "standup_manager": {
+        "name": "Sarah",
+        "id": "U01G3RJP1U3"
+    },
     "meeting_facilitator": {
-        "name": "Sarah (she/her)",
+        "name": "Sarah",
         "id": "U01G3RJP1U3"
     },
     "support_steward": {
