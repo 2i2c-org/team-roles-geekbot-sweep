@@ -78,14 +78,14 @@ class GeekbotStandup:
         else:
             return None
 
+    def _delete_previous_standup(self, standup_id):
+        """Delete an existing Geekbot standup
 
-    def _delete_previous_standup(self):
+        Args:
+            standup_id (int): The ID of the standup to delete
         """
-        Delete an existing Geekbot standup
-        """
-        standup = self._get_standup()
         response = self.geekbot_session.delete(
-            "/".join([self.geekbot_api_url, "v1", "standups", standup["id"]])
+            "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)])
         )
 
         if not self.CI_env:
@@ -173,8 +173,12 @@ class GeekbotStandup:
         self.broadcast_channel = "#team-updates"
         self.roles = self.roles["meeting_facilitator"]
 
-        # First, delete previous standup
-        self._delete_previous_standup()
+        # First, check if a standup exists
+        standup_id = self._check_standup_exists()
+
+        if self.standup_exists:
+            # Delete the existing standup
+            self._delete_previous_standup(standup_id)
 
         # Generate metadata for the standup
         metadata = self._generate_standup_metadata()
@@ -202,8 +206,12 @@ class GeekbotStandup:
         self.steward_buddy = self.roles["support_steward"]["current"]["name"]
         self.roles = self.roles["support_steward"]["incoming"]
 
-        # First, delete previous standup
-        self._delete_previous_standup()
+        # First, check if a standup exists
+        standup_id = self._check_standup_exists()
+
+        if self.standup_exists:
+            # Delete the existing standup
+            self._delete_previous_standup(standup_id)
 
         # Generate metadata for the standup
         metadata = self._generate_standup_metadata()
