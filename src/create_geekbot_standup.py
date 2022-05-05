@@ -6,6 +6,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+from textwrap import dedent
 
 from requests import Session
 from rich import print_json
@@ -13,7 +14,7 @@ from rich import print_json
 
 class GeekbotStandup:
     """
-    Mange Geekbot Standups in Slack for transitioning our Team Roles
+    Manage Geekbot Standups in Slack for transitioning our Team Roles
     """
 
     def __init__(self):
@@ -105,10 +106,11 @@ class GeekbotStandup:
         Returns:
             str: The question to be posed to the new Meeting Facilitator
         """
-        question = """
-        It is your turn to facilitate this month's team meeting! You can check the team
-        calendar for when this month's meeting is scheduled for here:
-        https://calendar.google.com/calendar/embed?src=c_4hjjouojd8psql9i1a8nd1uff4%%40group.calendar.google.com
+        question = dedent(f"""\
+        {self.roles['name'].split()[0]} - it is your turn to facilitate this month's
+        team meeting! You can check the team calendar for when this month's meeting is
+        scheduled for here:
+        https://calendar.google.com/calendar/embed?src=c_4hjjouojd8psql9i1a8nd1uff4%40group.calendar.google.com
         Reply 'ok' to this message to acknowledge your role. Or if you are not able to
         fulfil this role at this time, please arrange cover with another member of the
         Tech Team.
@@ -118,7 +120,7 @@ class GeekbotStandup:
         - Facilitate the meeting
         - Open up any follow-up issues or discussions and link to the hackmd
         - Transfer notes from the hackmd into the Team Compass
-        """
+        """)
         return question
 
     def _generate_question_support_steward(self):
@@ -129,15 +131,16 @@ class GeekbotStandup:
         Returns:
             str: The question to be posed to the new Support Steward
         """
-        question = f"""
-        It is your turn to be the support steward! Please make sure to watch for any
-        incoming tickets at https://2i2c.freshdesk.com/a/tickets/filters/all_tickets
+        question = dedent(f"""\
+        {self.roles['name'].split()[0]} - it is your turn to be the support steward!
+        Please make sure to watch for any incoming tickets here:
+        https://2i2c.freshdesk.com/a/tickets/filters/all_tickets
         Reply 'ok' to this message to acknowledge your role. Or if you are going to be
         away for a large part or your stewardship, please arrange cover with another
         member of the Tech Team.
 
         Your support steward buddy is: {self.steward_buddy}
-        """
+        """)
         return question
 
     def create_meeting_facilitator_standup(self):
