@@ -27,11 +27,11 @@ jobs:
           is_four_weeks = (n_weeks_since_last_meeting % 4) == 0
 
           # Set output variable for use in further jobs
-          print(f"::set-output name=continue-job::{is_four_weeks}")
+          print(f"::set-output name=continue-workflow::{is_four_weeks}")
 
   echo-output:
     runs-on: ubuntu-latest
     needs: [is-four-weeks]
     steps:
       - run: |
-          echo "${{ needs.is-four-weeks.outputs.continue-worflow }}"
+          echo "${{ needs.is-four-weeks.outputs.continue-workflow }}"
