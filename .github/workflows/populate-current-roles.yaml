@@ -1,0 +1,60 @@
+name: Populate a JSON file with members currently serving in our Team Roles
+
+on:
+  workflow_dispatch:
+    inputs:
+      current-meeting-facilitator:
+        required: true
+        description: |
+          The Slack display name of the team member currently serving in the Meeting
+          Facilitator role
+      current-support-steward:
+        required: true
+        description: |
+          The Slack display name of the team member currently serving in the Support
+          Steward role (i.e. for more than two weeks)
+      incoming-support-steward:
+        required: true
+        description: |
+          The Slack display name of the team member most recently taking up service in
+          the Support Steward role (i.e. for less than two weeks)
+      team-name:
+        required: false
+        default: tech-team
+        description: |
+          The Slack team our Team Roles are generated from
+
+jobs:
+  populate-team-roles:
+    runs-on: ubuntu-latest
+    environment: run-slack-bot
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python v3.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+          poetry install
+
+      - name: Populate team-roles.json
+        run: |
+          poetry run populate-current-roles
+        env:
+          CURRENT_MEETING_FACILITATOR: "${{ github.event.inputs.current-meeting-facilitator }}"
+          CURRENT_SUPPORT_STEWARD: "${{ github.event.inputs.current-support-steward }}"
+          INCOMING_SUPPORT_STEWARD: "${{ github.event.inputs.incoming-support-steward }}"
+          TEAM_NAME: "${{ github.event.inputs.team-name }}"
+          SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
+
+      - name: Upload team-roles.json as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: team-roles
+          path: team-roles.json
