@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: "0 0 * * 3"  # Run at 00:00 UTC every Wednesday (Because meetings happen Tuesdays)
 
+env:
+  TEAM_NAME: tech-team
+
 jobs:
   is-four-weeks:
     runs-on: ubuntu-latest
@@ -38,6 +41,7 @@ jobs:
 
   create-standup:
     runs-on: ubuntu-latest
+    # environment: run-slack-bot
     needs: [is-four-weeks]
     if: needs.is-four-weeks.outputs.continue-workflow == 'True'
     steps:
@@ -55,7 +59,15 @@ jobs:
           pip install poetry
           poetry install
 
-      - name: Download team-roles.json
-        uses: actions/download-artifact@v3
-        with:
-          name: team-roles
+      - name: Update team member in role
+        run: |
+          poetry run update-team-role meeting-facilitator
+        env:
+          TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
+          # SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
+
+      # - name: Add and Commit updated team-roles.json file
+      #   uses: EndBug/add-and-commit@v9
+      #   with:
+      #     add: team-roles.json
+      #     message: "Update the Team Roles JSON file"
