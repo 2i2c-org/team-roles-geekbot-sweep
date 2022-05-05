@@ -47,29 +47,21 @@ class GeekbotStandup:
         geekbot_session.headers.update({"Authorization": self.geekbot_api_key})
         return geekbot_session
 
-    def _get_standup(self):
-        """Retrieve information about an existing standup
-
-        Returns:
-            dict: Dictionary containing information about a chosen standup that exists
-                in Geekbot
-        """
+    def _check_standup_exists(self):
         response = self.geekbot_session.get(
             "/".join([self.geekbot_api_url, "v1", "standups"])
         )
         response.raise_for_status()
-        return next(x for x in response.json() if x["name"] == self.standup_name)
 
-    def _delete_previous_standup(self):
-        """
-        Delete an existing Geekbot standup
-        """
-        standup = self._get_standup()
-        response = self.geekbot_session.delete(
-            "/".join([self.geekbot_api_url, "v1", "standups", standup["id"]])
+        standup = next(
+            (x for x in response.json() if x["name"] == self.standup_name), None
         )
-        print_json(data=response.json())
-        response.raise_for_status()
+        self.standup_exists = bool(standup)
+
+        if self.standup_exists:
+            return standup["id"]
+        else:
+            return
 
     def _generate_standup_metadata(self):
         """Generate metadata for a new Geekbot standup. This includes information such as:
@@ -145,8 +137,8 @@ class GeekbotStandup:
         self.broadcast_channel = "#team-updates"
         self.roles = self.roles["meeting_facilitator"]
 
-        # First, delete previous standup
-        self._delete_previous_standup()
+        # First, check whether the standup exists
+        standup_id = self._check_standup_exists()
 
         # Generate metadata for the standup
         metadata = self._generate_standup_metadata()
@@ -155,10 +147,18 @@ class GeekbotStandup:
         question = self._generate_question_meeting_facilitator()
         metadata["questions"] = [{"question": question}]
 
-        # Create the standup
-        response = self.geekbot_session.post(
-            "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
-        )
+        if self.standup_exists:
+            # Update existing standup
+            response = self.geekbot_session.patch(
+                "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)]),
+                json=metadata,
+            )
+        else:
+            # Create the standup
+            response = self.geekbot_session.post(
+                "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
+            )
+
         print_json(data=response.json())
         response.raise_for_status()
 
