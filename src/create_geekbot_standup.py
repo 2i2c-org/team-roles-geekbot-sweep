@@ -106,7 +106,8 @@ class GeekbotStandup:
         Returns:
             str: The question to be posed to the new Meeting Facilitator
         """
-        question = dedent(f"""\
+        question = dedent(
+            f"""\
         {self.roles['name'].split()[0]} - it is your turn to facilitate this month's
         team meeting! You can check the team calendar for when this month's meeting is
         scheduled for here:
@@ -120,7 +121,8 @@ class GeekbotStandup:
         - Facilitate the meeting
         - Open up any follow-up issues or discussions and link to the hackmd
         - Transfer notes from the hackmd into the Team Compass
-        """)
+        """
+        )
         return question
 
     def _generate_question_support_steward(self):
@@ -131,7 +133,8 @@ class GeekbotStandup:
         Returns:
             str: The question to be posed to the new Support Steward
         """
-        question = dedent(f"""\
+        question = dedent(
+            f"""\
         {self.roles['name'].split()[0]} - it is your turn to be the support steward!
         Please make sure to watch for any incoming tickets here:
         https://2i2c.freshdesk.com/a/tickets/filters/all_tickets
@@ -140,7 +143,8 @@ class GeekbotStandup:
         member of the Tech Team.
 
         Your support steward buddy is: {self.steward_buddy}
-        """)
+        """
+        )
         return question
 
     def create_meeting_facilitator_standup(self):
