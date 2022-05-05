@@ -2,6 +2,15 @@ name: "Create Standup: Meeting Facilitator"
 
 on:
   workflow_dispatch:
+    update-roles:
+      required: false
+      type: boolean
+      default: false
+      description: |
+        Whether or not to update the Team Roles or proceed with those currently saved
+        in the team-roles.json file. If True, the file will be updated and new members
+        will be used in the standup. If False (default), the file will not be updated
+        and the members currently listed there will be used in the standup.
     team-name:
       required: false
       default: tech-team
