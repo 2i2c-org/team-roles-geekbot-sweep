@@ -180,9 +180,9 @@ class GeekbotStandup:
         metadata["questions"] = [{"question": question}]
 
         if self.standup_exists:
-            # Replace the existing standup
-            logger.info(f"Replacing the existing standup: {self.standup_name}")
-            response = self.geekbot_session.put(
+            # Update the existing standup
+            logger.info(f"Updating the existing standup: {self.standup_name}")
+            response = self.geekbot_session.patch(
                 "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)]),
                 json=metadata,
             )
@@ -221,9 +221,9 @@ class GeekbotStandup:
         metadata["questions"] = [{"question": question}]
 
         if self.standup_exists:
-            # Replace the existing standup
-            logger.info(f"Replacing the existing standup: {self.standup_name}")
-            response = self.geekbot_session.put(
+            # Update the existing standup
+            logger.info(f"Updating the existing standup: {self.standup_name}")
+            response = self.geekbot_session.patch(
                 "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)]),
                 json=metadata,
             )
