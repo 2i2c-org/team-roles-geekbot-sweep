@@ -192,6 +192,10 @@ class GeekbotStandup:
             response = self.geekbot_session.post(
                 "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
             )
+            logger.info(
+                f"This standup will be set to run **Weekly** on {self.standup_day}. "
+                + "Please edit the standup manually in the dashboard if you require a period other than Weekly."
+            )
 
         if not self.CI_env:
             print_json(data=response.json())
@@ -232,6 +236,10 @@ class GeekbotStandup:
             logger.info(f"Creating a new standup: {self.standup_name}")
             response = self.geekbot_session.post(
                 "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
+            )
+            logger.info(
+                f"This standup will be set to run **Weekly** on {self.standup_day}. "
+                + "Please edit the standup manually in the dashboard if you require a period other than Weekly."
             )
 
         if not self.CI_env:
