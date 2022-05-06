@@ -93,10 +93,6 @@ class GeekbotStandup:
         logger.info(f"Generating metadata for standup: {self.standup_name}")
 
         metadata = {
-            "name": self.standup_name,
-            "channel": self.broadcast_channel,
-            "time": "10:00:00",
-            "timezone": "user_local",
             "wait_time": 10,
             "users": [self.roles["id"]]
             if self.roles["id"] == self.standup_manager["id"]
@@ -106,11 +102,11 @@ class GeekbotStandup:
         }
 
         if not self.standup_exists:
+            metadata["name"] = self.standup_name
+            metadata["channel"] = self.broadcast_channel
+            metadata["time"] = "10:00:00"
+            metadata["timezone"] = "user_local"
             metadata["days"] = [self.standup_day]
-            logger.info(
-                f"This standup will be set to run **Weekly** on {self.standup_day}. "
-                + "Please edit the standup manually in the dashboard if you require a period other than Weekly."
-            )
 
         return metadata
 
@@ -184,9 +180,9 @@ class GeekbotStandup:
         metadata["questions"] = [{"question": question}]
 
         if self.standup_exists:
-            # Replace the existing standup
-            logger.info(f"Replacing the existing standup: {self.standup_name}")
-            response = self.geekbot_session.put(
+            # Update the existing standup
+            logger.info(f"Updating the existing standup: {self.standup_name}")
+            response = self.geekbot_session.patch(
                 "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)]),
                 json=metadata,
             )
@@ -195,6 +191,10 @@ class GeekbotStandup:
             logger.info(f"Creating a new standup: {self.standup_name}")
             response = self.geekbot_session.post(
                 "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
+            )
+            logger.info(
+                f"This standup will be set to run **Weekly** on {self.standup_day}. "
+                + "Please edit the standup manually in the dashboard if you require a period other than Weekly."
             )
 
         if not self.CI_env:
@@ -225,9 +225,9 @@ class GeekbotStandup:
         metadata["questions"] = [{"question": question}]
 
         if self.standup_exists:
-            # Replace the existing standup
-            logger.info(f"Replacing the existing standup: {self.standup_name}")
-            response = self.geekbot_session.put(
+            # Update the existing standup
+            logger.info(f"Updating the existing standup: {self.standup_name}")
+            response = self.geekbot_session.patch(
                 "/".join([self.geekbot_api_url, "v1", "standups", str(standup_id)]),
                 json=metadata,
             )
@@ -236,6 +236,10 @@ class GeekbotStandup:
             logger.info(f"Creating a new standup: {self.standup_name}")
             response = self.geekbot_session.post(
                 "/".join([self.geekbot_api_url, "v1", "standups"]), json=metadata
+            )
+            logger.info(
+                f"This standup will be set to run **Weekly** on {self.standup_day}. "
+                + "Please edit the standup manually in the dashboard if you require a period other than Weekly."
             )
 
         if not self.CI_env:
