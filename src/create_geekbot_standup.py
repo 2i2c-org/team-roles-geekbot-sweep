@@ -98,13 +98,20 @@ class GeekbotStandup:
             "time": "10:00:00",
             "timezone": "user_local",
             "wait_time": 10,
-            "days": [self.standup_day],
             "users": [self.roles["id"]]
             if self.roles["id"] == self.standup_manager["id"]
             else [self.roles["id"], self.standup_manager["id"]],
             "sync_channel_members": False,
             "personalized": False,
         }
+
+        if not self.standup_exists:
+            metadata["days"] = [self.standup_day]
+            logger.info(
+                f"This standup will be set to run **Weekly** on {self.standup_day}. "
+                + "Please edit the standup manually in the dashboard if you require a period other than Weekly."
+            )
+
         return metadata
 
     def _generate_question_meeting_facilitator(self):
