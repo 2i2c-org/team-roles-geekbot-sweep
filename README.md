@@ -194,3 +194,7 @@ Note that `SLACK_BOT_TOKEN` is provided via a GitHub Action Environment Secret.
 ### `create-standup-meeting-facilitator.yaml`
 
 _TBA_
+
+### `create-standup-support-steward.yaml`
+
+_TBA_
