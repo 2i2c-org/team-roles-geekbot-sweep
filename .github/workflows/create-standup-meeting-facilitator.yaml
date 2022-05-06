@@ -18,7 +18,7 @@ on:
         description: |
           The Slack team our Team Roles are generated from
   schedule:
-    - cron: "0 0 28 * *"  # Run at 00:00 UTC on the 28th) of each month
+    - cron: "0 0 28 * *"  # Run at 00:00 UTC on the 28th of each month
 
 env:
   TEAM_NAME: tech-team
