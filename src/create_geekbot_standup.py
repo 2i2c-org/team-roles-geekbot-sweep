@@ -6,7 +6,6 @@ import argparse
 import json
 import os
 from pathlib import Path
-from textwrap import dedent
 
 from loguru import logger
 from requests import Session
@@ -99,13 +98,20 @@ class GeekbotStandup:
             "time": "10:00:00",
             "timezone": "user_local",
             "wait_time": 10,
-            "days": [self.standup_day],
             "users": [self.roles["id"]]
             if self.roles["id"] == self.standup_manager["id"]
             else [self.roles["id"], self.standup_manager["id"]],
             "sync_channel_members": False,
             "personalized": False,
         }
+
+        if not self.standup_exists:
+            metadata["days"] = [self.standup_day]
+            logger.info(
+                f"This standup will be set to run **Weekly** on {self.standup_day}. "
+                + "Please edit the standup manually in the dashboard if you require a period other than Weekly."
+            )
+
         return metadata
 
     def _generate_question_meeting_facilitator(self):
@@ -118,22 +124,19 @@ class GeekbotStandup:
         """
         logger.info(f"Generating question for standup: {self.standup_name}")
 
-        question = dedent(
-            f"""\
-        {self.roles['name'].split()[0]} - it is your turn to facilitate this month's
-         team meeting! You can check the team calendar for when this month's meeting is
-         scheduled for here:
-         https://calendar.google.com/calendar/embed?src=c_4hjjouojd8psql9i1a8nd1uff4%40group.calendar.google.com
-         Reply 'ok' to this message to acknowledge your role. Or if you are not able to
-         fulfil this role at this time, please arrange cover with another member of the
-         Tech Team.
-
-        Here are some actions the meeting facilitator is expected to take:
-         - Collect and add agenda items to the meeting hackmd (link is in the calendar event)
-         - Facilitate the meeting
-         - Open up any follow-up issues or discussions and link to the hackmd
-         - Transfer notes from the hackmd into the Team Compass
-        """
+        question = (
+            f"{self.roles['name'].split()[0]} - it is your turn to facilitate this month's team meeting! "
+            + "You can check the team calendar for when this month's meeting is scheduled for here:\n"
+            + "https://calendar.google.com/calendar/embed?src=c_4hjjouojd8psql9i1a8nd1uff4%40group.calendar.google.com"
+            + "\n\n"
+            + "Reply 'ok' to this message to acknowledge your role. "
+            + "Or if you are not able to fulfil this role at this time, please arrange cover with another member of the Tech Team."
+            + "\n\n"
+            + "Here are some actions the meeting facilitator is expected to take:\n"
+            + ":white_check_mark: Collect and add agenda items to the meeting hackmd (link is in the calendar event)\n"
+            + ":white_check_mark: Facilitate the meeting\n"
+            + ":white_check_mark: Open up any follow-up issues or discussions and link to the hackmd\n"
+            + ":white_check_mark: Transfer notes from the hackmd into the Team Compass"
         )
         return question
 
@@ -147,17 +150,15 @@ class GeekbotStandup:
         """
         logger.info(f"Generating question for standup: {self.standup_name}")
 
-        question = dedent(
-            f"""\
-        {self.roles['name'].split()[0]} - it is your turn to be the support steward!
-         Please make sure to watch for any incoming tickets here:
-         https://2i2c.freshdesk.com/a/tickets/filters/all_tickets
-         Reply 'ok' to this message to acknowledge your role. Or if you are going to be
-         away for a large part of your stewardship, please arrange cover with another
-         member of the Tech Team.
-
-        Your support steward buddy is: {self.steward_buddy}
-        """
+        question = (
+            f"{self.roles['name'].split()[0]} - it is your turn to be the support steward! "
+            + "Please make sure to watch for any incoming tickets here:\n\n"
+            + "https://2i2c.freshdesk.com/a/tickets/filters/all_tickets"
+            + "\n\n"
+            + "Reply 'ok' to this message to acknowledge your role. "
+            + "Or if you are going to be away for a large part of your stewardship, please arrange cover with another member of the Tech Team."
+            + "\n\n"
+            + f"Your support steward buddy is: {self.steward_buddy.split()[0]}"
         )
         return question
 
