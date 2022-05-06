@@ -93,10 +93,6 @@ class GeekbotStandup:
         logger.info(f"Generating metadata for standup: {self.standup_name}")
 
         metadata = {
-            "name": self.standup_name,
-            "channel": self.broadcast_channel,
-            "time": "10:00:00",
-            "timezone": "user_local",
             "wait_time": 10,
             "users": [self.roles["id"]]
             if self.roles["id"] == self.standup_manager["id"]
@@ -106,11 +102,11 @@ class GeekbotStandup:
         }
 
         if not self.standup_exists:
+            metadata["name"] = self.standup_name
+            metadata["channel"] = self.broadcast_channel
+            metadata["time"] = "10:00:00"
+            metadata["timezone"] = "user_local"
             metadata["days"] = [self.standup_day]
-            logger.info(
-                f"This standup will be set to run **Weekly** on {self.standup_day}. "
-                + "Please edit the standup manually in the dashboard if you require a period other than Weekly."
-            )
 
         return metadata
 
