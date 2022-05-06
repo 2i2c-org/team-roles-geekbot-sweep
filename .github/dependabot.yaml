@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    ignore:
+      # Ignore patch upgrades to reduce noise
+      - update-types: ["version-update:semver-patch"]
+        dependency-name: "*" # Match all packages
+  - package-ecosystem: "poetry"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    ignore:
+      # Ignore patch upgrades to reduce noise
+      - update-types: ["version-update:semver-patch"]
+        dependency-name: "*" # Match all packages
