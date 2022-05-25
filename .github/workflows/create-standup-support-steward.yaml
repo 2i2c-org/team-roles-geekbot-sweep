@@ -46,7 +46,7 @@ jobs:
 
       - name: Echo outputs
         run: |
-          echo "coutinue-workflow: ${{ steps.decision.outputs.continue-workflow }}"
+          echo "continue-workflow: ${{ steps.decision.outputs.continue-workflow }}"
 
   create-standup:
     runs-on: ubuntu-latest
