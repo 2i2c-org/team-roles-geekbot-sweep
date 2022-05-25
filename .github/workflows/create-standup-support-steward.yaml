@@ -18,7 +18,7 @@ on:
         description: |
           The Slack team our Team Roles are generated from
   schedule:
-    - cron: "0 0 * * 1"  # Run at 00:00 UTC weekly on Mondays
+    - cron: "5 0 * * MON"  # Run at 00:05 UTC weekly on Mondays
 
 jobs:
   is-two-weeks:
@@ -37,9 +37,9 @@ jobs:
           ref_date = date(2022, 4, 25)
 
           diff_days = abs(date.today() - ref_date).days
-          n_days_since_last_meeting = diff_days % 14  # Because we transfer the role every 14 days
-          n_weeks_since_last_meeting = (n_days_since_last_meeting // 7) + 1  # Add 1 because we are effectively 0-indexed
-          is_two_weeks = (n_weeks_since_last_meeting % 2) == 0
+          n_days_since = diff_days % 14  # Because we transfer the role every 14 days
+          n_weeks_since = (n_days_since // 7) + 1  # Add 1 because we are effectively 0-indexed
+          is_two_weeks = (n_weeks_since % 2) == 0
 
           # Set output variable for use in further jobs
           print(f"::set-output name=continue-workflow::{is_two_weeks}")
@@ -47,6 +47,7 @@ jobs:
       - name: Echo outputs
         run: |
           echo "continue-workflow: ${{ steps.decision.outputs.continue-workflow }}"
+          echo "update-roles: ${{ github.event.inputs.update-roles }}"
 
   create-standup:
     runs-on: ubuntu-latest
