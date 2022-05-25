@@ -44,6 +44,10 @@ jobs:
           # Set output variable for use in further jobs
           print(f"::set-output name=continue-workflow::{is_two_weeks}")
 
+      - name: Echo outputs
+        run: |
+          echo "coutinue-workflow: ${{ steps.decision.outputs.continue-workflow }}"
+
   create-standup:
     runs-on: ubuntu-latest
     environment: run-slack-bot
