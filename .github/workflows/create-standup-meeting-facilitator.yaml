@@ -67,3 +67,4 @@ jobs:
           poetry run create-standup meeting-facilitator
         env:
           GEEKBOT_API_KEY: "${{ secrets.GEEKBOT_API_KEY }}"
+          POETRY_VIRTUALENVS_CREATE: false
