@@ -52,6 +52,7 @@ jobs:
         env:
           TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
           SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
+          POETRY_VIRTUALENVS_CREATE: false
 
       - name: Add and Commit updated team-roles.json file
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
