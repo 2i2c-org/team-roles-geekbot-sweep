@@ -46,6 +46,7 @@ jobs:
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
         run: |
           poetry run update-team-role meeting-facilitator
+          git diff
         env:
           TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
           SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
