@@ -42,20 +42,20 @@ jobs:
           pip install poetry
           poetry install
 
-      # - name: Update team member in role
-      #   if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
-      #   run: |
-      #     poetry run update-team-role meeting-facilitator
-      #   env:
-      #     TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
-      #     SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
+      - name: Update team member in role
+        if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
+        run: |
+          poetry run update-team-role meeting-facilitator
+        env:
+          TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
+          SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
 
-      # - name: Add and Commit updated team-roles.json file
-      #   if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
-      #   uses: EndBug/add-and-commit@v9
-      #   with:
-      #     add: team-roles.json
-      #     message: "Update the Team Roles JSON file"
+      - name: Add and Commit updated team-roles.json file
+        if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: team-roles.json
+          message: "Update the Team Roles JSON file"
 
       - name: Create a standup for the Meeting Facilitator
         run: |
