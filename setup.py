@@ -109,7 +109,7 @@ setup(
     entry_points={
         "console_scripts": [
             "list-team-members=src.get_slack_team_members:main",
-            "update-team-roles=src.update_team_roles:main",
+            "update-team-role=src.update_team_roles:main",
             "create-standup=src.create_geekbot_standup:main",
             "populate-current-roles=src.set_current_roles:main",
         ],
