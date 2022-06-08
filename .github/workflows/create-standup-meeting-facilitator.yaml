@@ -3,6 +3,12 @@ name: "Create Standup: Meeting Facilitator"
 on:
   workflow_dispatch:
     inputs:
+      debug:
+        required: false
+        type: boolean
+        default: false
+        description: |
+          Open a tmate session for debugging
       update-roles:
         required: false
         type: boolean
@@ -40,6 +46,10 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install .
+
+      - name: Setup tmate session
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
+        uses: mxschmitt/action-tmate@v3
 
       - name: Update team member in role
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
