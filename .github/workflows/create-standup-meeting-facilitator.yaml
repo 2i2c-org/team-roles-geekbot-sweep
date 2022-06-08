@@ -45,7 +45,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install .
+          pip install poetry
+          poetry install
 
       - name: Setup tmate session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
@@ -54,7 +55,7 @@ jobs:
       - name: Update team member in role
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
         run: |
-          update-team-role meeting-facilitator
+          poetry run update-team-roles meeting-facilitator
         env:
           TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
           SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
@@ -69,6 +70,6 @@ jobs:
 
       - name: Create a standup for the Meeting Facilitator
         run: |
-          create-standup meeting-facilitator
+          poetry run create-standup meeting-facilitator
         env:
           GEEKBOT_API_KEY: "${{ secrets.GEEKBOT_API_KEY }}"
