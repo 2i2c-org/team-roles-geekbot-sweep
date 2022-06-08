@@ -57,7 +57,7 @@ jobs:
       - name: Update team member in role
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
         run: |
-          poetry run update-team-role meeting-facilitator
+          poetry run update-team-roles meeting-facilitator
           git diff
         env:
           TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
