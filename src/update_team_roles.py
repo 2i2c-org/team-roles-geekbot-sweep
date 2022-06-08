@@ -159,9 +159,9 @@ def main():
     roles = TeamRoles()
 
     # Update the Team Roles
-    if args.command == "meeting_facilitator":
+    if args.command == "meeting-facilitator":
         roles.update_roles(update_meeting_facilitator=True)
-    elif args.command == "support_steward":
+    elif args.command == "support-steward":
         roles.update_roles(update_support_steward=True)
 
 
