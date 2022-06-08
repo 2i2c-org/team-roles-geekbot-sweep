@@ -41,14 +41,18 @@ jobs:
           pip install --upgrade pip
           pip install poetry
           poetry install
+        env:
+          POETRY_VIRTUALENVS_CREATE: false
 
       - name: Update team member in role
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
         run: |
           poetry run update-team-role meeting-facilitator
+          git diff
         env:
           TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
           SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
+          POETRY_VIRTUALENVS_CREATE: false
 
       - name: Add and Commit updated team-roles.json file
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
@@ -63,3 +67,4 @@ jobs:
           poetry run create-standup meeting-facilitator
         env:
           GEEKBOT_API_KEY: "${{ secrets.GEEKBOT_API_KEY }}"
+          POETRY_VIRTUALENVS_CREATE: false
