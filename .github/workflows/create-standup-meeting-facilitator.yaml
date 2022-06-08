@@ -3,12 +3,6 @@ name: "Create Standup: Meeting Facilitator"
 on:
   workflow_dispatch:
     inputs:
-      debug:
-        required: false
-        type: boolean
-        default: false
-        description: |
-          Setup a tmate session to debug the action with
       update-roles:
         required: false
         type: boolean
@@ -47,22 +41,14 @@ jobs:
           pip install --upgrade pip
           pip install poetry
           poetry install
-        env:
-          POETRY_VIRTUALENVS_CREATE: false
-
-      - name: Setup tmate session
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
-        uses: mxschmitt/action-tmate@v3
 
       - name: Update team member in role
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
         run: |
           poetry run update-team-role meeting-facilitator
-          git diff
         env:
           TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
           SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
-          POETRY_VIRTUALENVS_CREATE: false
 
       - name: Add and Commit updated team-roles.json file
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
@@ -77,4 +63,3 @@ jobs:
           poetry run create-standup meeting-facilitator
         env:
           GEEKBOT_API_KEY: "${{ secrets.GEEKBOT_API_KEY }}"
-          POETRY_VIRTUALENVS_CREATE: false
