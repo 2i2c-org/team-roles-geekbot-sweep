@@ -39,13 +39,12 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install poetry
-          poetry install
+          pip install .
 
       - name: Update team member in role
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
         run: |
-          poetry run update-team-roles meeting-facilitator
+          update-team-role meeting-facilitator
         env:
           TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
           SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
@@ -60,6 +59,6 @@ jobs:
 
       - name: Create a standup for the Meeting Facilitator
         run: |
-          poetry run create-standup meeting-facilitator
+          create-standup meeting-facilitator
         env:
           GEEKBOT_API_KEY: "${{ secrets.GEEKBOT_API_KEY }}"
