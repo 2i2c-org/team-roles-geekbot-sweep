@@ -1,3 +1,7 @@
+# Files relating to Google API authentication to be ignored
+**credentials.json
+**token.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
