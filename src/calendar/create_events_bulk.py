@@ -162,21 +162,32 @@ class CreateBulkEvents:
         except HttpError as error:
             print(f"An error occured: {error}")
 
-    def create_bulk_events(self, role, n_events=None):
+    def create_bulk_events(self, role, name=None, n_events=None):
         """Bulk create Team Role events in a Google Calendar
 
         Args:
             role (str): The role to create events for. Either 'meeting-facilitator' or
                 'support-steward'.
+            name (str, optional): The name of the current team member serving in the
+                role. Defaults to None, and will be pulled from team-roles.json.
             n_events (int, optional): The number of events to create for the specified
                 role. Defaults to ROLE_CYCLES[role]["n_events"].
         """
-        # Find the name of the person currently serving in this role from team-roles.json
+        # Find the name of the person currently serving in this role from
+        # team-roles.json or use a provided 'name' variable
         if role == "meeting-facilitator":
-            current_member = self.team_roles[role.replace("-", "_")]["name"]
+            current_member = (
+                self.team_roles[role.replace("-", "_")]["name"]
+                if name is None
+                else name
+            )
         elif role == "support-steward":
             self._adjust_reference_date()
-            current_member = self.team_roles[role.replace("-", "_")]["current"]["name"]
+            current_member = (
+                self.team_roles[role.replace("-", "_")]["current"]["name"]
+                if name is None
+                else name
+            )
 
         # Find the index of the current team member in the ordered list
         current_member_index = list(self.team_members).index(current_member)
@@ -212,6 +223,13 @@ def main():
         help="The role to create events for",
     )
     parser.add_argument(
+        "-m",
+        "--team-member",
+        type=str,
+        default=None,
+        help="The name of the team member currently serving in the role. Will be pulled from team-roles.json if not provided.",
+    )
+    parser.add_argument(
         "-n",
         "--n-events",
         type=int,
@@ -222,6 +240,7 @@ def main():
         "-d",
         "--date",
         type=str,
+        default=None,
         help="A reference date to begin creating events from. Defaults to today. WARNING: EXPERIMENTAL FEATURE.",
     )
 
