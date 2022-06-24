@@ -10,7 +10,7 @@ from .get_slack_team_members import SlackTeamMembers
 
 def main():
     # Set paths
-    project_path = Path(__file__).parent.parent
+    project_path = Path(__file__).parent.parent.parent
     roles_path = project_path.joinpath("team-roles.json")
 
     # Set environment variables

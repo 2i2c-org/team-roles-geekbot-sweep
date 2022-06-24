@@ -31,7 +31,7 @@ class GeekbotStandup:
         self.geekbot_session = self._create_geekbot_session()
 
         # Set paths
-        project_path = Path(__file__).parent.parent
+        project_path = Path(__file__).parent.parent.parent
         roles_path = project_path.joinpath("team-roles.json")
 
         # Check file exists before reading it

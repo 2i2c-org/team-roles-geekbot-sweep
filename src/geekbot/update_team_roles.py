@@ -21,7 +21,7 @@ class TeamRoles:
         self.slack = SlackTeamMembers()
 
         # Read in who is serving in which role from a JSON file
-        project_path = Path(__file__).parent.parent
+        project_path = Path(__file__).parent.parent.parent
         self.roles_path = project_path.joinpath("team-roles.json")
 
         # Check the file exists before reading
