@@ -257,28 +257,20 @@ def main():
             Create Geekbot standup apps to manage the transition of Team Roles through the Tech Team
         """
     )
-    subparser = parser.add_subparsers(
-        required=True, dest="command", help="Available commands"
+    parser.add_argument(
+        "role",
+        choices=["meeting-facilitator", "support-steward"],
+        help="The role to create a Geekbot Standup to transition",
     )
-
-    meeting_facilitator_parser = subparser.add_parser(
-        "meeting-facilitator",
-        help="Create a Geekbot standup to transition the Meeting Facilitator role",
-    )
-    support_steward_parser = subparser.add_parser(
-        "support-steward",
-        help="Create a Geekbot standup to transition the Support Steward role",
-    )
-
     args = parser.parse_args()
 
     # Instantiate the Geekbot Standup class
     standup = GeekbotStandup()
 
     # Create a standup for the chosen role
-    if args.command == "meeting-facilitator":
+    if args.role == "meeting-facilitator":
         standup.create_meeting_facilitator_standup()
-    elif args.command == "support-steward":
+    elif args.role == "support-steward":
         standup.create_support_steward_standup()
 
 

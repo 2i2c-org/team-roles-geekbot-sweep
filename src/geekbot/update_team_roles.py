@@ -104,16 +104,12 @@ class TeamRoles:
         self.team_roles["support_steward"]["incoming"]["name"] = next_member_name
         self.team_roles["support_steward"]["incoming"]["id"] = next_member_id
 
-    def update_roles(
-        self, update_meeting_facilitator=False, update_support_steward=False
-    ):
+    def update_roles(self, role):
         """Update our Team Roles by iterating through members of the Tech Team
 
         Args:
-            update_meeting_facilitator (bool, optional): If True, the Meeting Facilitator
-                role will be updated. Defaults to False.
-            update_support_steward (bool, optional): If True, the Support Steward role
-                will be updated. Defaults to False.
+            role (str): The role to update. Either 'meeting-facilitator' or
+                'support-steward'.
         """
         # Populate team members
         self.team_members = self.slack.get_users_in_team()
@@ -121,11 +117,10 @@ class TeamRoles:
         # Check the info for the standup manager is complete
         self._check_managers_id_is_set()
 
-        if update_meeting_facilitator:
+        if role == "meeting-facilitator":
             logger.info("Updating the Meeting Facilitator role")
             self._update_meeting_facilitator_role()
-
-        if update_support_steward:
+        elif role == "support-steward":
             logger.info("Updating the Support Steward role")
             self._update_support_steward_role()
 
@@ -140,29 +135,14 @@ def main():
     parser = argparse.ArgumentParser(
         description="Update our Team Roles by iterating through members of the Tech Team"
     )
-    subparser = parser.add_subparsers(
-        required=True, dest="command", help="Available commands"
+    parser.add_argument(
+        "role",
+        choices=["meeting-facilitator", "support-steward"],
+        help="The role to update",
     )
-
-    meeting_facilitator_parser = subparser.add_parser(
-        "meeting-facilitator",
-        help="Update the Meeting Facilitator role",
-    )
-    support_steward_parser = subparser.add_parser(
-        "support-steward",
-        help="Update the Support Steward role",
-    )
-
     args = parser.parse_args()
 
-    # Instantiate the TeamRoles class
-    roles = TeamRoles()
-
-    # Update the Team Roles
-    if args.command == "meeting-facilitator":
-        roles.update_roles(update_meeting_facilitator=True)
-    elif args.command == "support-steward":
-        roles.update_roles(update_support_steward=True)
+    TeamRoles().update_roles(role=args.role)
 
 
 if __name__ == "__main__":
