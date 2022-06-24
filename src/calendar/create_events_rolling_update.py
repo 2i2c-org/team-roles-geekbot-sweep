@@ -1,3 +1,6 @@
+"""
+Create the next event in a series based on the data for the last event in a calendar
+"""
 import argparse
 import os
 from datetime import datetime, timedelta
@@ -8,6 +11,7 @@ from googleapiclient.errors import HttpError
 from ..geekbot.get_slack_team_members import SlackTeamMembers
 from .gcal_api_auth import GoogleCalendarAPI
 
+# Some information about how often each of our team roles is transferred
 ROLE_CYCLES = {
     "meeting-facilitator": {
         "unit": "months",
@@ -25,6 +29,10 @@ ROLE_CYCLES = {
 
 
 class CreateNextEvent:
+    """
+    Create the next Team Role event in a series given the last known event in a Calendar
+    """
+
     def __init__(self):
         self.calendar_id = os.environ["CALENDAR_ID"]
         self.gcal_api = GoogleCalendarAPI().authenticate()
@@ -36,19 +44,34 @@ class CreateNextEvent:
         self.today = datetime.utcnow()
 
     def _get_upcoming_events(self, role):
+        """Get the upcoming events in a Google calendar
+
+        Args:
+            role (str): The role we want to retrieve events for. Either
+                'meeting-facilitator' or 'support-steward'.
+
+        Returns:
+            list[dict]: A list of event objects describing all the upcoming events in
+                the calendar for the specified role
+        """
+        # Get all upcoming events in a calendar
         events_results = (
             self.gcal_api.events()
             .list(
                 calendarId=self.calendar_id,
                 timeMin=self.today.isoformat() + "Z",
-                maxResults=100,
                 singleEvents=True,
                 orderBy="startTime",
+                # There will be 12 Meeting Facilitator events per year and 26 Support
+                # Steward events per year - so 50 is enough to cover both those event
+                # types together, plus some extra.
+                maxResults=50,
             )
             .execute()
         )
-
         events = events_results.get("items", [])
+
+        # Filter the events for those that have the specified role in their summary
         events = [
             event
             for event in events
@@ -58,17 +81,36 @@ class CreateNextEvent:
         return events
 
     def _calculate_next_event_data(self, role):
+        """Calculate the metadata for the next event in this role's series. Metadata are:
+        - Start date
+        - End date
+        - Name of person serving in that role
+
+        Args:
+            role (str): The role type to generate metadata for. Either
+                'meeting-facilitator' or 'support-steward'.
+
+        Returns:
+            tuple(datetime obj, datetime obj, str): Returns the start date, end date and
+                name of team member in the role for the next event in the series for a
+                given role
+        """
+        # Get upcoming events for this role
         events = self._get_upcoming_events(role)
 
+        # Find the last event in this series
         if role == "meeting-facilitator":
             last_event = events[-1]
         elif role == "support-steward":
+            # We use [-2] here because the support steward role overlaps by 2 two weeks
             last_event = events[-2]
 
+        # Extract the relevant metadata from the last event in the series
         last_event_end_date = last_event.get("dateTime", last_event["end"].get("date"))
         last_event_end_date = datetime.strptime(last_event_end_date, "%Y-%m-%d")
         last_team_member = last_event.get("summary", "").split(":")[-1].strip()
 
+        # Calculate the next team member to serve in this role
         last_team_member_index = next(
             (
                 i
@@ -78,14 +120,15 @@ class CreateNextEvent:
             None,
         )
         next_team_member_index = last_team_member_index + 1
-
         if next_team_member_index >= len(self.team_members):
             next_team_member_index = 0
-
         next_team_member = list(self.team_members)[next_team_member_index]
 
+        # Since start dates are inclusive and end dates are exclusive, the end and start
+        # dates for two consecutive events are equivalent
         next_event_start_date = last_event_end_date
 
+        # Calculate the end date for the specified role
         if role == "meeting-facilitator":
             next_event_end_date = next_event_start_date + relativedelta(
                 months=ROLE_CYCLES[role]["period"]
@@ -98,8 +141,17 @@ class CreateNextEvent:
         return next_event_start_date, next_event_end_date, next_team_member
 
     def create_next_event(self, role):
+        """Create the next event in a series in a Google Calendar for a given role
+
+        Args:
+            role (str): The role to create an event for. Either 'meeting-facilitator' or
+                'support-steward'.
+        """
+        # Get the metadata for the next event
         start_date, end_date, name = self._calculate_next_event_data(role)
 
+        # This represents the minimum amount of information to POST to the Google
+        # Calendar API to create an event in a given calendar.
         body = {
             "summary": f"{' '.join(role.split('-')).title()}: {name}",
             "start": {
@@ -113,6 +165,7 @@ class CreateNextEvent:
         }
 
         try:
+            # Create the event
             self.gcal_api.events().insert(
                 calendarId=self.calendar_id, body=body
             ).execute()
@@ -121,16 +174,15 @@ class CreateNextEvent:
 
 
 def main():
-    parser = argparse.ArgumentParser()
-
+    parser = argparse.ArgumentParser(
+        description="Create the next event in a series for a Team Role in a Google Calendar"
+    )
     parser.add_argument(
         "role",
         choices=["meeting-facilitator", "support-steward"],
-        help="",
+        help="The role to create an event for",
     )
-
     args = parser.parse_args()
-
     CreateNextEvent().create_next_event(role=args.role)
 
 
