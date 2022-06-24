@@ -11,12 +11,18 @@ slack-sdk = "^3.15"
 requests = "^2.27"
 rich = "^12.3"
 loguru = "^0.6"
+python-dateutil = "^2.8"
+google-api-python-client = "^2.51"
+google-auth-httplib2 = "^0.1"
+google-auth-oauthlib = "^0.5"
 
 [tool.poetry.scripts]
 list-team-members = "src.geekbot.get_slack_team_members:main"
 update-team-role = "src.geekbot.update_team_roles:main"
 create-standup = "src.geekbot.create_geekbot_standup:main"
 populate-current-roles = "src.geekbot.set_current_roles:main"
+create-next-event = "src.calendar.create_events_rolling_update:main"
+create-bulk-events = "src.calendar.create_events_bulk:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
