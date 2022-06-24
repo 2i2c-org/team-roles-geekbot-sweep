@@ -1,12 +1,10 @@
+import json
 import os
-from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
-import json
-from tempfile import NamedTemporaryFile
 
 
 class GoogleCalendarAPI:
@@ -19,7 +17,9 @@ class GoogleCalendarAPI:
         with NamedTemporaryFile(mode="w") as service_account_file:
             json.dump(self.service_account_key, service_account_file)
             service_account_file.flush()
-            creds = service_account.Credentials.from_service_account_file(service_account_file.name)
+            creds = service_account.Credentials.from_service_account_file(
+                service_account_file.name
+            )
 
         creds = creds.with_scopes(self.scopes)
 

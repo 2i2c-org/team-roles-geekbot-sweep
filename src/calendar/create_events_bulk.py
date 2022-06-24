@@ -8,8 +8,8 @@ from pathlib import Path
 from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
 
-from .gcal_api_auth import GoogleCalendarAPI
 from ..geekbot.get_slack_team_members import SlackTeamMembers
+from .gcal_api_auth import GoogleCalendarAPI
 
 ROLE_CYCLES = {
     "meeting-facilitator": {
