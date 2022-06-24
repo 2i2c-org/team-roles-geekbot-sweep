@@ -13,10 +13,10 @@ rich = "^12.3"
 loguru = "^0.6"
 
 [tool.poetry.scripts]
-list-team-members = "src.get_slack_team_members:main"
-update-team-role = "src.update_team_roles:main"
-create-standup = "src.create_geekbot_standup:main"
-populate-current-roles = "src.set_current_roles:main"
+list-team-members = "src.geekbot.get_slack_team_members:main"
+update-team-role = "src.geekbot.update_team_roles:main"
+create-standup = "src.geekbot.create_geekbot_standup:main"
+populate-current-roles = "src.geekbot.set_current_roles:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
