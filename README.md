@@ -106,16 +106,13 @@ poetry run update-team-role { meeting-facilitator | support-steward }
 Help info:
 
 ```bash
-usage: update-team-role [-h] {meeting-facilitator,support-steward} ...
+usage: update-team-role [-h] {meeting-facilitator,support-steward}
 
 Update our Team Roles by iterating through members of the Tech Team
 
 positional arguments:
   {meeting-facilitator,support-steward}
-                        Available commands
-    meeting-facilitator
-                        Update the Meeting Facilitator role
-    support-steward     Update the Support Steward role
+                        The role to update
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -142,16 +139,13 @@ poetry run create-standup { meeting-facilitator | support-steward }
 Help info:
 
 ```bash
-usage: create-standup [-h] {meeting-facilitator,support-steward} ...
+usage: create-standup [-h] {meeting-facilitator,support-steward}
 
 Create Geekbot standup apps to manage the transition of Team Roles through the Tech Team
 
 positional arguments:
   {meeting-facilitator,support-steward}
-                        Available commands
-    meeting-facilitator
-                        Create a Geekbot standup to transition the Meeting Facilitator role
-    support-steward     Create a Geekbot standup to transition the Support Steward role
+                        The role to create a Geekbot Standup to transition
 
 optional arguments:
   -h, --help            show this help message and exit
