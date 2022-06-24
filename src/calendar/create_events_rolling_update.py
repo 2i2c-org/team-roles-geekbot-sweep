@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
 
-from src.calendar.gcal_api_auth import GoogleCalendarAPI
-from src.geekbot.get_slack_team_members import SlackTeamMembers
+from .gcal_api_auth import GoogleCalendarAPI
+from ..geekbot.get_slack_team_members import SlackTeamMembers
 
 ROLE_CYCLES = {
     "meeting-facilitator": {

@@ -8,10 +8,8 @@ from pathlib import Path
 from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
 
-from src.calendar.gcal_api_auth import GoogleCalendarAPI
-from src.geekbot.get_slack_team_members import SlackTeamMembers
-
-ROOT_DIR = Path(__file__).parent.parent.parent
+from .gcal_api_auth import GoogleCalendarAPI
+from ..geekbot.get_slack_team_members import SlackTeamMembers
 
 ROLE_CYCLES = {
     "meeting-facilitator": {
@@ -36,7 +34,8 @@ class CreateBulkEvents:
         self.team_members = SlackTeamMembers().get_users_in_team().keys()
         self.gcal_api = GoogleCalendarAPI().authenticate()
 
-        team_roles_path = ROOT_DIR.joinpath("team-roles.json")
+        project_path = Path(__file__).parent.parent.parent
+        team_roles_path = project_path.joinpath("team-roles.json")
         with open(team_roles_path) as stream:
             self.team_roles = json.load(stream)
 
