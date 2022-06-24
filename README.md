@@ -181,6 +181,93 @@ To execute this script, run:
 poetry run populate-current-roles
 ```
 
+### `create_events_rolling_update.py`
+
+This script is used to create the next event for a Team Role given that a series of events already exist in a Google Calendar.
+It calculates the required metadata for the new event from the last event available on the calendar.
+It depends upon [`get_slack_team_members.py`](#get_slack_team_memberspy) to get an ordered list of the team members who fulfil these roles.
+
+In addition to the two environment variables required be `get_slack_team_members.py`, this script also requires the following environment variables to be set:
+
+- `GCP_SERVICE_ACCOUNT_KEY`: A Google Cloud Service Account with permissions to access Google's Calendar API
+- `CALENDAR_ID`: The ID of a Google Calendar to which the above Service Account has permission to manage events
+
+**Command line usage:**
+
+To execute this script, run:
+
+```bash
+poetry run create-next-event { meeting-facilitator | support-steward }
+```
+
+Help info:
+
+```bash
+usage: create-next-event [-h] {meeting-facilitator,support-steward}
+
+Create the next event in a series for a Team Role in a Google Calendar
+
+positional arguments:
+  {meeting-facilitator,support-steward}
+                        The role to create an event for
+
+optional arguments:
+  -h, --help            show this help message and exit
+```
+
+### `create_events_bulk.py`
+
+This script is used to generate a large number of events for a Team Role in a Google Calendar in bulk.
+It begins generating events either from the day the script is executed or from a provided reference date.
+It depends upon [`get_slack_team_members.py`](#get_slack_team_memberspy) to get an ordered list of the team members who fulfil these roles.
+
+In addition to the two environment variables required be `get_slack_team_members.py`, this script also requires the following environment variables to be set:
+
+- `GCP_SERVICE_ACCOUNT_KEY`: A Google Cloud Service Account with permissions to access Google's Calendar API
+- `CALENDAR_ID`: The ID of a Google Calendar to which the above Service Account has permission to manage events
+
+#### :fire: Reference Dates for the Support Steward :fire:
+
+Our Support Steward role starts and ends on Wednesdays for a period of 4 weeks with a team member rotating on/off the role every two weeks.
+
+The `create_events_bulk.py` script accounts for this by adjusting the reference date to the next Wednesday in the calendar.
+However, the next Wednesday might not necessarily line up with the 2/4 weekly cycle of the Support Steward.
+So take caution when running this script and choose a reference date carefully before executing.
+
+The two `create_events_*.py` scripts can't delete events and so, if they are repeatedly run, will create duplicate events.
+
+**Command line usage:**
+
+To execute this script, run:
+
+```bash
+poetry run create-bulk-events { meeting-facilitator | support-steward }
+```
+
+**Help info:**
+
+```bash
+usage: create-bulk-events [-h] [-n N_EVENTS] [-d DATE] {meeting-facilitator,support-steward}
+
+Bulk create a series of Team Role events in a Google Calendar
+
+positional arguments:
+  {meeting-facilitator,support-steward}
+                        The role to create events for
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -n N_EVENTS, --n-events N_EVENTS
+                        The number of role events to create. Defaults to 12 for Meeting
+                        Facilitator and 26 for Support Steward (both 1 year's worth).
+  -d DATE, --date DATE  A reference date to begin creating events from. Defaults to today.
+                        WARNING: EXPERIMENTAL FEATURE.
+```
+
+### `gcal_api_auth.py`
+
+This script is a helper script that returns an authenticated instance of the Google Calendar API for the [`create_events_rolling_update.py`](#create_events_rolling_updatepy) and [`create_events_bulk.py`](#create_events_bulkpy) to create events in a Google Calendar.
+
 ## CI/CD workflows
 
 All our CI/CD workflows are powered by [GitHub Actions](https://docs.github.com/en/actions) and the configuration is located in the [`.github/workflows`](.github/workflows/) folder.
