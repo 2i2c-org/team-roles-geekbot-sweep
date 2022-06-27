@@ -204,7 +204,10 @@ class CreateBulkEvents:
             )
 
         # Find the index of the current team member in the ordered list
-        current_member_index = list(self.team_members).index(current_member)
+        current_member_index = next(
+            (i for (i, member) in enumerate(self.team_members) if name in member),
+            None,
+        )
 
         # Set the number of events to create if not specified
         if n_events is None:
@@ -261,7 +264,7 @@ def main():
     args = parser.parse_args()
 
     create_bulk_events = CreateBulkEvents(date=args.date)
-    create_bulk_events.create_bulk_events(args.role, n_events=args.n_events)
+    create_bulk_events.create_bulk_events(args.role, name=args.team_member, n_events=args.n_events)
 
 
 if __name__ == "__main__":
