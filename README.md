@@ -1,10 +1,11 @@
 # Team Roles Geekbot Sweep
 
-A Slack/Geekbot App to sweep through our Tech Team and assign Team Roles
+A Slack/Geekbot/Google Calendar App to sweep through our Tech Team, assign Team Roles, and track them in a calendar
 
 ## Summary
 
-This repository is a collection of Python code that tracks which members of 2i2c's Tech Team (as defined by membership of the `team-team` Slack team) are currently serving in our Team Roles (Meeting Facilitator and Support Steward), works out which team member is due to take over the role, and dynamically generate Geekbot standups in Slack to visibly and explicitly notify the given team member that they are due to take over the role.
+This repository is a collection of Python code that tracks which members of 2i2c's Tech Team (as defined by membership of the `tech-team` Slack team) are currently serving in our Team Roles (Meeting Facilitator and Support Steward), works out which team member is due to take over the role, and dynamically generate Geekbot standups in Slack to visibly and explicitly notify the given team member that they are due to take over the role.
+It also creates events in a Google Calendar to make the role changes more visible.
 
 ### Useful Documentation
 
@@ -12,11 +13,13 @@ This repository is a collection of Python code that tracks which members of 2i2c
 
 - [Slack API](https://api.slack.com/methods)
 - [Geekbot API](https://geekbot.com/developers/)
+- [Google Calendar API](https://developers.google.com/calendar/api)
 
-**Tutorials on Slack bot building in Python:**
+**Tutorials:**
 
 - [How to Build Your First Slack Bot with Python](https://www.fullstackpython.com/blog/build-first-slack-bot-python.html)
 - [Building a simple bot using Python in 10 minutes](https://github.com/slackapi/python-slack-sdk/tree/main/tutorial)
+- [Quickstart Guide to the Google Calendar API with Python](https://developers.google.com/calendar/api/quickstart/python)
 
 ## Installation
 
@@ -38,7 +41,7 @@ For the Support Steward, we track both the current and incoming team members as 
 
 We have an extra role here called `standup_manager`.
 This is the team member who created `GEEKBOT_API_KEY` and will be added to all standups.
-This is because Geekbot only provide personal API keys and they do not have permission to see any standups the owner is not a member of.
+This is because Geekbot only provides personal API keys and these keys do not have permission to see any standups the owner of said key is not a member of.
 :fire: **If you are changing this role, you will need to recreate `GEEKBOT_API_KEY`.** :fire:
 
 ```json
@@ -274,8 +277,18 @@ Note that `SLACK_BOT_TOKEN` is provided via a GitHub Action Environment Secret.
 
 ### `create-standup-meeting-facilitator.yaml`
 
-_TBA_
+This workflow runs the [`create_geekbot_standup.py`](#create_geekbot_standuppy) to update the Meeting Facilitator role in the `team-roles.json` file and create/update a Geekbot Standup App to notify the new team member serving in the role.
+It can be manually triggered with the option of updating the team roles file or not, for example if you'd just like to reset the Geekbot App.
+
+This workflow is scheduled to run at midnight UTC on the 28th of each month.
+The Geekbot App is configured to notify the next Meeting Facilitator on the first Monday of each month.
 
 ### `create-standup-support-steward.yaml`
 
-_TBA_
+This workflow runs the [`create_geekbot_standup.py`](#create_geekbot_standuppy) to update the Support Steward role in the `team-roles.json` file and create/update a Geekbot Standup App to notify the new team member serving in the role.
+It can be manually triggered with the option of updating the team roles file or not, for example if you'd just like to reset the Geekbot App.
+
+This workflow is scheduled to run at 00:05 UTC every Monday
+and has a job `is-two-weeks` that determines if we are on a two-week cycle since a defined reference date.
+This is because we transfer the Support Steward role every two weeks, but writing a cronjob for every two weeks is tough!
+The Geekbot App is configured to notify the next Support Steward on every other Wednesday.
