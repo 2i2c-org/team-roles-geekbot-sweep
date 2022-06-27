@@ -205,7 +205,7 @@ class CreateBulkEvents:
 
         # Find the index of the current team member in the ordered list
         current_member_index = next(
-            (i for (i, member) in enumerate(self.team_members) if name in member),
+            (i for (i, name) in enumerate(self.team_members) if current_member in name),
             None,
         )
 
