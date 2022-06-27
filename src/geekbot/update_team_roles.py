@@ -12,9 +12,7 @@ from .get_slack_team_members import SlackTeamMembers
 
 
 class TeamRoles:
-    """
-    Iterate our Team Roles through the Tech Team
-    """
+    """Iterate our Team Roles through the Tech Team"""
 
     def __init__(self):
         # Instatiate the SlackTeamMembers class

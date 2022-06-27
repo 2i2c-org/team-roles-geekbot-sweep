@@ -27,9 +27,7 @@ class SlackTeamMembers:
         logger.info(f"Retrieving ID for Slack team: {self.team_name}")
 
         # Get all usergroups in workspace
-        response = self.client.api_call(
-            api_method="usergroups.list",
-        )
+        response = self.client.api_call(api_method="usergroups.list")
 
         # Find ID for the self.team_name usergroup
         index = next(
