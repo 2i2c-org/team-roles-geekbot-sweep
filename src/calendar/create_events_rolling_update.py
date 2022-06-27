@@ -4,7 +4,6 @@ Create the next event in a series based on the data for the last event in a cale
 import argparse
 import os
 from datetime import datetime, timedelta
-from textwrap import dedent
 
 from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
@@ -170,12 +169,7 @@ class CreateNextEvent:
 
         try:
             logger.info(
-                dedent(
-                    f"""Creating event ==> {body['summary']}
-                    \tStart date: {body['start']['date']}
-                    \tEnd date: {body['end']['date']}
-                    """
-                )
+                f"Creating event ==> {body['summary']}, Start date: {body['start']['date']}, End date: {body['end']['date']}"
             )
 
             # Create the event
