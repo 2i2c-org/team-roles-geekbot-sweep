@@ -275,13 +275,17 @@ This workflow runs the [`set_current_roles.py` script](#set_current_rolespy) to 
 It can be triggered manually and requires the environment variables required by `set_current_roles.py` and [`get_slack_team_members.py`](#get_slack_team_memberspy) to be provided as inputs.
 Note that `SLACK_BOT_TOKEN` is provided via a GitHub Action Environment Secret.
 
-### `create-standup-meeting-facilitator.yaml`
+### `meeting-facilitator.yaml`
 
-This workflow runs the [`create_geekbot_standup.py`](#create_geekbot_standuppy) to update the Meeting Facilitator role in the `team-roles.json` file and create/update a Geekbot Standup App to notify the new team member serving in the role.
+This workflow file contains two jobs: `create-standup` and `update-calendar`.
+It is scheduled to run at midnight UTC on the 28th of each month.
+
+The `create-standup` job runs the [`create_geekbot_standup.py`](#create_geekbot_standuppy) script to update the Meeting Facilitator role in the `team-roles.json` file and create/update a Geekbot Standup App to notify the new team member serving in the role.
 It can be manually triggered with the option of updating the team roles file or not, for example if you'd just like to reset the Geekbot App.
-
-This workflow is scheduled to run at midnight UTC on the 28th of each month.
 The Geekbot App is configured to notify the next Meeting Facilitator on the first Monday of each month.
+
+The `update-calendar` job runs the [`create_events_rolling_update.py`](#create_events_rolling_updatepy) script to create the next event in the series, keeping the calendar populated roughly one year in advance.
+This job cannot be manually triggered.
 
 ### `create-standup-support-steward.yaml`
 
