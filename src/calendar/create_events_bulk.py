@@ -7,7 +7,6 @@ import os
 from datetime import datetime, timedelta
 from itertools import cycle, islice
 from pathlib import Path
-from textwrap import dedent
 
 from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
@@ -166,12 +165,7 @@ class CreateBulkEvents:
 
         try:
             logger.info(
-                dedent(
-                    f"""Creating event ==> {body['summary']}
-                    \tStart date: {body['start']['date']}
-                    \tEnd date: {body['end']['date']}
-                    """
-                )
+                f"Creating event ==> {body['summary']}, Start date: {body['start']['date']}, End date: {body['end']['date']}"
             )
 
             # Create the event
