@@ -1,11 +1,11 @@
 # Team Roles Geekbot Sweep
 
-A Slack/Geekbot/Google Calendar App to sweep through our Tech Team, assign Team Roles, and track them in a calendar
+A Slack/Geekbot/Google Calendar App to sweep through our Tech Team, assign Team Roles, and track them in our Team Roles calendar
 
 ## Summary
 
 This repository is a collection of Python code that tracks which members of 2i2c's Tech Team (as defined by membership of the `tech-team` Slack team) are currently serving in our Team Roles (Meeting Facilitator and Support Steward), works out which team member is due to take over the role, and dynamically generate Geekbot standups in Slack to visibly and explicitly notify the given team member that they are due to take over the role.
-It also creates events in a Google Calendar to make the role changes more visible.
+It also creates events in the Team Roles Google Calendar to make the role changes more visible.
 
 ### Useful Documentation
 
