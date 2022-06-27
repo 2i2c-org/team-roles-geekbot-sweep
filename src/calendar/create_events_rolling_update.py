@@ -4,9 +4,11 @@ Create the next event in a series based on the data for the last event in a cale
 import argparse
 import os
 from datetime import datetime, timedelta
+from textwrap import dedent
 
 from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
+from loguru import logger
 
 from ..geekbot.get_slack_team_members import SlackTeamMembers
 from .gcal_api_auth import GoogleCalendarAPI
@@ -95,6 +97,8 @@ class CreateNextEvent:
                 name of team member in the role for the next event in the series for a
                 given role
         """
+        logger.info("Generating metadata for next event...")
+
         # Get upcoming events for this role
         events = self._get_upcoming_events(role)
 
@@ -165,12 +169,21 @@ class CreateNextEvent:
         }
 
         try:
+            logger.info(
+                dedent(
+                    f"""Creating event ==> {body['summary']}
+                    \tStart date: {body['start']['date']}
+                    \tEnd date: {body['end']['date']}
+                    """
+                )
+            )
+
             # Create the event
             self.gcal_api.events().insert(
                 calendarId=self.calendar_id, body=body
             ).execute()
         except HttpError as error:
-            print(f"An error occured: {error}")
+            logger.error(f"An error occured: {error}")
 
 
 def main():

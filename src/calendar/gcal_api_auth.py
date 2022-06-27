@@ -9,6 +9,7 @@ from tempfile import NamedTemporaryFile
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from loguru import logger
 
 
 class GoogleCalendarAPI:
@@ -33,5 +34,5 @@ class GoogleCalendarAPI:
         try:
             return build("calendar", "v3", credentials=creds)
         except HttpError as error:
-            print(f"An error occurred: {error}")
+            logger.error(f"An error occurred: {error}")
             sys.exit(1)

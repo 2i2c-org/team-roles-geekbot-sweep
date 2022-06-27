@@ -7,9 +7,11 @@ import os
 from datetime import datetime, timedelta
 from itertools import cycle, islice
 from pathlib import Path
+from textwrap import dedent
 
 from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
+from loguru import logger
 
 from ..geekbot.get_slack_team_members import SlackTeamMembers
 from .gcal_api_auth import GoogleCalendarAPI
@@ -58,6 +60,11 @@ class CreateBulkEvents:
         else:
             self.reference_date = datetime.strptime(date, "%Y-%m-%d")
 
+        logger.info(
+            "Reference date to calculate events from: {}",
+            self.reference_date.strftime("%Y-%m-D"),
+        )
+
     def _adjust_reference_date(self):
         """
         The Support Steward Role is transferred on Wednesdays. We adjust the reference
@@ -75,6 +82,10 @@ class CreateBulkEvents:
             self.reference_date = self.reference_date + timedelta(
                 days=(7 + (3 - weekday_num))
             )
+
+        logger.info(
+            "Reference date adjusted to: {}", self.reference_date.strftime("%Y-%m-%d")
+        )
 
     def _calculate_event_dates_meeting_facilitator(self, offset):
         """Calculate the start and end dates for a Meeting Facilitator calendar event
@@ -154,13 +165,22 @@ class CreateBulkEvents:
         }
 
         try:
+            logger.info(
+                dedent(
+                    f"""Creating event ==> {body['summary']}
+                    \tStart date: {body['start']['date']}
+                    \tEnd date: {body['end']['date']}
+                    """
+                )
+            )
+
             # Create the event
             self.gcal_api.events().insert(
                 calendarId=self.calendar_id, body=body
             ).execute()
 
         except HttpError as error:
-            print(f"An error occured: {error}")
+            logger.error(f"An error occured: {error}")
 
     def create_bulk_events(self, role, name=None, n_events=None):
         """Bulk create Team Role events in a Google Calendar
