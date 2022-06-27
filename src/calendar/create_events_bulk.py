@@ -264,7 +264,9 @@ def main():
     args = parser.parse_args()
 
     create_bulk_events = CreateBulkEvents(date=args.date)
-    create_bulk_events.create_bulk_events(args.role, name=args.team_member, n_events=args.n_events)
+    create_bulk_events.create_bulk_events(
+        args.role, name=args.team_member, n_events=args.n_events
+    )
 
 
 if __name__ == "__main__":
