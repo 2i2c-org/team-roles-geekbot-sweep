@@ -116,7 +116,8 @@ class TeamRoles:
             tuple(str, str): The names of the current and next team members to serve in
                 the specified role
         """
-        # Find the 5 upcoming events on a calendar
+        # Find the  upcoming events on a calendar. We use 7 here since we want at least 2 Meeting Facilitator events
+        # and 3 Support Steward events. So 7 gives us some leeway.
         events_results = (
             self.gcal_api.events()
             .list(
@@ -148,6 +149,8 @@ class TeamRoles:
                 next_member = None
 
         elif role == "support-steward":
+            # For the Support Steward, we use the 1 and 2 indexed events, instead of 0 and 1, since
+            # team members in this role overlap with one another
             try:
                 current_member = events[1]["summary"].split(":")[-1].strip()
             except IndexError:
