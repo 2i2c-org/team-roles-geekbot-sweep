@@ -100,7 +100,7 @@ class TeamRoles:
                 current_member = self.team_roles["support_steward"]["incoming"]["name"]
 
         if next_member is None:
-            next_member = self._find_next_team_member(current_member)[0]
+            next_member = self._find_next_team_member(current_member)
 
         return current_member, next_member
 
