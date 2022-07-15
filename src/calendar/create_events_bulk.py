@@ -45,7 +45,7 @@ class CreateBulkEvents:
         roles_path = project_path.joinpath("team-roles.json")
 
         # Check the file exists before reading
-        if not os.path.exists(self.roles_path):
+        if not os.path.exists(roles_path):
             raise FileNotFoundError(f"File must exist to continue! {roles_path}")
 
         with open(roles_path) as stream:
