@@ -42,8 +42,13 @@ class CreateBulkEvents:
         self.gcal_api = GoogleCalendarAPI().authenticate()
 
         project_path = Path(__file__).parent.parent.parent
-        team_roles_path = project_path.joinpath("team-roles.json")
-        with open(team_roles_path) as stream:
+        roles_path = project_path.joinpath("team-roles.json")
+
+        # Check the file exists before reading
+        if not os.path.exists(self.roles_path):
+            raise FileNotFoundError(f"File must exist to continue! {roles_path}")
+
+        with open(roles_path) as stream:
             self.team_roles = json.load(stream)
 
     def _generate_reference_date(self, date=None):

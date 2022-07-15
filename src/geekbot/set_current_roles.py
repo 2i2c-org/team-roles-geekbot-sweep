@@ -13,6 +13,10 @@ def main():
     project_path = Path(__file__).parent.parent.parent
     roles_path = project_path.joinpath("team-roles.json")
 
+    # Check the file exists before continuing
+    if not os.path.exists(roles_path):
+        raise FileNotFoundError(f"File must exist to continue! {roles_path}")
+
     # Set environment variables
     current_meeting_facilitator = os.environ["CURRENT_MEETING_FACILITATOR"]
     current_support_steward = os.environ["CURRENT_SUPPORT_STEWARD"]
