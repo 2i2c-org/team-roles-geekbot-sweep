@@ -1,4 +1,4 @@
-name: "Create Standup: Support Steward"
+name: Support Steward
 
 on:
   workflow_dispatch:
@@ -89,3 +89,32 @@ jobs:
           poetry run create-standup support-steward
         env:
           GEEKBOT_API_KEY: "${{ secrets.GEEKBOT_API_KEY }}"
+
+  update-calendar:
+    runs-on: ubuntu-latest
+    environment: run-slack-bot
+    needs: [is-two-weeks]
+    if: github.event_name == 'schedule' && needs.is-two-weeks.outputs.continue-workflow == 'True'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python v3.9
+        uses: actions/setup-python@v4.0.0
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+          poetry install
+
+      - name: Create next Support Steward event in the calendar
+        run: |
+          poetry run create-next-event support-steward
+        env:
+          TEAM_NAME: "${{ env.TEAM_NAME }}"
+          SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
+          CALENDAR_ID: "${{ secrets.CALENDAR_ID }}"
+          GCP_SERVICE_ACCOUNT_KEY: "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"
