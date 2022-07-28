@@ -49,6 +49,8 @@ jobs:
         env:
           TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
           SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
+          CALENDAR_ID: "${{ secrets.CALENDAR_ID }}"
+          GCP_SERVICE_ACCOUNT_KEY: "${{ secrects.GCP_SERVICE_ACCOUNT_KEY }}"
 
       - name: Add and Commit updated team-roles.json file
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
