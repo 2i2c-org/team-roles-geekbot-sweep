@@ -278,20 +278,30 @@ This workflow runs the [`set_current_roles.py` script](#set_current_rolespy) to 
 It can be triggered manually and requires the environment variables required by `set_current_roles.py` and [`get_slack_team_members.py`](#get_slack_team_memberspy) to be provided as inputs.
 Note that `SLACK_BOT_TOKEN` is provided via a GitHub Action Environment Secret.
 
-### `create-standup-meeting-facilitator.yaml`
+### `meeting-facilitator.yaml`
 
-This workflow runs the [`create_geekbot_standup.py`](#create_geekbot_standuppy) to update the Meeting Facilitator role in the `team-roles.json` file and create/update a Geekbot Standup App to notify the new team member serving in the role.
+This workflow file contains two jobs: `create-standup` and `update-calendar`.
+It is scheduled to run at midnight UTC on the 28th of each month.
+
+The `create-standup` job runs the [`create_geekbot_standup.py`](#create_geekbot_standuppy) script to update the Meeting Facilitator role in the `team-roles.json` file and create/update a Geekbot Standup App to notify the new team member serving in the role.
 It can be manually triggered with the option of updating the team roles file or not, for example if you'd just like to reset the Geekbot App.
-
-This workflow is scheduled to run at midnight UTC on the 28th of each month.
 The Geekbot App is configured to notify the next Meeting Facilitator on the first Monday of each month.
 
-### `create-standup-support-steward.yaml`
+The `update-calendar` job runs the [`create_events_rolling_update.py`](#create_events_rolling_updatepy) script to create the next event in the series, keeping the calendar populated roughly one year in advance.
+This job cannot be manually triggered.
 
-This workflow runs the [`create_geekbot_standup.py`](#create_geekbot_standuppy) to update the Support Steward role in the `team-roles.json` file and create/update a Geekbot Standup App to notify the new team member serving in the role.
-It can be manually triggered with the option of updating the team roles file or not, for example if you'd just like to reset the Geekbot App.
+### `support-steward.yaml`
 
-This workflow is scheduled to run at 00:05 UTC every Monday
-and has a job `is-two-weeks` that determines if we are on a two-week cycle since a defined reference date.
+This workflow file contains three jobs: `is-two-weeks`, `create-standup` and `update-calendar`.
+It is scheduled to run at midnight UTC weekly on Mondays.
+
+The `is-two-weeks` job determines if we are on a two-week cycle since a defined reference date.
 This is because we transfer the Support Steward role every two weeks, but writing a cronjob for every two weeks is tough!
 The Geekbot App is configured to notify the next Support Steward on every other Wednesday.
+If we are not on a two-week cycle, the following jobs will not be triggered.
+
+The `create-standup` job runs the [`create_geekbot_standup.py`](#create_geekbot_standuppy) to update the Support Steward role in the `team-roles.json` file and create/update a Geekbot Standup App to notify the new team member serving in the role.
+It can be manually triggered with the option of updating the team roles file or not, for example if you'd just like to reset the Geekbot App.
+
+The `update-calendar` job runs the [`create_events_rolling_update.py`](#create_events_rolling_updatepy) script to create the next event in the series, keeping the calendar populated roughly one year in advance.
+This job cannot be manually triggered.

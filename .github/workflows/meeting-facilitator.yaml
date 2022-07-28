@@ -1,4 +1,4 @@
-name: "Create Standup: Support Steward"
+name: Meeting Facilitator
 
 on:
   workflow_dispatch:
@@ -18,42 +18,15 @@ on:
         description: |
           The Slack team our Team Roles are generated from
   schedule:
-    - cron: "5 0 * * MON"  # Run at 00:05 UTC weekly on Mondays
+    - cron: "0 0 28 * *"  # Run at 00:00 UTC on the 28th of each month
+
+env:
+  TEAM_NAME: tech-team
 
 jobs:
-  is-two-weeks:
-    runs-on: ubuntu-latest
-    outputs:
-      continue-workflow: ${{ steps.decision.outputs.continue-workflow }}
-    steps:
-      - name: Decide if 2 weeks have passed and the workflow should continue
-        id: decision
-        shell: python
-        run: |
-          from datetime import date
-
-          # This is a Monday before our last support steward transfer (Apr 27, 2022),
-          # so we'll calculate is_two_weeks relative to this
-          ref_date = date(2022, 4, 25)
-
-          diff_days = abs(date.today() - ref_date).days
-          n_days_since = diff_days % 14  # Because we transfer the role every 14 days
-          n_weeks_since = (n_days_since // 7) + 1  # Add 1 because we are effectively 0-indexed
-          is_two_weeks = (n_weeks_since % 2) == 0
-
-          # Set output variable for use in further jobs
-          print(f"::set-output name=continue-workflow::{is_two_weeks}")
-
-      - name: Echo outputs
-        run: |
-          echo "continue-workflow: ${{ steps.decision.outputs.continue-workflow }}"
-          echo "update-roles: ${{ github.event.inputs.update-roles }}"
-
   create-standup:
     runs-on: ubuntu-latest
     environment: run-slack-bot
-    needs: [is-two-weeks]
-    if: needs.is-two-weeks.outputs.continue-workflow == 'True' || github.event.inputs.update-roles == 'true'
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -72,7 +45,7 @@ jobs:
       - name: Update team member in role
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
         run: |
-          poetry run update-team-role support-steward
+          poetry run update-team-role meeting-facilitator
         env:
           TEAM_NAME: "${{ github.event.inputs.team-name || env.TEAM_NAME }}"
           SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
@@ -85,9 +58,38 @@ jobs:
         with:
           add: team-roles.json
           message: "Update the Team Roles JSON file"
+          default_author: github_actions
 
-      - name: Create a standup for the Support Steward
+      - name: Create a standup for the Meeting Facilitator
         run: |
-          poetry run create-standup support-steward
+          poetry run create-standup meeting-facilitator
         env:
           GEEKBOT_API_KEY: "${{ secrets.GEEKBOT_API_KEY }}"
+
+  update-calendar:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    environment: run-slack-bot
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python v3.9
+        uses: actions/setup-python@v4.0.0
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+          poetry install
+
+      - name: Create next Meeting Facilitator event in the calendar
+        run: |
+          poetry run create-next-event meeting-facilitator
+        env:
+          TEAM_NAME: "${{ env.TEAM_NAME }}"
+          SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
+          CALENDAR_ID: "${{ secrets.CALENDAR_ID }}"
+          GCP_SERVICE_ACCOUNT_KEY: "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"
