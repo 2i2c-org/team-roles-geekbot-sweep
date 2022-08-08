@@ -20,6 +20,9 @@ on:
   schedule:
     - cron: "0 0 * * MON"  # Run at 00:00 UTC weekly on Mondays
 
+env:
+  TEAM_NAME: "tech-team"
+
 jobs:
   is-two-weeks:
     runs-on: ubuntu-latest
