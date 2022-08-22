@@ -110,7 +110,7 @@ optional arguments:
 ### `update_team_roles.py`
 
 This script generates the next team member to serve in a given role by iterating one place through the appropriate Slack team (either `meeting-facilitators` or `support-stewards`).
-It depends on [`get_slack_team_members.py`](#get_slack_team_memberspy) to pull the list of team members from Slack.
+It depends on [`get_slack_team_members.py`](#get_slack_team_memberspy) to pull the list of team members from Slack and therefore needs those environment variables set (Note: `team_name` is promoted to an environment variable for this script).
 The team member _currently_ serving in the role is pulled from the current event in the Team Roles calendar.
 If no event is found, the current team member is read from the `team-roles.json` file.
 The updated team roles are written back to the same file.

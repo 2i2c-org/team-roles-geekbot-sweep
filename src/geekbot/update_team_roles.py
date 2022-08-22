@@ -18,9 +18,10 @@ class TeamRoles:
 
     def __init__(self):
         self.calendar_id = os.environ["CALENDAR_ID"]
+        team_name = os.environ["TEAM_NAME"]
 
         # Populate team members
-        self.team_members = SlackTeamMembers().get_users_in_team()
+        self.team_members = SlackTeamMembers().get_users_in_team(team_name=team_name)
 
         # Instatiate the GoogleCalendarAPI class
         self.gcal_api = GoogleCalendarAPI().authenticate()
