@@ -75,10 +75,10 @@ All scripts are written in Python and are located in the [`src`](src/) folder.
 ### `get_slack_team_members.py`
 
 This script interacts with the Slack API to produce a dictionary of Slack users who are members of a given Slack team (formally called a "usergroup" in the API), and their IDs.
-The script requires two environment variables to be set:
+The script requires two variables to be set:
 
-- `TEAM_NAME`: The name of the Slack team to list members of, e.g., `meeting-facilitators` or `support-stewards`
-- `SLACK_BOT_TOKEN`: A bot user token for a Slack App installed into the workspace.
+- `team_name` (cli argument): The name of the Slack team to list members of, e.g., `meeting-facilitators` or `support-stewards`
+- `SLACK_BOT_TOKEN` (environment variable): A bot user token for a Slack App installed into the workspace.
   The bot requires the `usergroups:read` and `users:read` permission scopes to operate.
   It does not need to be a member of any channels in the Slack workspace.
 
@@ -91,6 +91,20 @@ Running the following command will print the dictionary of team members' names a
 
 ```bash
 poetry run list-team-members
+```
+
+**Help info:**
+
+```bash
+usage: list-team-members [-h] team_name
+
+List the members and IDs of a Slack usergroup
+
+positional arguments:
+  team_name   The name of the Slack usergroup to list members of
+
+optional arguments:
+  -h, --help  show this help message and exit
 ```
 
 ### `update_team_roles.py`

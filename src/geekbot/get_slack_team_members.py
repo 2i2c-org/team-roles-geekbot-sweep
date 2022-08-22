@@ -93,10 +93,23 @@ class SlackTeamMembers:
 
 
 def main():
+    import argparse
     from rich import print_json
 
+    parser = argparse.ArgumentParser(
+        description="List the members and IDs of a Slack usergroup"
+    )
+
+    parser.add_argument(
+        "team_name",
+        type=str,
+        help="The name of the Slack usergroup to list members of",
+    )
+
+    args = parser.parse_args()
+
     app = SlackTeamMembers()
-    usernames = app.get_users_in_team()
+    usernames = app.get_users_in_team(team_name=args.team_name)
     print_json(data=usernames)
 
 
