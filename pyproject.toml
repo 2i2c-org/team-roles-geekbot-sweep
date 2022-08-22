@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "src"
 version = "0.1.0"
-description = "A tool to automatically assign 2i2c Tech Team members to various Team Roles"
+description = "A tool to automatically assign 2i2c team members to various Team Roles"
 license = "MIT"
 authors = []
 

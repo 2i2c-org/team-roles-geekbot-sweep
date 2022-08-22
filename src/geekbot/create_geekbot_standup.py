@@ -1,6 +1,6 @@
 """
 Functions to create Geekbot Standups in Slack to aid the transition of our Team Roles
-through the Tech Team
+through 2i2c team members
 """
 import argparse
 import json
@@ -126,7 +126,7 @@ class GeekbotStandup:
             + "https://calendar.google.com/calendar/embed?src=c_4hjjouojd8psql9i1a8nd1uff4%40group.calendar.google.com"
             + "\n\n"
             + "Reply 'ok' to this message to acknowledge your role. "
-            + "Or if you are not able to fulfil this role at this time, please arrange cover with another member of the Tech Team. "
+            + "Or if you are not able to fulfil this role at this time, please arrange cover with another member of the team. "
             + "If you have already swapped with someone, please tag them in your response."
             + "\n\n"
             + "Here are some actions the meeting facilitator is expected to take:\n"
@@ -153,7 +153,7 @@ class GeekbotStandup:
             + "https://2i2c.freshdesk.com/a/tickets/filters/all_tickets"
             + "\n\n"
             + "Reply 'ok' to this message to acknowledge your role. "
-            + "Or if you are going to be away for a large part of your stewardship, please arrange cover with another member of the Tech Team. "
+            + "Or if you are going to be away for a large part of your stewardship, please arrange cover with another member of the team. "
             + "If you have already swapped with someone, please tag them in your response."
             + "\n\n"
             + f"Your support steward buddy is: {self.steward_buddy.split()[0]}"
@@ -254,7 +254,7 @@ def main():
     # Create a command line parser
     parser = argparse.ArgumentParser(
         description="""
-            Create Geekbot standup apps to manage the transition of Team Roles through the Tech Team
+            Create Geekbot standup apps to manage the transition of Team Roles through 2i2c team members
         """
     )
     parser.add_argument(

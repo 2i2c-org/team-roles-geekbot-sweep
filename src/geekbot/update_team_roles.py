@@ -14,7 +14,7 @@ from .get_slack_team_members import SlackTeamMembers
 
 
 class TeamRoles:
-    """Iterate our Team Roles through the Tech Team"""
+    """Iterate our Team Roles through 2i2c team members"""
 
     def __init__(self):
         self.calendar_id = os.environ["CALENDAR_ID"]
@@ -211,7 +211,7 @@ class TeamRoles:
 
     def update_roles(self, role):
         """Update our Team Roles by inspecting a Google Calendar and/or iterating
-        through members of the Tech Team
+        through 2i2c team members
 
         Args:
             role (str): The role to update. Either 'meeting-facilitator' or
@@ -240,7 +240,7 @@ class TeamRoles:
 def main():
     # Construct a command line parser
     parser = argparse.ArgumentParser(
-        description="Update our Team Roles by iterating through members of the Tech Team"
+        description="Update our Team Roles by iterating through 2i2c team members"
     )
     parser.add_argument(
         "role",

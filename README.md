@@ -1,10 +1,11 @@
 # Team Roles Geekbot Sweep
 
-A Slack/Geekbot/Google Calendar App to sweep through our Tech Team, assign Team Roles, and track them in our Team Roles calendar
+A Slack/Geekbot/Google Calendar App to sweep through 2i2c team members, assign Team Roles, and track them in our Team Roles calendar
 
 ## Summary
 
-This repository is a collection of Python code that tracks which members of 2i2c's Tech Team (as defined by membership of the `tech-team` Slack team) are currently serving in our Team Roles (Meeting Facilitator and Support Steward), works out which team member is due to take over the role, and dynamically generate Geekbot standups in Slack to visibly and explicitly notify the given team member that they are due to take over the role.
+This repository is a collection of Python code that tracks which 2i2c team members are currently serving in our Team Roles (Meeting Facilitator and Support Steward).
+The code works out which team member is due to take over a given role, and dynamically generates Geekbot standups in Slack to visibly and explicitly notify the given team member that they are due to take over the role.
 It also creates events in the Team Roles Google Calendar to make the role changes more visible.
 
 ### Useful Documentation
@@ -32,10 +33,10 @@ poetry install
 
 ## Team Roles JSON file structure
 
-Which members of the Tech Team are serving (or have served) in a given role are stored in the `team-roles.json` file, which has the below structure.
+Which 2i2c teams members are serving (or have served) in a given role are stored in the `team-roles.json` file, which has the below structure.
 
 We keep track of both a team members Slack display name and user ID.
-This is because interacting with the APIs requires the user ID, but it is more human-readable to also have the names.
+This is because interacting with the Slack and Geekbot APIs requires the user ID, but it is more human-readable to also have the names.
 
 For the Support Steward, we track both the current and incoming team members as we have two people overlapping in this role.
 
@@ -76,7 +77,7 @@ All scripts are written in Python and are located in the [`src`](src/) folder.
 This script interacts with the Slack API to produce a dictionary of Slack users who are members of a given Slack team (formally called a "usergroup" in the API), and their IDs.
 The script requires two environment variables to be set:
 
-- `TEAM_NAME`: The name of the Slack team to list members of, e.g., `tech-team`
+- `TEAM_NAME`: The name of the Slack team to list members of, e.g., `meeting-facilitators` or `support-stewards`
 - `SLACK_BOT_TOKEN`: A bot user token for a Slack App installed into the workspace.
   The bot requires the `usergroups:read` and `users:read` permission scopes to operate.
   It does not need to be a member of any channels in the Slack workspace.
@@ -94,9 +95,9 @@ poetry run list-team-members
 
 ### `update_team_roles.py`
 
-This script generates the next team member to serve in a given role by iterating one place through the Tech Team.
-It depends on [`get_slack_team_members.py`](#get_slack_team_memberspy) to pull the list of tech team members from Slack.
-The team member currently serving in the role is pulled from the current event in the Team Roles calendar.
+This script generates the next team member to serve in a given role by iterating one place through the appropriate Slack team (either `meeting-facilitators` or `support-stewards`).
+It depends on [`get_slack_team_members.py`](#get_slack_team_memberspy) to pull the list of team members from Slack.
+The team member _currently_ serving in the role is pulled from the current event in the Team Roles calendar.
 If no event is found, the current team member is read from the `team-roles.json` file.
 The updated team roles are written back to the same file.
 There are command line options to determine which role is to be updated.
@@ -114,7 +115,7 @@ poetry run update-team-role { meeting-facilitator | support-steward }
 ```bash
 usage: update-team-role [-h] {meeting-facilitator,support-steward}
 
-Update our Team Roles by iterating through members of the Tech Team
+Update our Team Roles by iterating through 2i2c team members
 
 positional arguments:
   {meeting-facilitator,support-steward}
@@ -147,7 +148,7 @@ poetry run create-standup { meeting-facilitator | support-steward }
 ```bash
 usage: create-standup [-h] {meeting-facilitator,support-steward}
 
-Create Geekbot standup apps to manage the transition of Team Roles through the Tech Team
+Create Geekbot standup apps to manage the transition of Team Roles through 2i2c team members
 
 positional arguments:
   {meeting-facilitator,support-steward}
@@ -247,7 +248,7 @@ poetry run create-bulk-events { meeting-facilitator | support-steward }
 **Help info:**
 
 ```bash
-usage: create-bulk-events [-h] [-n N_EVENTS] [-d DATE] {meeting-facilitator,support-steward}
+usage: create-bulk-events [-h] [-m TEAM_MEMBER] [-n N_EVENTS] [-d DATE] {meeting-facilitator,support-steward}
 
 Bulk create a series of Team Role events in a Google Calendar
 
@@ -257,11 +258,11 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
+  -m TEAM_MEMBER, --team-member TEAM_MEMBER
+                        The name of the team member currently serving in the role. Will be pulled from team-roles.json if not provided.
   -n N_EVENTS, --n-events N_EVENTS
-                        The number of role events to create. Defaults to 12 for Meeting
-                        Facilitator and 26 for Support Steward (both 1 year's worth).
-  -d DATE, --date DATE  A reference date to begin creating events from. Defaults to today.
-                        WARNING: EXPERIMENTAL FEATURE.
+                        The number of role events to create. Defaults to 12 for Meeting Facilitator and 26 for Support Steward (both 1 year's worth).
+  -d DATE, --date DATE  A reference date to begin creating events from. Defaults to today. WARNING: EXPERIMENTAL FEATURE.
 ```
 
 ### `gcal_api_auth.py`
