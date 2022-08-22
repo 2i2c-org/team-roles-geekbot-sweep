@@ -8,6 +8,23 @@ from pathlib import Path
 from .get_slack_team_members import SlackTeamMembers
 
 
+def split_string_by_char(str_to_split, char_to_split_by=","):
+    """Split a long string into a list of strings on a specified character.
+
+    Args:
+        str_to_split (str): The long string to split into a list of strings
+        char_to_split_by (str, optional): The character to split str_to_split by.
+            Defaults to "," (comma).
+    """
+    list_of_strs = str_to_split.split(char_to_split_by)
+
+    # Ensure leading/trailing whitespace is
+    for i, item in enumerate(list_of_strs):
+        list_of_strs[i] = item.strip()
+
+    return list_of_strs
+
+
 def main():
     # Set paths
     project_path = Path(__file__).parent.parent.parent
@@ -23,28 +40,41 @@ def main():
     incoming_support_steward = os.environ["INCOMING_SUPPORT_STEWARD"]
     standup_manager = os.environ["STANDUP_MANAGER"]
 
+    teams = os.environ["TEAM_NAMES"]
+    if "," in teams:
+        teams = split_string_by_char(teams)
+    else:
+        teams = [teams]
+
     # Instantiate SlackTeamMembers class
     slack = SlackTeamMembers()
-    members = slack.get_users_in_team()
+
+    # Create an empty dictionary to store members of various teams in
+    members = {}
+
+    # Add the team members for each team to the dictionary
+    for team in teams:
+        users = slack.get_users_in_team(team_name=team)
+        members[team] = users
 
     # Write team roles dict
     team_roles = {
         "standup_manager": {
             "name": standup_manager,
-            "id": members[standup_manager],
+            "id": members["meeting-facilitators"][standup_manager],
         },
         "meeting_facilitator": {
             "name": current_meeting_facilitator,
-            "id": members[current_meeting_facilitator],
+            "id": members["meeting-facilitators"][current_meeting_facilitator],
         },
         "support_steward": {
             "incoming": {
                 "name": incoming_support_steward,
-                "id": members[incoming_support_steward],
+                "id": members["support-stewards"][incoming_support_steward],
             },
             "current": {
                 "name": current_support_steward,
-                "id": members[current_support_steward],
+                "id": members["support-stewards"][current_support_steward],
             },
         },
     }
