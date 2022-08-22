@@ -202,7 +202,7 @@ This script is used to create the next event for a Team Role given that a series
 It calculates the required metadata for the new event from the last event available on the calendar.
 It depends upon [`get_slack_team_members.py`](#get_slack_team_memberspy) to get an ordered list of the team members who fulfil these roles.
 
-In addition to the two environment variables required be `get_slack_team_members.py`, this script also requires the following environment variables to be set:
+In addition to the two environment variables required be `get_slack_team_members.py` (Note: `team_name` has been promoted to an environment variable for this script), this script also requires the following environment variables to be set:
 
 - `GCP_SERVICE_ACCOUNT_KEY`: A Google Cloud Service Account with permissions to access Google's Calendar API
 - `CALENDAR_ID`: The ID of a Google Calendar to which the above Service Account has permission to manage events
@@ -236,7 +236,7 @@ This script is used to generate a large number of events for a Team Role in a Go
 It begins generating events either from the day the script is executed or from a provided reference date.
 It depends upon [`get_slack_team_members.py`](#get_slack_team_memberspy) to get an ordered list of the team members who fulfil these roles.
 
-In addition to the two environment variables required be `get_slack_team_members.py`, this script also requires the following environment variables to be set:
+In addition to the two environment variables required be `get_slack_team_members.py` (Note: `team_name` has been promoted to an environment variable for this script), this script also requires the following environment variables to be set:
 
 - `GCP_SERVICE_ACCOUNT_KEY`: A Google Cloud Service Account with permissions to access Google's Calendar API
 - `CALENDAR_ID`: The ID of a Google Calendar to which the above Service Account has permission to manage events
