@@ -94,6 +94,7 @@ class SlackTeamMembers:
 
 def main():
     import argparse
+
     from rich import print_json
 
     parser = argparse.ArgumentParser(

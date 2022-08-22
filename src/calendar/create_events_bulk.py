@@ -41,7 +41,9 @@ class CreateBulkEvents:
 
         self._generate_reference_date(date=date)
 
-        self.team_members = SlackTeamMembers().get_users_in_team(team_name=team_name).keys()
+        self.team_members = (
+            SlackTeamMembers().get_users_in_team(team_name=team_name).keys()
+        )
 
         self.gcal_api = GoogleCalendarAPI().authenticate()
 
