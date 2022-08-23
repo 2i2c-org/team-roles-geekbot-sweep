@@ -122,7 +122,7 @@ class CreateNextEvent:
             (
                 i
                 for (i, name) in enumerate(self.usergroup_members)
-                if last_member in name
+                if last_member.lowercase() in name.lowercase()
             ),
             None,
         )
