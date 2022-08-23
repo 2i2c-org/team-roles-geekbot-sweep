@@ -12,6 +12,13 @@ on:
           in the team-roles.json file. If True, the file will be updated and new members
           will be used in the standup. If False (default), the file will not be updated
           and the members currently listed there will be used in the standup.
+      update-calendar:
+        required: false
+        type: boolean
+        default: false
+        description: |
+          Whether or not to add a new event to the Team Roles calendar. If True, a new
+          event will be added.
       usergroup-name:
         required: false
         default: support-stewards
@@ -99,7 +106,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: run-slack-bot
     needs: [is-two-weeks]
-    if: github.event_name == 'schedule' && needs.is-two-weeks.outputs.continue-workflow == 'True'
+    if: |
+      github.event.inputs.update-calendar == 'true'
+      || (github.event_name == 'schedule'
+      && needs.is-two-weeks.outputs.continue-workflow == 'True')
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
