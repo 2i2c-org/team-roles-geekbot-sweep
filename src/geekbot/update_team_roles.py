@@ -10,7 +10,7 @@ from pathlib import Path
 from loguru import logger
 
 from ..calendar.gcal_api_auth import GoogleCalendarAPI
-from .get_slack_team_members import SlackTeamMembers
+from .get_slack_team_members import SlackUsergroupMembers
 
 
 class TeamRoles:
@@ -18,10 +18,12 @@ class TeamRoles:
 
     def __init__(self):
         self.calendar_id = os.environ["CALENDAR_ID"]
-        team_name = os.environ["TEAM_NAME"]
+        usergroup_name = os.environ["USERGROUP_NAME"]
 
-        # Populate team members
-        self.team_members = SlackTeamMembers().get_users_in_team(team_name=team_name)
+        # Populate usergroup members
+        self.usergroup_members = SlackUsergroupMembers().get_users_in_usergroup(
+            usergroup_name
+        )
 
         # Instatiate the GoogleCalendarAPI class
         self.gcal_api = GoogleCalendarAPI().authenticate()
@@ -49,7 +51,7 @@ class TeamRoles:
         if (self.team_roles["standup_manager"].get("id") is None) or (
             self.team_roles["standup_manager"]["id"] == ""
         ):
-            self.team_roles["standup_manager"]["id"] = self.team_members[
+            self.team_roles["standup_manager"]["id"] = self.usergroup_members[
                 self.team_roles["standup_manager"]["name"]
             ]
 
@@ -65,17 +67,17 @@ class TeamRoles:
         index = next(
             (
                 i
-                for (i, name) in enumerate(self.team_members.keys())
+                for (i, name) in enumerate(self.usergroup_members.keys())
                 if current_member in name
             ),
             None,
         )
 
         # If we reach the end of the list, we want to wrap around and start again
-        if len(self.team_members) == (index + 1):
+        if len(self.usergroup_members) == (index + 1):
             index = -1
 
-        return list(self.team_members.keys())[index + 1]
+        return list(self.usergroup_members.keys())[index + 1]
 
     def _ensure_team_members_are_not_none(self, role, current_member, next_member):
         """If there are no events in the Google Calendar, _find_team_members will set
@@ -117,8 +119,9 @@ class TeamRoles:
             tuple(str, str): The names of the current and next team members to serve in
                 the specified role
         """
-        # Find the  upcoming events on a calendar. We use 7 here since we want at least 2 Meeting Facilitator events
-        # and 3 Support Steward events. So 7 gives us some leeway.
+        # Find the  upcoming events on a calendar. We use 7 here since we want at least
+        # 2 Meeting Facilitator events and 3 Support Steward events. So 7 gives us some
+        # leeway.
         events_results = (
             self.gcal_api.events()
             .list(
@@ -176,7 +179,7 @@ class TeamRoles:
         next_member_id = next(
             (
                 id
-                for (name, id) in self.team_members.items()
+                for (name, id) in self.usergroup_members.items()
                 if next_member_name in name
             ),
             None,
@@ -200,7 +203,7 @@ class TeamRoles:
         next_member_id = next(
             (
                 id
-                for (name, id) in self.team_members.items()
+                for (name, id) in self.usergroup_members.items()
                 if next_member_name in name
             ),
             None,

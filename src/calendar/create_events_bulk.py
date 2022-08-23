@@ -12,7 +12,7 @@ from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
 from loguru import logger
 
-from ..geekbot.get_slack_team_members import SlackTeamMembers
+from ..geekbot.get_slack_team_members import SlackUsergroupMembers
 from .gcal_api_auth import GoogleCalendarAPI
 
 # Some information about how often each of our team roles is transferred
@@ -37,12 +37,12 @@ class CreateBulkEvents:
 
     def __init__(self, date=None):
         self.calendar_id = os.environ["CALENDAR_ID"]
-        team_name = os.environ["TEAM_NAME"]
+        usergroup_name = os.environ["USERGROUP_NAME"]
 
         self._generate_reference_date(date=date)
 
-        self.team_members = (
-            SlackTeamMembers().get_users_in_team(team_name=team_name).keys()
+        self.usergroup_members = (
+            SlackUsergroupMembers().get_users_in_usergroup(usergroup_name).keys()
         )
 
         self.gcal_api = GoogleCalendarAPI().authenticate()
@@ -216,7 +216,11 @@ class CreateBulkEvents:
 
         # Find the index of the current team member in the ordered list
         current_member_index = next(
-            (i for (i, name) in enumerate(self.team_members) if current_member in name),
+            (
+                i
+                for (i, name) in enumerate(self.usergroup_members)
+                if current_member in name
+            ),
             None,
         )
 
@@ -226,9 +230,9 @@ class CreateBulkEvents:
 
         # Create a repeating list of team members (in order) long enough to index for
         # the number of events we will create
-        team_members = list(
+        members = list(
             islice(
-                cycle(self.team_members),
+                cycle(self.usergroup_members),
                 current_member_index + 1,
                 n_events + current_member_index + 1,
             )
@@ -236,8 +240,8 @@ class CreateBulkEvents:
 
         # Create the events
         for i in range(n_events):
-            next_team_member = team_members[i]
-            self._create_event(role, next_team_member, i)
+            next_member = members[i]
+            self._create_event(role, next_member, i)
 
 
 def main():
