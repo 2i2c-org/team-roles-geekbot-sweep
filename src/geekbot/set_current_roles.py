@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 
-from .get_slack_team_members import SlackTeamMembers
+from .get_slack_usergroup_members import SlackUsergroupMembers
 
 
 def split_string_by_char(str_to_split, char_to_split_by=","):
@@ -40,22 +40,22 @@ def main():
     incoming_support_steward = os.environ["INCOMING_SUPPORT_STEWARD"]
     standup_manager = os.environ["STANDUP_MANAGER"]
 
-    teams = os.environ["TEAM_NAMES"]
-    if "," in teams:
-        teams = split_string_by_char(teams)
+    usergroups = os.environ["USERGROUP_NAMES"]
+    if "," in usergroups:
+        usergroups = split_string_by_char(usergroups)
     else:
-        teams = [teams]
+        usergroups = [usergroups]
 
-    # Instantiate SlackTeamMembers class
-    slack = SlackTeamMembers()
+    # Instantiate SlackUsergroupMembers class
+    slack = SlackUsergroupMembers()
 
     # Create an empty dictionary to store members of various teams in
     members = {}
 
     # Add the team members for each team to the dictionary
-    for team in teams:
-        users = slack.get_users_in_team(team_name=team)
-        members[team] = users
+    for usergroup in usergroups:
+        users = slack.get_users_in_usergroup(usergroup)
+        members[usergroup] = users
 
     # Write team roles dict
     team_roles = {

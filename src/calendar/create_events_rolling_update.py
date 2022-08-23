@@ -9,7 +9,7 @@ from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
 from loguru import logger
 
-from ..geekbot.get_slack_team_members import SlackTeamMembers
+from ..geekbot.get_slack_usergroup_members import SlackUsergroupMembers
 from .gcal_api_auth import GoogleCalendarAPI
 
 # Some information about how often each of our team roles is transferred
@@ -36,11 +36,11 @@ class CreateNextEvent:
 
     def __init__(self):
         self.calendar_id = os.environ["CALENDAR_ID"]
-        team_name = os.environ["TEAM_NAME"]
+        usergroup_name = os.environ["USERGROUP_NAME"]
 
         self.gcal_api = GoogleCalendarAPI().authenticate()
-        self.team_members = (
-            SlackTeamMembers().get_users_in_team(team_name=team_name).keys()
+        self.usergroup_members = (
+            SlackUsergroupMembers().get_users_in_usergroup(usergroup_name).keys()
         )
 
         self._get_todays_date()
@@ -115,21 +115,21 @@ class CreateNextEvent:
         # Extract the relevant metadata from the last event in the series
         last_event_end_date = last_event.get("dateTime", last_event["end"].get("date"))
         last_event_end_date = datetime.strptime(last_event_end_date, "%Y-%m-%d")
-        last_team_member = last_event.get("summary", "").split(":")[-1].strip()
+        last_member = last_event.get("summary", "").split(":")[-1].strip()
 
         # Calculate the next team member to serve in this role
-        last_team_member_index = next(
+        last_member_index = next(
             (
                 i
-                for (i, name) in enumerate(self.team_members)
-                if last_team_member in name
+                for (i, name) in enumerate(self.usergroup_members)
+                if last_member in name
             ),
             None,
         )
-        next_team_member_index = last_team_member_index + 1
-        if next_team_member_index >= len(self.team_members):
-            next_team_member_index = 0
-        next_team_member = list(self.team_members)[next_team_member_index]
+        next_member_index = last_member_index + 1
+        if next_member_index >= len(self.usergroup_members):
+            next_member_index = 0
+        next_member = list(self.usergroup_members)[next_member_index]
 
         # Since start dates are inclusive and end dates are exclusive, the end and start
         # dates for two consecutive events are equivalent
@@ -145,7 +145,7 @@ class CreateNextEvent:
                 days=ROLE_CYCLES[role]["period"]
             )
 
-        return next_event_start_date, next_event_end_date, next_team_member
+        return next_event_start_date, next_event_end_date, next_member
 
     def create_next_event(self, role):
         """Create the next event in a series in a Google Calendar for a given role

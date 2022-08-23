@@ -35,7 +35,7 @@ poetry install
 
 Which 2i2c teams members are serving (or have served) in a given role are stored in the `team-roles.json` file, which has the below structure.
 
-We keep track of both a team members Slack display name and user ID.
+We keep track of both a team member's Slack display name and user ID.
 This is because interacting with the Slack and Geekbot APIs requires the user ID, but it is more human-readable to also have the names.
 
 For the Support Steward, we track both the current and incoming team members as we have two people overlapping in this role.
@@ -72,17 +72,17 @@ This is because Geekbot only provides personal API keys and these keys do not ha
 
 All scripts are written in Python and are located in the [`src`](src/) folder.
 
-### `get_slack_team_members.py`
+### `get_slack_usergroup_members.py`
 
-This script interacts with the Slack API to produce a dictionary of Slack users who are members of a given Slack team (formally called a "usergroup" in the API), and their IDs.
+This script interacts with the Slack API to produce a dictionary of Slack users who are members of a given Slack usergroup and their IDs.
 The script requires two variables to be set:
 
-- `team_name` (cli argument): The name of the Slack team to list members of, e.g., `meeting-facilitators` or `support-stewards`
+- `usergroup_name` (cli argument): The name of the Slack usergroup to list members of, e.g., `meeting-facilitators` or `support-stewards`
 - `SLACK_BOT_TOKEN` (environment variable): A bot user token for a Slack App installed into the workspace.
   The bot requires the `usergroups:read` and `users:read` permission scopes to operate.
   It does not need to be a member of any channels in the Slack workspace.
 
-The script will generate a dictionary of members of `TEAM_NAME` where the keys are the users' display names, and the values are their associated user IDs.
+The script will generate a dictionary of members of `usergroup_name` where the keys are the users' display names, and the values are their associated user IDs.
 The dictionary is ordered alphabetically by its keys.
 
 **Command line usage:**
@@ -90,27 +90,27 @@ The dictionary is ordered alphabetically by its keys.
 Running the following command will print the dictionary of team members' names and IDs to the console.
 
 ```bash
-poetry run list-team-members
+poetry run list-members
 ```
 
 **Help info:**
 
 ```bash
-usage: list-team-members [-h] team_name
+usage: list-members [-h] usergroup_name
 
 List the members and IDs of a Slack usergroup
 
 positional arguments:
-  team_name   The name of the Slack usergroup to list members of
+  usergroup_name  The name of the Slack usergroup to list members of
 
 optional arguments:
-  -h, --help  show this help message and exit
+  -h, --help      show this help message and exit
 ```
 
 ### `update_team_roles.py`
 
-This script generates the next team member to serve in a given role by iterating one place through the appropriate Slack team (either `meeting-facilitators` or `support-stewards`).
-It depends on [`get_slack_team_members.py`](#get_slack_team_memberspy) to pull the list of team members from Slack and therefore needs those environment variables set (Note: `team_name` is promoted to an environment variable for this script).
+This script generates the next team member to serve in a given role by iterating one place through the appropriate Slack usergroup (either `meeting-facilitators` or `support-stewards`).
+It depends on [`get_slack_usergroup_members.py`](#get_slack_usergroup_memberspy) to pull the list of usergroup members from Slack and therefore needs those environment variables set (Note: `usergroup_name` is promoted to an environment variable for this script).
 The team member _currently_ serving in the role is pulled from the current event in the Team Roles calendar.
 If no event is found, the current team member is read from the `team-roles.json` file.
 The updated team roles are written back to the same file.
@@ -175,10 +175,14 @@ optional arguments:
 ### `set_current_roles.py`
 
 This script is used to initialise the `team-roles.json` file with manual input.
-It depends upon [`get_slack_team_members.py`](#get_slack_team_memberspy) to convert Slack display names into user IDs.
+It depends upon [`get_slack_usergroup_members.py`](#get_slack_usergroup_memberspy) to convert Slack display names into user IDs.
 
-In addition to the two environment variables required by `get_slack_team_members.py`, this script also requires the following environment variables to be set:
+This script requires the following environment variables to be set:
 
+- `USERGROUP_NAMES`: The name of the Slack usergroup to list members of, e.g., `meeting-facilitators` or `support-stewards`.
+  Multiple usergroups can be provided by separating them with a comma.
+- `SLACK_BOT_TOKEN`: A bot user token for a Slack App installed into the workspace.
+  (See above for more details.)
 - `CURRENT_MEETING_FACILITATOR`: The Slack display name of the team member currently serving in the Meeting Facilitator role
 - `CURRENT_SUPPORT_STEWARD`: The Slack display name of the team member currently serving in the Support Steward role (i.e. for more than two weeks)
 - `INCOMING_SUPPORT_STEWARD`: The Slack display name of the team member most recently taking up service in the Support Steward role (i.e. for less than two weeks)
@@ -200,9 +204,9 @@ poetry run populate-current-roles
 
 This script is used to create the next event for a Team Role given that a series of events already exist in a Google Calendar.
 It calculates the required metadata for the new event from the last event available on the calendar.
-It depends upon [`get_slack_team_members.py`](#get_slack_team_memberspy) to get an ordered list of the team members who fulfil these roles.
+It depends upon [`get_slack_usergroup_members.py`](#get_slack_usergroup_memberspy) to get an ordered list of the team members who fulfil these roles.
 
-In addition to the two environment variables required be `get_slack_team_members.py` (Note: `team_name` has been promoted to an environment variable for this script), this script also requires the following environment variables to be set:
+In addition to the two environment variables required be `get_slack_usergroup_members.py` (Note: `usergroup_name` has been promoted to an environment variable for this script), this script also requires the following environment variables to be set:
 
 - `GCP_SERVICE_ACCOUNT_KEY`: A Google Cloud Service Account with permissions to access Google's Calendar API
 - `CALENDAR_ID`: The ID of a Google Calendar to which the above Service Account has permission to manage events
@@ -234,9 +238,9 @@ optional arguments:
 
 This script is used to generate a large number of events for a Team Role in a Google Calendar in bulk.
 It begins generating events either from the day the script is executed or from a provided reference date.
-It depends upon [`get_slack_team_members.py`](#get_slack_team_memberspy) to get an ordered list of the team members who fulfil these roles.
+It depends upon [`get_slack_usergroup_members.py`](#get_slack_usergroup_memberspy) to get an ordered list of the team members who fulfil these roles.
 
-In addition to the two environment variables required be `get_slack_team_members.py` (Note: `team_name` has been promoted to an environment variable for this script), this script also requires the following environment variables to be set:
+In addition to the two environment variables required be `get_slack_usergroup_members.py` (Note: `usergroup_name` has been promoted to an environment variable for this script), this script also requires the following environment variables to be set:
 
 - `GCP_SERVICE_ACCOUNT_KEY`: A Google Cloud Service Account with permissions to access Google's Calendar API
 - `CALENDAR_ID`: The ID of a Google Calendar to which the above Service Account has permission to manage events
@@ -275,7 +279,8 @@ optional arguments:
   -m TEAM_MEMBER, --team-member TEAM_MEMBER
                         The name of the team member currently serving in the role. Will be pulled from team-roles.json if not provided.
   -n N_EVENTS, --n-events N_EVENTS
-                        The number of role events to create. Defaults to 12 for Meeting Facilitator and 26 for Support Steward (both 1 year's worth).
+                        The number of role events to create. Defaults to 12 for Meeting Facilitator and 26 for Support Steward (both 1 year's
+                        worth).
   -d DATE, --date DATE  A reference date to begin creating events from. Defaults to today. WARNING: EXPERIMENTAL FEATURE.
 ```
 
@@ -290,7 +295,7 @@ All our CI/CD workflows are powered by [GitHub Actions](https://docs.github.com/
 ### `populate-current-roles.yaml`
 
 This workflow runs the [`set_current_roles.py` script](#set_current_rolespy) to generate an initial `team-roles.json` file and commit it to the repo for use in future GitHub Actions workflow runs.
-It can be triggered manually and requires the environment variables required by `set_current_roles.py` and [`get_slack_team_members.py`](#get_slack_team_memberspy) to be provided as inputs.
+It can be triggered manually and requires the environment variables required by `set_current_roles.py` and [`get_slack_usergroup_members.py`](#get_slack_usergroup_memberspy) to be provided as inputs.
 Note that `SLACK_BOT_TOKEN` is provided via a GitHub Action Environment Secret.
 
 ### `meeting-facilitator.yaml`
