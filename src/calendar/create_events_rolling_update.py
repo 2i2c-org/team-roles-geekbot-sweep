@@ -36,8 +36,12 @@ class CreateNextEvent:
 
     def __init__(self):
         self.calendar_id = os.environ["CALENDAR_ID"]
+        team_name = os.environ["TEAM_NAME"]
+
         self.gcal_api = GoogleCalendarAPI().authenticate()
-        self.team_members = SlackTeamMembers().get_users_in_team().keys()
+        self.team_members = (
+            SlackTeamMembers().get_users_in_team(team_name=team_name).keys()
+        )
 
         self._get_todays_date()
 

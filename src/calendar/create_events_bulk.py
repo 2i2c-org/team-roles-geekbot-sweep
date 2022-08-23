@@ -37,8 +37,14 @@ class CreateBulkEvents:
 
     def __init__(self, date=None):
         self.calendar_id = os.environ["CALENDAR_ID"]
+        team_name = os.environ["TEAM_NAME"]
+
         self._generate_reference_date(date=date)
-        self.team_members = SlackTeamMembers().get_users_in_team().keys()
+
+        self.team_members = (
+            SlackTeamMembers().get_users_in_team(team_name=team_name).keys()
+        )
+
         self.gcal_api = GoogleCalendarAPI().authenticate()
 
         project_path = Path(__file__).parent.parent.parent

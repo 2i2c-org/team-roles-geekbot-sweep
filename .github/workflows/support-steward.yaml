@@ -14,14 +14,14 @@ on:
           and the members currently listed there will be used in the standup.
       team-name:
         required: false
-        default: tech-team
+        default: support-stewards
         description: |
           The Slack team our Team Roles are generated from
   schedule:
     - cron: "0 0 * * MON"  # Run at 00:00 UTC weekly on Mondays
 
 env:
-  TEAM_NAME: "tech-team"
+  TEAM_NAME: support-stewards
 
 jobs:
   is-two-weeks:
