@@ -12,7 +12,7 @@ from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
 from loguru import logger
 
-from ..geekbot.get_slack_team_members import SlackUsergroupMembers
+from ..geekbot.get_slack_usergroup_members import SlackUsergroupMembers
 from .gcal_api_auth import GoogleCalendarAPI
 
 # Some information about how often each of our team roles is transferred

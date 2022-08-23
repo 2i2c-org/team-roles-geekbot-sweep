@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 
-from .get_slack_team_members import SlackUsergroupMembers
+from .get_slack_usergroup_members import SlackUsergroupMembers
 
 
 def split_string_by_char(str_to_split, char_to_split_by=","):

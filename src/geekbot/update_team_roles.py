@@ -10,7 +10,7 @@ from pathlib import Path
 from loguru import logger
 
 from ..calendar.gcal_api_auth import GoogleCalendarAPI
-from .get_slack_team_members import SlackUsergroupMembers
+from .get_slack_usergroup_members import SlackUsergroupMembers
 
 
 class TeamRoles:

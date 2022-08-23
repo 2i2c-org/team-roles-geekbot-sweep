@@ -17,7 +17,7 @@ google-auth-httplib2 = "^0.1"
 google-auth-oauthlib = "^0.5"
 
 [tool.poetry.scripts]
-list-members = "src.geekbot.get_slack_team_members:main"
+list-members = "src.geekbot.get_slack_usergroup_members:main"
 update-team-role = "src.geekbot.update_team_roles:main"
 create-standup = "src.geekbot.create_geekbot_standup:main"
 populate-current-roles = "src.geekbot.set_current_roles:main"
