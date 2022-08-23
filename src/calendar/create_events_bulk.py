@@ -219,7 +219,7 @@ class CreateBulkEvents:
             (
                 i
                 for (i, name) in enumerate(self.usergroup_members)
-                if current_member in name
+                if current_member.lowercase() in name.lowercase()
             ),
             None,
         )

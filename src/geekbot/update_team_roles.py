@@ -68,7 +68,7 @@ class TeamRoles:
             (
                 i
                 for (i, name) in enumerate(self.usergroup_members.keys())
-                if current_member in name
+                if current_member.lowercase() in name.lowercase()
             ),
             None,
         )
@@ -180,7 +180,7 @@ class TeamRoles:
             (
                 id
                 for (name, id) in self.usergroup_members.items()
-                if next_member_name in name
+                if next_member_name.lowercase() in name.lowercase()
             ),
             None,
         )
@@ -204,7 +204,7 @@ class TeamRoles:
             (
                 id
                 for (name, id) in self.usergroup_members.items()
-                if next_member_name in name
+                if next_member_name.lowercase() in name.lowercase()
             ),
             None,
         )
