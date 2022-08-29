@@ -76,6 +76,7 @@ jobs:
   update-calendar:
     runs-on: ubuntu-latest
     if: github.event.inputs.update-calendar == 'true' || github.event_name == 'schedule'
+    needs: create-standup
     environment: run-slack-bot
     steps:
       - name: Checkout repo

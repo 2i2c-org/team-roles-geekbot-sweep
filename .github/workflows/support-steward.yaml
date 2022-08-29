@@ -62,7 +62,9 @@ jobs:
   create-standup:
     runs-on: ubuntu-latest
     environment: run-slack-bot
-    needs: [is-two-weeks]
+    needs:
+      - is-two-weeks
+      - create-standup
     if: needs.is-two-weeks.outputs.continue-workflow == 'True' || github.event.inputs.update-roles == 'true'
     steps:
       - name: Checkout repo
