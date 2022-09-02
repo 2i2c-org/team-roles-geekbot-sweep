@@ -247,6 +247,7 @@ However, the next Wednesday might not necessarily line up with the 2/4 weekly cy
 So take caution when running this script and choose a reference date carefully before executing.
 
 The two `create_events_*.py` scripts can't delete events and so, if they are repeatedly run, will create duplicate events.
+See [`delete_events_bulk.py`](#delete_events_bulkpy) for information on deleting events from the calendar.
 
 **Command line usage:**
 
@@ -275,6 +276,37 @@ optional arguments:
                         The number of role events to create. Defaults to 12 for Meeting Facilitator and 26 for Support Steward (both 1 year's
                         worth).
   -d DATE, --date DATE  A reference date to begin creating events from. Defaults to today. WARNING: EXPERIMENTAL FEATURE.
+```
+
+### `delete_events_bulk.py`
+
+This script is used to delete all upcoming events in the calendar for a role from a reference date.
+We may wish to run this script when a team member has been onboarded/off-boarded from a role and we need to update the calendar en masse.
+And so we can clear the upcoming events with this script, and regenerate events with [`create_events_bulk.py`](#create_events_bulkpy).
+
+A date from which to select events for deletion can be provided, and will default to the 1st of the month following that in which the program is run.
+I.e., if you run the program on 2022-09-15, events that have start dates after 2022-10-01 will be retrieved.
+
+**Command line usage:**
+
+```bash
+poetry run delete-bulk-events { meeting-facilitator | support-steward }
+```
+
+**Help info:**
+
+```bash
+usage: delete-bulk-events [-h] [-d DATE] {meeting-facilitator,support-steward}
+
+Bulk delete all upcoming Team Role events in a Google Calendar
+
+positional arguments:
+  {meeting-facilitator,support-steward}
+                        The role to delete events for
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d DATE, --date DATE  A reference date to begin creating events from. Defaults to the 1st of the next month.
 ```
 
 ### `gcal_api_auth.py`

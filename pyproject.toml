@@ -23,6 +23,7 @@ create-standup = "src.geekbot.create_geekbot_standup:main"
 populate-current-roles = "src.geekbot.set_current_roles:main"
 create-next-event = "src.calendar.create_events_rolling_update:main"
 create-bulk-events = "src.calendar.create_events_bulk:main"
+delete-bulk-events = "src.calendar.delete_events_bulk:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
