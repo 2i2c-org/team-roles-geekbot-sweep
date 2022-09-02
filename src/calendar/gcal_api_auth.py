@@ -38,7 +38,7 @@ class GoogleCalendarAPI:
 
         with get_decrypted_file(gcp_service_account_file) as decrypted_file:
             creds = service_account.Credentials.from_service_account_file(
-                decrypted_file.name
+                decrypted_file
             )
 
         creds = creds.with_scopes(self.scopes)
