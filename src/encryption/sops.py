@@ -36,11 +36,9 @@ def get_decrypted_file(original_filepath):
             yielded if the file is not valid JSON, or does not contain 'secrets'.
     """
     assert_file_exists(original_filepath)
-    filename = os.path.basename(original_filepath)
-    _, ext = os.path.splitext(filename)
 
-    # First check for "secrets" in the filename
-    if "secrets" in filename:
+    # First check for "secrets" in the filepath
+    if "secrets" in str(original_filepath):
         # Then check the file is valid JSON
         with open(original_filepath) as f:
             try:
