@@ -71,7 +71,7 @@ class DeleteBulkEvents:
             calendarId=self.calendar_id,
             eventId=event_id,
             sendUpdates=None,
-        )
+        ).execute()
 
     def _list_all_events(self, role):
         """List all the upcoming events for a specific role
@@ -83,8 +83,6 @@ class DeleteBulkEvents:
             list[dict]: A list of dictionaries containing metadata about the upcoming
                 events for the specified role
         """
-        role = role.replace("-", " ")
-
         # Retrieve all events after the given reference date
         events = (
             self.gcal_api.events()
@@ -115,6 +113,7 @@ class DeleteBulkEvents:
         Args:
             role (str): The role to retreive, list, and delete events for
         """
+        role = role.replace("-", " ")
         events = self._list_all_events(role)
 
         if not events:
