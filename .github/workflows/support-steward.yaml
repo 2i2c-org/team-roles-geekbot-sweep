@@ -61,7 +61,6 @@ jobs:
 
   create-standup:
     runs-on: ubuntu-latest
-    environment: run-slack-bot
     needs:
       - is-two-weeks
       - create-standup
@@ -112,7 +111,6 @@ jobs:
 
   update-calendar:
     runs-on: ubuntu-latest
-    environment: run-slack-bot
     needs: [is-two-weeks]
     if: |
       github.event.inputs.update-calendar == 'true'
