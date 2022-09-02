@@ -12,6 +12,7 @@ from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
 from loguru import logger
 
+from ..encryption.sops import get_decrypted_file
 from ..geekbot.get_slack_usergroup_members import SlackUsergroupMembers
 from .gcal_api_auth import GoogleCalendarAPI
 
@@ -36,26 +37,33 @@ class CreateBulkEvents:
     """Create Team Role events in a Calendar in Bulk"""
 
     def __init__(self, date=None):
-        self.calendar_id = os.environ["CALENDAR_ID"]
-        usergroup_name = os.environ["USERGROUP_NAME"]
-
         self._generate_reference_date(date=date)
-
+        usergroup_name = os.environ["USERGROUP_NAME"]
         self.usergroup_members = (
             SlackUsergroupMembers().get_users_in_usergroup(usergroup_name).keys()
         )
 
-        self.gcal_api = GoogleCalendarAPI().authenticate()
-
+        # Set filepaths
         project_path = Path(__file__).parent.parent.parent
         roles_path = project_path.joinpath("team-roles.json")
+        secrets_path = project_path.joinpath("secrets")
 
-        # Check the file exists before reading
+        # Check the team roles file exists before reading
         if not os.path.exists(roles_path):
             raise FileNotFoundError(f"File must exist to continue! {roles_path}")
 
         with open(roles_path) as stream:
             self.team_roles = json.load(stream)
+
+        # Read in the calendar ID and authenticate GCal API
+        with get_decrypted_file(
+            secrets_path.joinpath("calendar_id.json")
+        ) as calendar_id_path:
+            with open(calendar_id_path) as f:
+                contents = json.load(f)
+
+        self.calendar_id = contents["calendar_id"]
+        self.gcal_api = GoogleCalendarAPI().authenticate()
 
     def _generate_reference_date(self, date=None):
         """Generate a reference date to calculate start and end dates for role events

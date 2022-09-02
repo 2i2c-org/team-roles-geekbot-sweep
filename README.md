@@ -22,7 +22,9 @@ It also creates events in the Team Roles Google Calendar to make the role change
 - [Building a simple bot using Python in 10 minutes](https://github.com/slackapi/python-slack-sdk/tree/main/tutorial)
 - [Quickstart Guide to the Google Calendar API with Python](https://developers.google.com/calendar/api/quickstart/python)
 
-## Installation
+## Getting setup
+
+### Package Installation
 
 Installing the dependencies requires [`poetry`](https://python-poetry.org/).
 You can install the dependencies by running:
@@ -30,6 +32,12 @@ You can install the dependencies by running:
 ```bash
 poetry install
 ```
+
+### Setting up `sops` for secret decryption
+
+Secrets required to execute the code in this repository are stored in the `secrets` folder and are encrypted with [`sops`](https://github.com/mozilla/sops).
+You will therefore need to have `sops` installed to run this code locally.
+See [this guide](https://infrastructure.2i2c.org/en/latest/tutorials/setup.html#step-3-authenticate-with-google-cloud-to-decrypt-our-secret-files) to setup `sops` before executing any code here.
 
 ## Team Roles JSON file structure
 
@@ -75,12 +83,7 @@ All scripts are written in Python and are located in the [`src`](src/) folder.
 ### `get_slack_usergroup_members.py`
 
 This script interacts with the Slack API to produce a dictionary of Slack users who are members of a given Slack usergroup and their IDs.
-The script requires two variables to be set:
-
-- `usergroup_name` (cli argument): The name of the Slack usergroup to list members of, e.g., `meeting-facilitators` or `support-stewards`
-- `SLACK_BOT_TOKEN` (environment variable): A bot user token for a Slack App installed into the workspace.
-  The bot requires the `usergroups:read` and `users:read` permission scopes to operate.
-  It does not need to be a member of any channels in the Slack workspace.
+The script requires the `usergroup_name` variable to be set, which is the name of the Slack usergroup to list members of, e.g., `meeting-facilitators` or `support-stewards`.
 
 The script will generate a dictionary of members of `usergroup_name` where the keys are the users' display names, and the values are their associated user IDs.
 The dictionary is ordered alphabetically by its keys.
@@ -110,7 +113,9 @@ optional arguments:
 ### `update_team_roles.py`
 
 This script generates the next team member to serve in a given role by iterating one place through the appropriate Slack usergroup (either `meeting-facilitators` or `support-stewards`).
-It depends on [`get_slack_usergroup_members.py`](#get_slack_usergroup_memberspy) to pull the list of usergroup members from Slack and therefore needs those environment variables set (Note: `usergroup_name` is promoted to an environment variable for this script).
+It depends on [`get_slack_usergroup_members.py`](#get_slack_usergroup_memberspy) to pull the list of usergroup members from Slack.
+The desired usergroup to pull the members of is parsed to the script via the `USERGROUP_NAME` environment variable.
+
 The team member _currently_ serving in the role is pulled from the current event in the Team Roles calendar.
 If no event is found, the current team member is read from the `team-roles.json` file.
 The updated team roles are written back to the same file.
@@ -145,8 +150,6 @@ This script reads in [`team-roles.json`](#team-roles-json-file-structure) after 
 
 The `MeetingFacilitatorStandup` broadcasts to the `team-updates` Slack channel, and the `SupportStewardStandup` broadcasts to the `support-freshdesk` channel.
 The [Geekbot app](https://geekbot.com/) needs to be installed to the Slack workspace and invited to the channels to which it will broadcast.
-
-The script requires the `GEEKBOT_API_KEY` environment variable to be set with a valid API key for communicating with Geekbot's API.
 Command line options are provided to select which role a standup should be created for.
 
 **Command line usage:**
@@ -181,14 +184,12 @@ This script requires the following environment variables to be set:
 
 - `USERGROUP_NAMES`: The name of the Slack usergroup to list members of, e.g., `meeting-facilitators` or `support-stewards`.
   Multiple usergroups can be provided by separating them with a comma.
-- `SLACK_BOT_TOKEN`: A bot user token for a Slack App installed into the workspace.
-  (See above for more details.)
 - `CURRENT_MEETING_FACILITATOR`: The Slack display name of the team member currently serving in the Meeting Facilitator role
 - `CURRENT_SUPPORT_STEWARD`: The Slack display name of the team member currently serving in the Support Steward role (i.e. for more than two weeks)
 - `INCOMING_SUPPORT_STEWARD`: The Slack display name of the team member most recently taking up service in the Support Steward role (i.e. for less than two weeks)
-- `STANDUP_MANAGER`: This is the Slack display name of the team member who created `GEEKBOT_API_KEY` and will be added to all standups.
+- `STANDUP_MANAGER`: This is the Slack display name of the team member who created `geekbot_api_token.json` and will be added to all standups.
   This role is required since Geekbot only offers personal API keys and the script won't be able to see any exisitng standups that the owner of the key is not a member of.
-  :fire: **If you are changing this role, you will need to recreate `GEEKBOT_API_KEY`.** :fire:
+  :fire: **If you are changing this role, you will need to recreate `geekbot_api_token.json`.** :fire:
 
 This script is paired with the [`populate-current-roles` workflow](#populate-current-rolesyaml) to commit the updated `team-roles.json` file to the repo for future CI/CD runs of the bot.
 
@@ -205,11 +206,7 @@ poetry run populate-current-roles
 This script is used to create the next event for a Team Role given that a series of events already exist in a Google Calendar.
 It calculates the required metadata for the new event from the last event available on the calendar.
 It depends upon [`get_slack_usergroup_members.py`](#get_slack_usergroup_memberspy) to get an ordered list of the team members who fulfil these roles.
-
-In addition to the two environment variables required be `get_slack_usergroup_members.py` (Note: `usergroup_name` has been promoted to an environment variable for this script), this script also requires the following environment variables to be set:
-
-- `GCP_SERVICE_ACCOUNT_KEY`: A Google Cloud Service Account with permissions to access Google's Calendar API
-- `CALENDAR_ID`: The ID of a Google Calendar to which the above Service Account has permission to manage events
+The desired usergroup is parsed to the script via the `USERGROUP_NAME` environment variable.
 
 **Command line usage:**
 
@@ -239,11 +236,7 @@ optional arguments:
 This script is used to generate a large number of events for a Team Role in a Google Calendar in bulk.
 It begins generating events either from the day the script is executed or from a provided reference date.
 It depends upon [`get_slack_usergroup_members.py`](#get_slack_usergroup_memberspy) to get an ordered list of the team members who fulfil these roles.
-
-In addition to the two environment variables required be `get_slack_usergroup_members.py` (Note: `usergroup_name` has been promoted to an environment variable for this script), this script also requires the following environment variables to be set:
-
-- `GCP_SERVICE_ACCOUNT_KEY`: A Google Cloud Service Account with permissions to access Google's Calendar API
-- `CALENDAR_ID`: The ID of a Google Calendar to which the above Service Account has permission to manage events
+The desired usergroup is parsed to the script via the `USERGROUP_NAME` environment variable.
 
 #### :fire: Reference Dates for the Support Steward :fire:
 
@@ -288,6 +281,10 @@ optional arguments:
 
 This script is a helper script that returns an authenticated instance of the Google Calendar API for the [`create_events_rolling_update.py`](#create_events_rolling_updatepy) and [`create_events_bulk.py`](#create_events_bulkpy) to create events in a Google Calendar.
 
+### `sops.py`
+
+This is a helper script that securely decrypts secrets using `sops` into a temporary file for use throughout the package.
+
 ## CI/CD workflows
 
 All our CI/CD workflows are powered by [GitHub Actions](https://docs.github.com/en/actions) and the configuration is located in the [`.github/workflows`](.github/workflows/) folder.
@@ -296,7 +293,6 @@ All our CI/CD workflows are powered by [GitHub Actions](https://docs.github.com/
 
 This workflow runs the [`set_current_roles.py` script](#set_current_rolespy) to generate an initial `team-roles.json` file and commit it to the repo for use in future GitHub Actions workflow runs.
 It can be triggered manually and requires the environment variables required by `set_current_roles.py` and [`get_slack_usergroup_members.py`](#get_slack_usergroup_memberspy) to be provided as inputs.
-Note that `SLACK_BOT_TOKEN` is provided via a GitHub Action Environment Secret.
 
 ### `meeting-facilitator.yaml`
 
@@ -325,3 +321,14 @@ When manually triggered, updating the team roles file is optional, for example i
 
 The `update-calendar` job runs the [`create_events_rolling_update.py`](#create_events_rolling_updatepy) script to create the next event in the series, keeping the calendar populated roughly one year in advance.
 If running manually, this job can be skipped completely.
+
+## Regarding secrets
+
+The following secrets with stated permissions are stored in the `secrets` folder.
+
+- `calendar_id.json`: The ID of a Google Calendar to which a GCP Service Account has permission to manage events
+- `gcp_service_account.json`: A Google Cloud Service Account Key with permissions to access Google's Calendar API
+- `geekbot_api_token.json`: A personal API token from the `STANDUP_MANAGER`'s account to authenticate against the Geekbot API
+- `slack_bot_token.json`: A bot user token for a Slack App installed into the workspace.
+  The bot requires the `usergroups:read` and `users:read` permission scopes to operate.
+  It does not need to be a member of any channels in the Slack workspace.

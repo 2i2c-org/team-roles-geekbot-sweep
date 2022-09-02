@@ -11,6 +11,8 @@ from loguru import logger
 from requests import Session
 from rich import print_json
 
+from ..encryption.sops import get_decrypted_file
+
 
 class GeekbotStandup:
     """
@@ -18,29 +20,35 @@ class GeekbotStandup:
     """
 
     def __init__(self):
-        # Set variables
         self.geekbot_api_url = "https://api.geekbot.io"
-        self.geekbot_api_key = os.environ["GEEKBOT_API_KEY"]
 
         try:
             self.CI_env = os.environ["CI"]
         except KeyError:
             self.CI_env = False
 
-        # Open a Geekbot session
-        self.geekbot_session = self._create_geekbot_session()
-
-        # Set paths
+        # Set filepaths
         project_path = Path(__file__).parent.parent.parent
         roles_path = project_path.joinpath("team-roles.json")
+        secrets_path = project_path.joinpath("secrets")
 
-        # Check file exists before reading it
+        # Check team roles file exists before reading it
         if not os.path.exists(roles_path):
             raise FileNotFoundError(f"File must exist to continue! {roles_path}")
 
         # Read in team-roles.json
         with open(roles_path) as stream:
             self.roles = json.load(stream)
+
+        # Read in Geekbot API key
+        with get_decrypted_file(secrets_path.joinpath("geekbot_api_token.json")) as df:
+            with open(df) as f:
+                contents = json.load(f)
+
+        self.geekbot_api_key = contents["geekbot_api_token"]
+
+        # Open a Geekbot session
+        self.geekbot_session = self._create_geekbot_session()
 
     def _create_geekbot_session(self):
         """Create a Session loaded with a Geekbot API key to make requests
