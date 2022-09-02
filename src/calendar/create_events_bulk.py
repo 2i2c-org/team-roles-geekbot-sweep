@@ -11,6 +11,8 @@ from pathlib import Path
 from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
 from loguru import logger
+from rich.progress import track
+from rich.prompt import Confirm
 
 from ..encryption.sops import get_decrypted_file
 from ..geekbot.get_slack_usergroup_members import SlackUsergroupMembers
@@ -150,8 +152,8 @@ class CreateBulkEvents:
 
         return start_date, end_date
 
-    def _create_event(self, role, name, offset):
-        """Create an event in a Google Calendar
+    def _generate_event_metadata(self, role, name, offset):
+        """Generate metadata for an event to be created in a Google Calendar
 
         Args:
             role (str): The role to create an event for. Either 'meeting-facilitator'
@@ -160,6 +162,10 @@ class CreateBulkEvents:
                 this event
             offset (int): The offset from the reference date. The units of this value
                 is described by ROLE_CYCLES[role]["units"].
+
+        Returns:
+            dict: A dictionary of calendar event metadata. Items include the start and
+                end times of the event, and a summary.
         """
         if role == "meeting-facilitator":
             start_date, end_date = self._calculate_event_dates_meeting_facilitator(
@@ -182,14 +188,19 @@ class CreateBulkEvents:
             },
         }
 
-        try:
-            logger.info(
-                f"Creating event ==> {body['summary']}, Start date: {body['start']['date']}, End date: {body['end']['date']}"
-            )
+        return body
 
+    def _create_event(self, event_info):
+        """Create an event in a Google Calendar
+
+        Args:
+            event_info (dict): Metadata describing the event to create. Must include
+                start and end dates, and a summary.
+        """
+        try:
             # Create the event
             self.gcal_api.events().insert(
-                calendarId=self.calendar_id, body=body
+                calendarId=self.calendar_id, body=event_info
             ).execute()
 
         except HttpError as error:
@@ -246,10 +257,29 @@ class CreateBulkEvents:
             )
         )
 
-        # Create the events
+        logger.info("Generating upcoming events...")
+
+        # Generate the events
+        events = []
         for i in range(n_events):
             next_member = members[i]
-            self._create_event(role, next_member, i)
+            event = self._generate_event_metadata(role, next_member, i)
+            print(
+                event["start"]["date"],
+                "->",
+                event["end"]["date"],
+                ":",
+                event["summary"],
+            )
+            events.append(event)
+
+        confirm = Confirm.ask("Create these events?", default=False)
+
+        if confirm:
+            for event in track(events, description="Creating calendar events..."):
+                self._create_event(event)
+        else:
+            logger.info("Ok! Exiting with out creating any events")
 
 
 def main():
@@ -286,8 +316,7 @@ def main():
 
     args = parser.parse_args()
 
-    create_bulk_events = CreateBulkEvents(date=args.date)
-    create_bulk_events.create_bulk_events(
+    CreateBulkEvents(date=args.date).create_bulk_events(
         args.role, name=args.team_member, n_events=args.n_events
     )
 
