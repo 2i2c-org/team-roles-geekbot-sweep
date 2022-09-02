@@ -86,15 +86,18 @@ class DeleteBulkEvents:
         role = role.replace("-", " ")
 
         # Retrieve all events after the given reference date
-        timeMin = self.reference_date.isoformat() + "Z"  # 'Z' indicates UTC time
         events = (
             self.gcal_api.events()
             .list(
                 calendarId=self.calendar_id,
-                timeMin=timeMin,
-                maxResults=100,
+                timeMin=self.reference_date.isoformat() + "Z",  # 'Z' indicates UTC time
                 singleEvents=True,
                 orderBy="startTime",
+                # The calendar is kept populated ~1 year in advance. 52 weeks per year.
+                # Support Steward is fortnightly, so that's 26 events per year. Hence
+                # setting maxResults to 30 is more than enough to cover all upcoming
+                # events.
+                maxResults=30,
             )
             .execute()
         )
