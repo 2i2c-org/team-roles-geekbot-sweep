@@ -49,15 +49,23 @@ jobs:
           pip install poetry
           poetry install
 
+      # This action use the github official cache mechanism internally
+      - name: Install sops
+        uses: mdgreenwald/mozilla-sops-action@v1
+        with:
+          version: v3.7.2
+
+      - name: Setup sops credentials to decrypt repo secrets
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: "${{ secrets.GCP_KMS_DECRYPTOR_KEY }}"
+
       - name: Update team member in role
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
         run: |
           poetry run update-team-role meeting-facilitator
         env:
           USERGROUP_NAME: "${{ github.event.inputs.usergroup-name || env.USERGROUP_NAME }}"
-          SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
-          CALENDAR_ID: "${{ secrets.CALENDAR_ID }}"
-          GCP_SERVICE_ACCOUNT_KEY: "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"
 
       - name: Add and Commit updated team-roles.json file
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
@@ -70,8 +78,6 @@ jobs:
       - name: Create a standup for the Meeting Facilitator
         run: |
           poetry run create-standup meeting-facilitator
-        env:
-          GEEKBOT_API_KEY: "${{ secrets.GEEKBOT_API_KEY }}"
 
   update-calendar:
     runs-on: ubuntu-latest
@@ -93,11 +99,19 @@ jobs:
           pip install poetry
           poetry install
 
+      # This action use the github official cache mechanism internally
+      - name: Install sops
+        uses: mdgreenwald/mozilla-sops-action@v1
+        with:
+          version: v3.7.2
+
+      - name: Setup sops credentials to decrypt repo secrets
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: "${{ secrets.GCP_KMS_DECRYPTOR_KEY }}"
+
       - name: Create next Meeting Facilitator event in the calendar
         run: |
           poetry run create-next-event meeting-facilitator
         env:
           USERGROUP_NAME: "${{ github.event.inputs.usergroup-name || env.USERGROUP_NAME }}"
-          SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
-          CALENDAR_ID: "${{ secrets.CALENDAR_ID }}"
-          GCP_SERVICE_ACCOUNT_KEY: "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"

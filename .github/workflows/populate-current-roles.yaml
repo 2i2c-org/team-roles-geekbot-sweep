@@ -52,6 +52,17 @@ jobs:
           pip install poetry
           poetry install
 
+      # This action use the github official cache mechanism internally
+      - name: Install sops
+        uses: mdgreenwald/mozilla-sops-action@v1
+        with:
+          version: v3.7.2
+
+      - name: Setup sops credentials to decrypt repo secrets
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: "${{ secrets.GCP_KMS_DECRYPTOR_KEY }}"
+
       - name: Populate team-roles.json
         run: |
           poetry run populate-current-roles
@@ -61,7 +72,6 @@ jobs:
           INCOMING_SUPPORT_STEWARD: "${{ github.event.inputs.incoming-support-steward }}"
           USERGROUP_NAMES: "${{ github.event.inputs.usergroup-name }}"
           STANDUP_MANAGER: "${{ github.event.inputs.standup-manager }}"
-          SLACK_BOT_TOKEN: "${{ secrets.SLACK_BOT_TOKEN }}"
 
       - name: Add and Commit updated team-roles.json file
         uses: EndBug/add-and-commit@v9
