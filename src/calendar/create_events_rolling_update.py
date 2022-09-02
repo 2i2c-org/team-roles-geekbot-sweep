@@ -2,13 +2,16 @@
 Create the next event in a series based on the data for the last event in a calendar
 """
 import argparse
+import json
 import os
 from datetime import datetime, timedelta
+from pathlib import Path
 
 from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
 from loguru import logger
 
+from ..encryption.sops import get_decrypted_file
 from ..geekbot.get_slack_usergroup_members import SlackUsergroupMembers
 from .gcal_api_auth import GoogleCalendarAPI
 
@@ -35,15 +38,26 @@ class CreateNextEvent:
     """
 
     def __init__(self):
-        self.calendar_id = os.environ["CALENDAR_ID"]
         usergroup_name = os.environ["USERGROUP_NAME"]
-
-        self.gcal_api = GoogleCalendarAPI().authenticate()
         self.usergroup_members = (
             SlackUsergroupMembers().get_users_in_usergroup(usergroup_name).keys()
         )
 
         self._get_todays_date()
+
+        # Set filepaths
+        project_path = Path(__file__).parent.parent.parent
+        secrets_path = project_path.joinpath("secrets")
+
+        # Read in calendar ID and authenticate GCal API
+        with get_decrypted_file(
+            secrets_path.joinpath("calendar_id.json")
+        ) as calendar_id_path:
+            with open(calendar_id_path) as f:
+                contents = json.load(f)
+
+        self.calendar_id = contents["calendar_id"]
+        self.gcal_api = GoogleCalendarAPI().authenticate()
 
     def _get_todays_date(self):
         self.today = datetime.utcnow()

@@ -1,19 +1,31 @@
 """
 Functions to get Slack members who are in a given usergroup
 """
-import os
+import json
 from collections import OrderedDict
+from pathlib import Path
 
 from loguru import logger
 from slack_sdk import WebClient
+
+from ..encryption.sops import get_decrypted_file
 
 
 class SlackUsergroupMembers:
     """Find the members of a given Slack usergroup"""
 
     def __init__(self):
+        # Set filepaths
+        project_path = Path(__file__).parent.parent.parent
+        secrets_path = project_path.joinpath("secrets")
+
+        # Get Slack bot token
+        with get_decrypted_file(secrets_path.joinpath("slack_bot_token.json")) as df:
+            with open(df) as f:
+                contents = json.load(f)
+
         # Instantiate a SLACK API client
-        self.client = WebClient(token=os.environ["SLACK_BOT_TOKEN"])
+        self.client = WebClient(token=contents["slack_bot_token"])
 
     def _get_usergroup_id(self, usergroup_name):
         """Retrieve the ID of a given Slack usergroup"""

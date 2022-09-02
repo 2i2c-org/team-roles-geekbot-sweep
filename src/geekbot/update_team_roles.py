@@ -10,6 +10,7 @@ from pathlib import Path
 from loguru import logger
 
 from ..calendar.gcal_api_auth import GoogleCalendarAPI
+from ..encryption.sops import get_decrypted_file
 from .get_slack_usergroup_members import SlackUsergroupMembers
 
 
@@ -17,7 +18,6 @@ class TeamRoles:
     """Iterate our Team Roles through 2i2c team members"""
 
     def __init__(self):
-        self.calendar_id = os.environ["CALENDAR_ID"]
         usergroup_name = os.environ["USERGROUP_NAME"]
 
         # Populate usergroup members
@@ -25,19 +25,27 @@ class TeamRoles:
             usergroup_name
         )
 
-        # Instatiate the GoogleCalendarAPI class
-        self.gcal_api = GoogleCalendarAPI().authenticate()
-
         # Read in who is serving in which role from a JSON file
         project_path = Path(__file__).parent.parent.parent
         self.roles_path = project_path.joinpath("team-roles.json")
+        secrets_path = project_path.joinpath("secrets")
 
-        # Check the file exists before reading
+        # Check the team roles file exists before reading
         if not os.path.exists(self.roles_path):
             raise FileNotFoundError(f"File must exist to continue! {self.roles_path}")
 
         with open(self.roles_path) as stream:
             self.team_roles = json.load(stream)
+
+        # Read in the Calendar ID
+        with get_decrypted_file(secrets_path.joinpath("calendar_id.json")) as df:
+            with open(df) as f:
+                contents = json.load(f)
+
+        self.calendar_id = contents["calendar_id"]
+
+        # Instatiate the GoogleCalendarAPI class
+        self.gcal_api = GoogleCalendarAPI().authenticate()
 
         # Check the info for the standup manager is complete
         self._check_managers_id_is_set()
