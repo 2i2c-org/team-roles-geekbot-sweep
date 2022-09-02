@@ -4,6 +4,7 @@ Create the next event in a series based on the data for the last event in a cale
 import argparse
 import json
 import os
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -73,21 +74,26 @@ class CreateNextEvent:
             list[dict]: A list of event objects describing all the upcoming events in
                 the calendar for the specified role
         """
-        # Get all upcoming events in a calendar
-        events_results = (
-            self.gcal_api.events()
-            .list(
-                calendarId=self.calendar_id,
-                timeMin=self.today.isoformat() + "Z",
-                singleEvents=True,
-                orderBy="startTime",
-                # There will be 12 Meeting Facilitator events per year and 26 Support
-                # Steward events per year - so 50 is enough to cover both those event
-                # types together, plus some extra.
-                maxResults=50,
+        try:
+            # Get all upcoming events in a calendar
+            events_results = (
+                self.gcal_api.events()
+                .list(
+                    calendarId=self.calendar_id,
+                    timeMin=self.today.isoformat() + "Z",  # 'Z' indicates UTC timezone
+                    singleEvents=True,
+                    orderBy="startTime",
+                    # There will be 12 Meeting Facilitator events per year and 26 Support
+                    # Steward events per year - so 50 is enough to cover both those event
+                    # types together, plus some extra.
+                    maxResults=50,
+                )
+                .execute()
             )
-            .execute()
-        )
+        except HttpError as error:
+            logger.error(f"An error occurred: {error}")
+            sys.exit(1)
+
         events = events_results.get("items", [])
 
         # Filter the events for those that have the specified role in their summary
