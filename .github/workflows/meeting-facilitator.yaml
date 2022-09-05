@@ -42,11 +42,25 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install poetry
-          poetry install
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv if one exists
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies if cache does not exist
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Install library
+        run: poetry install --no-interaction
 
       # This action use the github official cache mechanism internally
       - name: Install sops
@@ -62,6 +76,7 @@ jobs:
       - name: Update team member in role
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
         run: |
+          source .venv/bin/activate
           poetry run update-team-role meeting-facilitator
         env:
           USERGROUP_NAME: "${{ github.event.inputs.usergroup-name || env.USERGROUP_NAME }}"
@@ -76,6 +91,7 @@ jobs:
 
       - name: Create a standup for the Meeting Facilitator
         run: |
+          source .venv/bin/activate
           poetry run create-standup meeting-facilitator
 
   update-calendar:
@@ -91,11 +107,25 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install poetry
-          poetry install
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv if one exists
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies if cache does not exist
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Install library
+        run: poetry install --no-interaction
 
       # This action use the github official cache mechanism internally
       - name: Install sops
@@ -110,6 +140,7 @@ jobs:
 
       - name: Create next Meeting Facilitator event in the calendar
         run: |
+          source .venv/bin/activate
           poetry run create-next-event meeting-facilitator
         env:
           USERGROUP_NAME: "${{ github.event.inputs.usergroup-name || env.USERGROUP_NAME }}"
