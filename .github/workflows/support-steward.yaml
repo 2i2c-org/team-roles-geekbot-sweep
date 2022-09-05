@@ -63,7 +63,6 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - is-two-weeks
-      - create-standup
     if: needs.is-two-weeks.outputs.continue-workflow == 'True' || github.event.inputs.update-roles == 'true'
     steps:
       - name: Checkout repo
@@ -111,7 +110,9 @@ jobs:
 
   update-calendar:
     runs-on: ubuntu-latest
-    needs: [is-two-weeks]
+    needs:
+      - is-two-weeks
+      - create-standup
     if: |
       github.event.inputs.update-calendar == 'true'
       || (github.event_name == 'schedule'
