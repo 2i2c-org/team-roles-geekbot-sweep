@@ -79,51 +79,6 @@ class CreateBulkEvents:
             "Reference date adjusted to: {}", self.reference_date.strftime("%Y-%m-%d")
         )
 
-    def _calculate_event_dates_meeting_facilitator(self, offset):
-        """Calculate the start and end dates for a Meeting Facilitator calendar event
-
-        Args:
-            offset (int): The offset from the current date in months
-
-        Returns:
-            datetime objs: The start and end dates for a Meeting Facilitator event
-        """
-        # Always calculate the start date for the next month from the reference date
-        # given. Hence if offset = 0, we don't create a Meeting Facilitator event for
-        # the month we are currently in.
-        start_date = self.reference_date + relativedelta(
-            months=ROLE_CYCLES["meeting-facilitator"]["frequency"] * offset + 1
-        )
-        end_date = start_date + relativedelta(
-            months=ROLE_CYCLES["meeting-facilitator"]["period"]
-        )
-
-        # Meeting Facilitator events last the whole month, so ensure the day attribute
-        # is set to the first day of the month. End date is exclusive, so this will
-        # always run the end of the month, no matter how many days it contains.
-        start_date = start_date.replace(day=1)
-        end_date = end_date.replace(day=1)
-
-        return start_date, end_date
-
-    def _calculate_event_dates_support_steward(self, offset):
-        """Calculate the start and end dates for a Support Steward calendar event
-
-        Args:
-            offset (int): The offset from the current date in fortnights (2 weeks)
-
-        Returns:
-            datetime objs: The start and end dates for a Support Steward event
-        """
-        start_date = self.reference_date + timedelta(
-            days=(ROLE_CYCLES["support-steward"]["frequency"] * offset)
-        )
-        end_date = start_date + timedelta(
-            days=(ROLE_CYCLES["support-steward"]["period"])
-        )
-
-        return start_date, end_date
-
     def _generate_event_metadata(self, role, name, offset):
         """Generate metadata for an event to be created in a Google Calendar
 
