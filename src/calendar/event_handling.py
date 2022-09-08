@@ -55,38 +55,48 @@ class CalendarEventHandler:
 
         self.calendar_id = contents["calendar_id"]
 
-    def _calculate_next_event_dates(self, event_end_date):
+    def _calculate_next_event_dates(self, event_end_date, offset):
         """Calculate the start and end date of the next event in a series for a role,
         given the end date of the previous event
 
         Args:
             event_end_date (date obj): The end date of the previous event in the series
+            offset (int): An integer multiple of event_end_date to offset the original
+                event_end_date by. Used when generating metadata for events in bulk.
 
         Returns:
             tuple(date obj, date obj): The start and end dates respectively for the next
                 event in the series
         """
-        # Since start dates are inclusive and end dates are exclusive, the end and start
-        # dates for two consecutive events are equivalent
-        next_event_start_date = event_end_date
-
         # Calculate the end date for the specified role
         if self.role == "meeting-facilitator":
+            next_event_start_date = event_end_date + relativedelta(
+                months=ROLE_CYCLES[self.role]["frequency"] * offset
+            )
+            next_event_start_date = next_event_start_date.replace(day=1)
+
             next_event_end_date = next_event_start_date + relativedelta(
                 months=ROLE_CYCLES[self.role]["period"]
             )
+            next_event_end_date = next_event_start_date.replace(day=1)
+
         elif self.role == "support-steward":
+            next_event_start_date = event_end_date + relativedelta(
+                days=ROLE_CYCLES[self.role]["frequency"] * offset
+            )
             next_event_end_date = next_event_start_date + relativedelta(
                 days=ROLE_CYCLES[self.role]["period"]
             )
 
         return next_event_start_date, next_event_end_date
 
-    def _find_next_team_member(self, last_member):
+    def _find_next_team_member(self, last_member, offset):
         """Find the next team member to serve in a given role
 
         Args:
             last_member (str): The last team member serving in the role
+            offset (int): An integer multiple of event_end_date to offset the original
+                event_end_date by. Used when generating metadata for events in bulk.
 
         Returns:
             str: The next team member to serve in the role
@@ -104,21 +114,26 @@ class CalendarEventHandler:
         if last_member_index is None:
             raise ValueError(f"Last team member for {self.role} unknown: {last_member}")
 
-        next_member_index = last_member_index + 1
+        next_member_index = last_member_index + 1 + offset
         if next_member_index >= len(self.usergroup_members):
-            next_member_index = 0
+            next_member_index = 0 + (offset % len(self.usergroup_members))
 
         return list(self.usergroup_members)[next_member_index]
 
-    def _get_last_event(self):
+    def _get_last_event(self, suppress_logs):
         """Extract the metadata of the last event in a series. Metadata extracted are: the
         member who served in the role, and the end date of the event.
+
+        Args:
+            suppress_logs (bool, optional): Don't print out logging statements. USed when generating
+                event metadata in bulk and we don't want to clutter the console. Defaults to False.
 
         Returns:
             tuple(date obj, str): The end date of the last event in the series, and the team
                 member who served in the role during that event
         """
-        logger.info("Extracting metadata for last event in the series...")
+        if not suppress_logs:
+            logger.info("Extracting metadata for last event in the series...")
 
         # Get upcoming events for this role
         events = self._get_upcoming_events()
@@ -140,7 +155,8 @@ class CalendarEventHandler:
             )
             last_event_end_date = datetime.strptime(last_event_end_date, "%Y-%m-%d")
 
-        logger.info(f"Currently serving team member: {last_member}")
+        if not suppress_logs:
+            logger.info(f"Currently serving team member: {last_member}")
 
         return last_event_end_date, last_member
 
@@ -182,23 +198,40 @@ class CalendarEventHandler:
 
         return events
 
-    def calculate_next_event_data(self):
+    def calculate_next_event_data(
+        self, ref_date=None, member=None, offset=0, suppress_logs=False
+    ):
         """Calculate the metadata for the next event in this role's series. Metadata are:
         - Start date
         - End date
         - Team member serving in that role
+
+        Args:
+            ref_date (date obj, optional): A reference date to calculate future event dates from.
+                Defaults to None and will pull from the calendar.
+            member (str, optional): The team member currently serving in the role. Defaults to None
+                and will pull from the calendar.
+            offset (int, optional): An integer multiple of event_end_date to offset the original
+                event_end_date by. Used when generating metadata for events in bulk. Defaults to 0.
+            suppress_logs (bool, optional): Don't print out logging statements. USed when generating
+                event metadata in bulk and we don't want to clutter the console. Defaults to False.
 
         Returns:
             dict: Returns the minimum information for a successful POST to the Google
                 Calendar API in order to create an event. Must include a start/end date
                 and a summary
         """
-        last_end_date, last_member = self._get_last_event()
+        if (ref_date is None) and (member is None):
+            last_end_date, last_member = self._get_last_event(suppress_logs)
+        else:
+            last_member = member
+            last_end_date = ref_date
 
-        logger.info("Generating metadata for next event...")
+        if not suppress_logs:
+            logger.info("Generating metadata for next event...")
 
-        next_member = self._find_next_team_member(last_member)
-        start_date, end_date = self._calculate_next_event_dates(last_end_date)
+        next_member = self._find_next_team_member(last_member, offset)
+        start_date, end_date = self._calculate_next_event_dates(last_end_date, offset)
 
         # This represents the minimum amount of information to POST to the Google
         # Calendar API to create an event in a given calendar.
