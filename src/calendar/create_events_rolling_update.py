@@ -28,19 +28,6 @@ class CreateNextEvent:
             SlackUsergroupMembers().get_users_in_usergroup(usergroup_name).keys()
         )
 
-        # Set filepaths
-        project_path = Path(__file__).parent.parent.parent
-        secrets_path = project_path.joinpath("secrets")
-
-        # Read in calendar ID and authenticate GCal API
-        with get_decrypted_file(
-            secrets_path.joinpath("calendar_id.json")
-        ) as calendar_id_path:
-            with open(calendar_id_path) as f:
-                contents = json.load(f)
-
-        self.calendar_id = contents["calendar_id"]
-
     def _get_upcoming_events(self, role):
         """Get the upcoming events in a Google calendar
 

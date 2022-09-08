@@ -23,3 +23,16 @@ class CalendarEventHandler:
     def __init__(self):
         self.gcal_api = GoogleCalendarAPI.athentticate()
         self.today = datetime.today()
+
+        # Set filepaths
+        project_path = Path(__file__).parent.parent.parent
+        secrets_path = project_path.joinpath("secrets")
+
+        # Read in calendar ID and authenticate GCal API
+        with get_decrypted_file(
+            secrets_path.joinpath("calendar_id.json")
+        ) as calendar_id_path:
+            with open(calendar_id_path) as f:
+                contents = json.load(f)
+
+        self.calendar_id = contents["calendar_id"]
