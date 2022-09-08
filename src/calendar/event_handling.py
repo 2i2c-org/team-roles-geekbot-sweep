@@ -264,3 +264,19 @@ class CalendarEventHandler:
 
         except HttpError as error:
             logger.error(f"An error occured: {error}")
+
+    def _delete_event(self, event_id):
+        """Delete an event from a Google Calendar
+
+        Args:
+            event_id (str): The ID of the event to be deleted
+        """
+        try:
+            self.gcal_api.events().delete(
+                calendarId=self.calendar_id,
+                eventId=event_id,
+                sendUpdates=None,
+            ).execute()
+
+        except HttpError as error:
+            logger.error(f"An error occurred: {error}")
