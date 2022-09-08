@@ -28,48 +28,6 @@ class CreateNextEvent:
             SlackUsergroupMembers().get_users_in_usergroup(usergroup_name).keys()
         )
 
-    def _get_upcoming_events(self, role):
-        """Get the upcoming events in a Google calendar
-
-        Args:
-            role (str): The role we want to retrieve events for. Either
-                'meeting-facilitator' or 'support-steward'.
-
-        Returns:
-            list[dict]: A list of event objects describing all the upcoming events in
-                the calendar for the specified role
-        """
-        try:
-            # Get all upcoming events in a calendar
-            events_results = (
-                self.gcal_api.events()
-                .list(
-                    calendarId=self.calendar_id,
-                    timeMin=self.today.isoformat() + "Z",  # 'Z' indicates UTC timezone
-                    singleEvents=True,
-                    orderBy="startTime",
-                    # There will be 12 Meeting Facilitator events per year and 26 Support
-                    # Steward events per year - so 50 is enough to cover both those event
-                    # types together, plus some extra.
-                    maxResults=50,
-                )
-                .execute()
-            )
-        except HttpError as error:
-            logger.error(f"An error occurred: {error}")
-            sys.exit(1)
-
-        events = events_results.get("items", [])
-
-        # Filter the events for those that have the specified role in their summary
-        events = [
-            event
-            for event in events
-            if " ".join(role.split("-")).title() in event["summary"]
-        ]
-
-        return events
-
     def _calculate_next_event_data(self, role):
         """Calculate the metadata for the next event in this role's series. Metadata are:
         - Start date
