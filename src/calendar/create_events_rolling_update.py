@@ -11,6 +11,7 @@ from pathlib import Path
 from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
 from loguru import logger
+from rich.prompt import Confirm
 
 from ..encryption.sops import get_decrypted_file
 from ..geekbot.get_slack_usergroup_members import SlackUsergroupMembers
@@ -174,6 +175,9 @@ class CreateNextEvent:
             role (str): The role to create an event for. Either 'meeting-facilitator' or
                 'support-steward'.
         """
+        # Determine if we are working in a CI environment or not
+        ci = os.environ.get("CI", False)
+
         # Get the metadata for the next event
         start_date, end_date, name = self._calculate_next_event_data(role)
 
@@ -191,10 +195,17 @@ class CreateNextEvent:
             },
         }
 
-        try:
-            logger.info(
-                f"Creating event ==> {body['summary']}, Start date: {body['start']['date']}, End date: {body['end']['date']}"
+        print(body["start"]["date"], "->", body["end"]["date"], ":", body["summary"])
+
+        if not ci:
+            confirm = Confirm.ask(
+                "Create the above event?",
+                default=False,
             )
+
+        if ci or confirm:
+        try:
+                logger.info("Creating event...")
 
             # Create the event
             self.gcal_api.events().insert(
@@ -202,6 +213,8 @@ class CreateNextEvent:
             ).execute()
         except HttpError as error:
             logger.error(f"An error occured: {error}")
+        elif not ci and not confirm:
+            logger.info("Ok! Exiting without creating an event")
 
 
 def main():
