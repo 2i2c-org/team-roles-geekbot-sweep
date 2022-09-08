@@ -11,6 +11,7 @@ from pathlib import Path
 from dateutil.relativedelta import relativedelta
 from googleapiclient.errors import HttpError
 from loguru import logger
+from rich.prompt import Confirm
 
 from ..encryption.sops import get_decrypted_file
 from ..geekbot.get_slack_usergroup_members import SlackUsergroupMembers
@@ -126,16 +127,21 @@ class CreateNextEvent:
         events = self._get_upcoming_events(role)
 
         # Find the last event in this series
-        if role == "meeting-facilitator":
-            last_event = events[-1]
-        elif role == "support-steward":
-            # We use [-2] here because the support steward role overlaps by 2 two weeks
-            last_event = events[-2]
+        last_event = events[-1]
 
         # Extract the relevant metadata from the last event in the series
         last_event_end_date = last_event.get("dateTime", last_event["end"].get("date"))
         last_event_end_date = datetime.strptime(last_event_end_date, "%Y-%m-%d")
         last_member = last_event.get("summary", "").split(":")[-1].strip()
+
+        if role == "support-steward":
+            # We use [-2] here because the support steward role overlaps by 2 two weeks. So for the last evet dates,
+            # we need the second to last event in the list
+            last_event = events[-2]
+            last_event_end_date = last_event.get(
+                "dateTime", last_event["end"].get("date")
+            )
+            last_event_end_date = datetime.strptime(last_event_end_date, "%Y-%m-%d")
 
         # Calculate the next team member to serve in this role
         last_member_index = next(
@@ -174,6 +180,9 @@ class CreateNextEvent:
             role (str): The role to create an event for. Either 'meeting-facilitator' or
                 'support-steward'.
         """
+        # Determine if we are working in a CI environment or not
+        ci = os.environ.get("CI", False)
+
         # Get the metadata for the next event
         start_date, end_date, name = self._calculate_next_event_data(role)
 
@@ -191,17 +200,23 @@ class CreateNextEvent:
             },
         }
 
-        try:
-            logger.info(
-                f"Creating event ==> {body['summary']}, Start date: {body['start']['date']}, End date: {body['end']['date']}"
-            )
+        print(body["start"]["date"], "->", body["end"]["date"], ":", body["summary"])
 
-            # Create the event
-            self.gcal_api.events().insert(
-                calendarId=self.calendar_id, body=body
-            ).execute()
-        except HttpError as error:
-            logger.error(f"An error occured: {error}")
+        if not ci:
+            confirm = Confirm.ask("Create the above event?", default=False)
+
+        if ci or confirm:
+            try:
+                logger.info("Creating event...")
+
+                # Create the event
+                self.gcal_api.events().insert(
+                    calendarId=self.calendar_id, body=body
+                ).execute()
+            except HttpError as error:
+                logger.error(f"An error occured: {error}")
+        elif not ci and not confirm:
+            logger.info("Ok! Exiting without creating an event")
 
 
 def main():
