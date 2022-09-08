@@ -110,7 +110,7 @@ def create_bulk_events(role, n_events=None, ref_date=None, member=None):
     logger.info("Generating new event metadata...")
 
     # Get existing events from the calendar
-    ext_events = []  # event_handler._get_upcoming_events()
+    ext_events = event_handler.get_upcoming_events()
     if ext_events:
         events = []
         for i in range(n_events):

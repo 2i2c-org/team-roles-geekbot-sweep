@@ -136,7 +136,7 @@ class CalendarEventHandler:
             logger.info("Extracting metadata for last event in the series...")
 
         # Get upcoming events for this role
-        events = self._get_upcoming_events()
+        events = self.get_upcoming_events()
 
         # Find the last event in this series
         last_event = events[-1]
@@ -160,20 +160,30 @@ class CalendarEventHandler:
 
         return last_event_end_date, last_member
 
-    def _get_upcoming_events(self):
+    def get_upcoming_events(self, date=None):
         """Get the upcoming events in a Google calendar for a specific role
+
+        Args:
+            date (date obj, optional): The date from which to list events.
+                Defaults to TODAY in ISO format.
 
         Returns:
             list[dict]: A list of event objects describing all the upcoming events in
                 the calendar for the specified role
         """
+        # 'Z' indicates UTC timezone
+        if date is None:
+            date = f"{self.today.isoformat()}Z"
+        else:
+            date = f"{date.isoformat()}Z"
+
         try:
             # Get all upcoming events in a calendar
             events_results = (
                 self.gcal_api.events()
                 .list(
                     calendarId=self.calendar_id,
-                    timeMin=self.today.isoformat() + "Z",  # 'Z' indicates UTC timezone
+                    timeMin=date,
                     singleEvents=True,
                     orderBy="startTime",
                     # There will be 12 Meeting Facilitator events per year and 26 Support
