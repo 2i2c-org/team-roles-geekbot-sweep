@@ -127,16 +127,21 @@ class CreateNextEvent:
         events = self._get_upcoming_events(role)
 
         # Find the last event in this series
-        if role == "meeting-facilitator":
             last_event = events[-1]
-        elif role == "support-steward":
-            # We use [-2] here because the support steward role overlaps by 2 two weeks
-            last_event = events[-2]
 
         # Extract the relevant metadata from the last event in the series
         last_event_end_date = last_event.get("dateTime", last_event["end"].get("date"))
         last_event_end_date = datetime.strptime(last_event_end_date, "%Y-%m-%d")
         last_member = last_event.get("summary", "").split(":")[-1].strip()
+
+        if role == "support-steward":
+            # We use [-2] here because the support steward role overlaps by 2 two weeks. So for the last evet dates,
+            # we need the second to last event in the list
+            last_event = events[-2]
+            last_event_end_date = last_event.get(
+                "dateTime", last_event["end"].get("date")
+            )
+            last_event_end_date = datetime.strptime(last_event_end_date, "%Y-%m-%d")
 
         # Calculate the next team member to serve in this role
         last_member_index = next(
