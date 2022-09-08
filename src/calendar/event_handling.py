@@ -38,9 +38,10 @@ class CalendarEventHandler:
         self.gcal_api = GoogleCalendarAPI().authenticate()
         self.role = role
         self.today = datetime.today()
-        self.usergroup_members = (
-            SlackUsergroupMembers().get_users_in_usergroup(usergroup_name).keys()
+        self.usergroup_dict = SlackUsergroupMembers().get_users_in_usergroup(
+            usergroup_name
         )
+        self.usergroup_members = self.usergroup_dict.keys()
 
         # Set filepaths
         project_path = Path(__file__).parent.parent.parent
@@ -90,13 +91,13 @@ class CalendarEventHandler:
 
         return next_event_start_date, next_event_end_date
 
-    def _find_next_team_member(self, last_member, offset):
+    def _find_next_team_member(self, last_member, offset=0):
         """Find the next team member to serve in a given role
 
         Args:
             last_member (str): The last team member serving in the role
-            offset (int): An integer multiple of event_end_date to offset the original
-                event_end_date by. Used when generating metadata for events in bulk.
+            offset (int, optional): An integer multiple of event_end_date to offset the original
+                event_end_date by. Used when generating metadata for events in bulk. Defaults to 0.
 
         Returns:
             str: The next team member to serve in the role
@@ -120,7 +121,7 @@ class CalendarEventHandler:
 
         return list(self.usergroup_members)[next_member_index]
 
-    def _get_last_event(self, suppress_logs):
+    def get_last_event(self, suppress_logs=False):
         """Extract the metadata of the last event in a series. Metadata extracted are: the
         member who served in the role, and the end date of the event.
 
