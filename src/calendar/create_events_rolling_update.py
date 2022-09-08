@@ -127,7 +127,7 @@ class CreateNextEvent:
         events = self._get_upcoming_events(role)
 
         # Find the last event in this series
-            last_event = events[-1]
+        last_event = events[-1]
 
         # Extract the relevant metadata from the last event in the series
         last_event_end_date = last_event.get("dateTime", last_event["end"].get("date"))
@@ -203,21 +203,18 @@ class CreateNextEvent:
         print(body["start"]["date"], "->", body["end"]["date"], ":", body["summary"])
 
         if not ci:
-            confirm = Confirm.ask(
-                "Create the above event?",
-                default=False,
-            )
+            confirm = Confirm.ask("Create the above event?", default=False)
 
         if ci or confirm:
-        try:
+            try:
                 logger.info("Creating event...")
 
-            # Create the event
-            self.gcal_api.events().insert(
-                calendarId=self.calendar_id, body=body
-            ).execute()
-        except HttpError as error:
-            logger.error(f"An error occured: {error}")
+                # Create the event
+                self.gcal_api.events().insert(
+                    calendarId=self.calendar_id, body=body
+                ).execute()
+            except HttpError as error:
+                logger.error(f"An error occured: {error}")
         elif not ci and not confirm:
             logger.info("Ok! Exiting without creating an event")
 
