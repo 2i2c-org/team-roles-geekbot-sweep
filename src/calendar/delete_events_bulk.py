@@ -2,157 +2,15 @@
 Delete Team Role Events in a Calendar in bulk
 """
 import argparse
-import json
 import os
 import sys
 from datetime import datetime
-from pathlib import Path
 
-from dateutil.relativedelta import relativedelta
-from googleapiclient.errors import HttpError
 from loguru import logger
 from rich.progress import track
 from rich.prompt import Confirm
 
-from ..encryption.sops import get_decrypted_file
-from ..geekbot.get_slack_usergroup_members import SlackUsergroupMembers
-from .gcal_api_auth import GoogleCalendarAPI
-
-
-class DeleteBulkEvents:
-    """Delete Team Role events in a Calendar in Bulk from a given reference date"""
-
-    def __init__(self, date=None):
-        self._generate_reference_date(date=date)
-        usergroup_name = os.environ["USERGROUP_NAME"]
-        self.user_group_members = (
-            SlackUsergroupMembers().get_users_in_usergroup(usergroup_name).keys()
-        )
-
-        # Set filepaths
-        project_path = Path(__file__).parent.parent.parent
-        secrets_path = project_path.joinpath("secrets")
-
-        # Read in the calendar ID and authenticate GCal API
-        with get_decrypted_file(
-            secrets_path.joinpath("calendar_id.json")
-        ) as calendar_id_path:
-            with open(calendar_id_path) as f:
-                contents = json.load(f)
-
-        self.calendar_id = contents["calendar_id"]
-        self.gcal_api = GoogleCalendarAPI().authenticate()
-
-    def _generate_reference_date(self, date=None):
-        """Generate a reference date from when to begin listing and deleting events.
-        Defaults to the 1st of the next month from which the program is run.
-
-        Args:
-            date (str, optional): A chosen reference date as a string in the format
-                'YYYY-MM-DD'. Defaults to None.
-        """
-        if date is None:
-            self.reference_date = (datetime.today() + relativedelta(months=1)).replace(
-                day=1
-            )
-        else:
-            self.reference_date = datetime.strptime(date, "%Y-%m-%d")
-
-        logger.info(
-            "Reference date to calculate events from: {}",
-            self.reference_date.strftime("%Y-%m-%d"),
-        )
-
-    def _delete_an_event(self, event_id):
-        """Delete an event from a Google Calendar
-
-        Args:
-            event_id (str): The ID of the event to be deleted
-        """
-        logger.info(f"Deleting event ID: {event_id}")
-        try:
-            self.gcal_api.events().delete(
-                calendarId=self.calendar_id,
-                eventId=event_id,
-                sendUpdates=None,
-            ).execute()
-        except HttpError as error:
-            logger.error(f"An error occurred: {error}")
-
-    def _list_all_events(self, role):
-        """List all the upcoming events for a specific role
-
-        Args:
-            role (str): The role to list events for
-
-        Returns:
-            list[dict]: A list of dictionaries containing metadata about the upcoming
-                events for the specified role
-        """
-        # Retrieve all events after the given reference date
-        try:
-            events = (
-                self.gcal_api.events()
-                .list(
-                    calendarId=self.calendar_id,
-                    timeMin=f"{self.reference_date.isoformat()}Z",  # 'Z' indicates UTC time
-                    singleEvents=True,
-                    orderBy="startTime",
-                    # The calendar is kept populated ~1 year in advance. 52 weeks per year.
-                    # Support Steward is fortnightly, so that's 26 events per year. Hence
-                    # setting maxResults to 30 is more than enough to cover all upcoming
-                    # events.
-                    maxResults=30,
-                )
-                .execute()
-            )
-        except HttpError as error:
-            logger.error(f"An error occurred: {error}")
-            sys.exit(1)
-
-        events = events.get("items", None)
-
-        # Filter events for the specified role
-        events = [event for event in events if role in event["summary"].lower()]
-
-        return events
-
-    def delete_all_future_role_events(self, role):
-        """Retreive, list and confirm the deletion of the upcoming events for a
-        specified role in a Google Calendar
-
-        Args:
-            role (str): The role to retreive, list, and delete events for
-        """
-        role = role.replace("-", " ")
-        events = self._list_all_events(role)
-
-        if not events:
-            logger.info("No upcoming events found")
-            sys.exit()
-
-        logger.info(f"{len(events)} events for {role.title()} found")
-
-        for event in events:
-            print(
-                event["start"]["date"],
-                "->",
-                event["end"]["date"],
-                ":",
-                event["summary"],
-            )
-
-        confirm = Confirm.ask("Delete all these events?", default=False)
-
-        if confirm:
-            for event in track(
-                events, description=f"Deleting {role.title()} events..."
-            ):
-                self._delete_an_event(event["id"])
-            logger.info("Event deletion completed")
-        else:
-            logger.info("Ok! Exiting without deleting anything")
-            sys.exit()
+from .event_handling import CalendarEventHandler
 
 
 def main():
@@ -175,7 +33,42 @@ def main():
 
     args = parser.parse_args()
 
-    DeleteBulkEvents(date=args.date).delete_all_future_role_events(role=args.role)
+    if args.date is not None:
+        args.date = datetime.strptime(args.date, "%Y-%m-%d")
+
+    # Set variables from environment
+    usergroup_name = os.environ["USERGROUP_NAME"]
+
+    # Instatiate the event handler
+    event_handler = CalendarEventHandler(args.role, usergroup_name)
+
+    # Retreive upcoming events
+    events = event_handler.get_upcoming_events(date=args.date)
+
+    if not events:
+        logger.info("No events found")
+        sys.exit()
+
+    logger.info(f"{len(events)} events for {args.role.replace('-', ' ').title()} found")
+
+    for event in events:
+        print(f"{event['start']['date']} -> {event['end']['date']}: {event['summary']}")
+
+    # Prompt for confirmation
+    confirm = Confirm.ask("Delete all these events?", default=False)
+
+    if confirm:
+        # Delete the events
+        for event in track(
+            events,
+            description=f"Deleting {args.role.replace('-', ' ').title()} events...",
+        ):
+            event_handler.delete_event(event["id"])
+        logger.info("Event deletion completed")
+
+    else:
+        logger.info("Ok! Exiting without deleting anything")
+        sys.exit()
 
 
 if __name__ == "__main__":
