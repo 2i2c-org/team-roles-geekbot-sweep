@@ -1,3 +1,7 @@
+from datetime import datetime
+
+from .gcal_api_auth import GoogleCalendarAPI
+
 # Some information about how often each of our team roles is transferred
 ROLE_CYCLES = {
     "meeting-facilitator": {
@@ -17,4 +21,5 @@ ROLE_CYCLES = {
 
 class CalendarEventHandler:
     def __init__(self):
-        pass
+        self.gcal_api = GoogleCalendarAPI.athentticate()
+        self.today = datetime.today()

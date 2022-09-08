@@ -15,7 +15,6 @@ from rich.prompt import Confirm
 
 from ..encryption.sops import get_decrypted_file
 from ..geekbot.get_slack_usergroup_members import SlackUsergroupMembers
-from .gcal_api_auth import GoogleCalendarAPI
 
 
 class CreateNextEvent:
@@ -29,8 +28,6 @@ class CreateNextEvent:
             SlackUsergroupMembers().get_users_in_usergroup(usergroup_name).keys()
         )
 
-        self._get_todays_date()
-
         # Set filepaths
         project_path = Path(__file__).parent.parent.parent
         secrets_path = project_path.joinpath("secrets")
@@ -43,10 +40,6 @@ class CreateNextEvent:
                 contents = json.load(f)
 
         self.calendar_id = contents["calendar_id"]
-        self.gcal_api = GoogleCalendarAPI().authenticate()
-
-    def _get_todays_date(self):
-        self.today = datetime.utcnow()
 
     def _get_upcoming_events(self, role):
         """Get the upcoming events in a Google calendar

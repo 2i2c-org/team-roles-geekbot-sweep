@@ -16,7 +16,6 @@ from rich.prompt import Confirm
 
 from ..encryption.sops import get_decrypted_file
 from ..geekbot.get_slack_usergroup_members import SlackUsergroupMembers
-from .gcal_api_auth import GoogleCalendarAPI
 
 
 class CreateBulkEvents:
@@ -49,7 +48,6 @@ class CreateBulkEvents:
                 contents = json.load(f)
 
         self.calendar_id = contents["calendar_id"]
-        self.gcal_api = GoogleCalendarAPI().authenticate()
 
     def _generate_reference_date(self, date=None):
         """Generate a reference date to calculate start and end dates for role events
