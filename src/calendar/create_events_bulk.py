@@ -109,14 +109,27 @@ def create_bulk_events(role, n_events=None, ref_date=None, member=None):
 
     logger.info("Generating new event metadata...")
 
+    # Blank list to append events to
+    events = []
+
     # Get existing events from the calendar
     ext_events = event_handler.get_upcoming_events()
-    if ext_events:
-        events = []
+
+    # Check which events need to be created
+    if ext_events and (ref_date is None) and (member is None):
         for i in range(n_events):
             events.append(
                 event_handler.calculate_next_event_data(offset=i, suppress_logs=True)
             )
+
+    elif ext_events and (ref_date is not None) and (member is not None):
+        for i in range(n_events):
+            events.append(
+                event_handler.calculate_next_event_data(
+                    ref_date=ref_date, member=member, offset=i, suppress_logs=True
+                )
+            )
+
     else:
         if member is None:
             # Read in team-roles.json file
@@ -146,7 +159,6 @@ def create_bulk_events(role, n_events=None, ref_date=None, member=None):
                 "If you don't want to create the suggested events, exit the script and rerun setting the --date [-d] and --team-member [-m] flags."
             )
 
-        events = []
         for i in range(n_events):
             events.append(
                 event_handler.calculate_next_event_data(

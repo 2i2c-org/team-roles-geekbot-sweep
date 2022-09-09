@@ -233,7 +233,7 @@ class CalendarEventHandler:
                 and a summary
         """
         if (ref_date is None) and (member is None):
-            last_end_date, last_member = self._get_last_event(suppress_logs)
+            last_end_date, last_member = self.get_last_event(suppress_logs)
         else:
             last_member = member
             last_end_date = ref_date
