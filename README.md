@@ -260,7 +260,7 @@ poetry run create-bulk-events { meeting-facilitator | support-steward }
 **Help info:**
 
 ```bash
-usage: create-bulk-events [-h] [-m TEAM_MEMBER] [-n N_EVENTS] [-d DATE] {meeting-facilitator,support-steward}
+usage: create-bulk-events [-h] [-n N_EVENTS] [-d DATE] [-m TEAM_MEMBER] {meeting-facilitator,support-steward}
 
 Bulk create a series of Team Role events in a Google Calendar
 
@@ -270,12 +270,16 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  -m TEAM_MEMBER, --team-member TEAM_MEMBER
-                        The name of the team member currently serving in the role. Will be pulled from team-roles.json if not provided.
   -n N_EVENTS, --n-events N_EVENTS
-                        The number of role events to create. Defaults to 12 for Meeting Facilitator and 26 for Support Steward (both 1 year's
-                        worth).
-  -d DATE, --date DATE  A reference date to begin creating events from. Defaults to today. WARNING: EXPERIMENTAL FEATURE.
+                        The number of role events to create. Defaults to 12 for Meeting Facilitator and 26
+                        for Support Steward (both 1 year's worth).
+  -d DATE, --date DATE  A reference date to begin creating events from. Defaults to appending events from the
+                        last in the series, or TODAY if no events exist. WARNING: EXPERIMENTAL FEATURE. This
+                        flag is MUTUALLY INCLUSIVE with --team-member [-m].
+  -m TEAM_MEMBER, --team-member TEAM_MEMBER
+                        The name of the team member currently serving in the role. Defaults to being pulled
+                        from either the last calendar event, or team-roles.json if a calendar event doesn't
+                        not exist. This flag is MUTUALLY INCLUSIVE with --date [-d].
 ```
 
 ### `delete_events_bulk.py`
@@ -306,12 +310,17 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  -d DATE, --date DATE  A reference date to begin creating events from. Defaults to the 1st of the next month.
+  -d DATE, --date DATE  A reference date to begin creating events from. Defaults to the 1st of the next
+                        month.
 ```
 
 ### `gcal_api_auth.py`
 
 This script is a helper script that returns an authenticated instance of the Google Calendar API for the [`create_events_rolling_update.py`](#create_events_rolling_updatepy) and [`create_events_bulk.py`](#create_events_bulkpy) to create events in a Google Calendar.
+
+### `event_handling.py`
+
+This script is a helper script that centralises logic around generating metadata for events, creating them, and deleting them from a Google Calendar.
 
 ### `sops.py`
 
