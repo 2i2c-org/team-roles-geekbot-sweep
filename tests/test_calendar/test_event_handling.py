@@ -1,5 +1,5 @@
-from datetime import datetime
 import unittest
+from datetime import datetime
 from unittest.mock import patch
 
 from src.calendar.event_handling import CalendarEventHandler
@@ -19,8 +19,12 @@ class EventHandlerSubClass(CalendarEventHandler):
 def test_create_next_event_dates_meeting_facilitator_no_offset():
     end_date = datetime(2022, 10, 1)
 
-    test_event_handler = EventHandlerSubClass("meeting-facilitator", "meeting-facilitators")
-    next_start_date, next_end_date = test_event_handler._calculate_next_event_dates(end_date, 0)
+    test_event_handler = EventHandlerSubClass(
+        "meeting-facilitator", "meeting-facilitators"
+    )
+    next_start_date, next_end_date = test_event_handler._calculate_next_event_dates(
+        end_date, 0
+    )
 
     expected_start_date = datetime(2022, 10, 1)
     expected_end_date = datetime(2022, 11, 1)
@@ -33,7 +37,9 @@ def test_create_next_event_dates_support_steward_no_offset():
     end_date = datetime(2022, 9, 21)
 
     test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
-    next_start_date, next_end_date = test_event_handler._calculate_next_event_dates(end_date, 0)
+    next_start_date, next_end_date = test_event_handler._calculate_next_event_dates(
+        end_date, 0
+    )
 
     expected_start_date = datetime(2022, 9, 21)
     expected_end_date = datetime(2022, 10, 19)
@@ -46,11 +52,15 @@ def test_create_next_event_dates_meeting_facilitator_with_offset():
     case = unittest.TestCase()
     end_date = datetime(2022, 10, 1)
     offset = 3
-    test_event_handler = EventHandlerSubClass("meeting-facilitator", "meeting-facilitators")
+    test_event_handler = EventHandlerSubClass(
+        "meeting-facilitator", "meeting-facilitators"
+    )
 
     next_event_dates = []
     for i in range(offset):
-        next_event_dates.append(test_event_handler._calculate_next_event_dates(end_date, i))
+        next_event_dates.append(
+            test_event_handler._calculate_next_event_dates(end_date, i)
+        )
 
     expected_event_dates = [
         (datetime(2022, 10, 1), datetime(2022, 11, 1)),
@@ -69,7 +79,9 @@ def test_create_next_event_dates_support_steward_with_offset():
 
     next_event_dates = []
     for i in range(offset):
-        next_event_dates.append(test_event_handler._calculate_next_event_dates(end_date, i))
+        next_event_dates.append(
+            test_event_handler._calculate_next_event_dates(end_date, i)
+        )
 
     expected_event_dates = [
         (datetime(2022, 9, 21), datetime(2022, 10, 19)),
@@ -93,21 +105,18 @@ def test_find_next_team_member():
 
 @patch("src.calendar.event_handling.CalendarEventHandler.get_upcoming_events")
 def test_get_last_event_meeting_facilitator(mock_upcoming_events):
-    test_event_handler = EventHandlerSubClass("meeting-facilitator", "meeting-facilitators")
+    test_event_handler = EventHandlerSubClass(
+        "meeting-facilitator", "meeting-facilitators"
+    )
 
     mock_upcoming_events.return_value = [
         {
             "end": {
                 "date": "2022-09-01",
             },
-            "summary": "Meeting Facilitator: Person A"
+            "summary": "Meeting Facilitator: Person A",
         },
-        {
-            "end": {
-                "date": "2022-10-01"
-            },
-            "summary": "Meeting Facilitator: Person B"
-        },
+        {"end": {"date": "2022-10-01"}, "summary": "Meeting Facilitator: Person B"},
     ]
 
     end_date, last_member = test_event_handler.get_last_event(suppress_logs=True)
@@ -125,20 +134,10 @@ def test_get_last_event_support_steward(mock_upcoming_events):
             "end": {
                 "date": "2022-09-21",
             },
-            "summary": "Support Steward: Person A"
+            "summary": "Support Steward: Person A",
         },
-        {
-            "end": {
-                "date": "2022-10-05"
-            },
-            "summary": "Support Steward: Person B"
-        },
-        {
-            "end": {
-                "date": "2022-10-19"
-            },
-            "summary": "Support Steward: Person C"
-        },
+        {"end": {"date": "2022-10-05"}, "summary": "Support Steward: Person B"},
+        {"end": {"date": "2022-10-19"}, "summary": "Support Steward: Person C"},
     ]
 
     end_date, last_member = test_event_handler.get_last_event(suppress_logs=True)
