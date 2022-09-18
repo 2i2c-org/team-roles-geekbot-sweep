@@ -1,11 +1,6 @@
 from datetime import datetime
-from pathlib import Path
-from unittest.mock import patch
 
-from src.calendar.create_events_bulk import (
-    adjust_reference_date,
-    read_team_roles_from_file,
-)
+from src.calendar.create_events_bulk import adjust_reference_date
 
 
 def test_adjust_reference_date_less_than_three():
