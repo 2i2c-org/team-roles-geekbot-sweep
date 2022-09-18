@@ -12,6 +12,7 @@ on:
 jobs:
   test-code:
     runs-on: ubuntu-latest
+    environment: codecov
     strategy:
       fail-fast: false
       matrix:
@@ -53,9 +54,9 @@ jobs:
       - name: Print/generate coverage report
         run: coverage report && coverage xml
 
-      # - name: Upload coverage to Codecov
-      #   if: matrix.python-version == '3.9'
-      #   uses: codecov/codecov-action@v3
-      #   with:
-      #     fail_ci_if_error: true
-      #     token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.9'
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
