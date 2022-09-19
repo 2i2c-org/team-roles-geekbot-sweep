@@ -98,7 +98,7 @@ class TeamRoles:
         """
         # Find the current team member and next team member to serve in a role
         _, current_member = self.event_handler.get_last_event()
-        next_member = self.event_handler.find_next_team_member(current_member)
+        next_member = self.event_handler._find_next_team_member(current_member)
 
         logger.info(f"Next {' '.join(self.role.split('-')).title()}: {next_member}")
 
