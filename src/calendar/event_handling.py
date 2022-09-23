@@ -79,7 +79,6 @@ class CalendarEventHandler:
             next_event_end_date = next_event_start_date + relativedelta(
                 months=ROLE_CYCLES[self.role]["period"]
             )
-            next_event_end_date = next_event_start_date.replace(day=1)
 
         elif self.role == "support-steward":
             next_event_start_date = event_end_date + relativedelta(
