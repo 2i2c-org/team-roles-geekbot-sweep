@@ -111,15 +111,22 @@ def test_get_last_event_meeting_facilitator(mock_upcoming_events):
 
     mock_upcoming_events.return_value = [
         {
+            "start": {
+                "date": "2022-08-01",
+            },
             "end": {
                 "date": "2022-09-01",
             },
             "summary": "Meeting Facilitator: Person A",
         },
-        {"end": {"date": "2022-10-01"}, "summary": "Meeting Facilitator: Person B"},
+        {
+            "start": {"date": "2022-09-01"},
+            "end": {"date": "2022-10-01"},
+            "summary": "Meeting Facilitator: Person B",
+        },
     ]
 
-    end_date, last_member = test_event_handler.get_last_event(suppress_logs=True)
+    end_date, last_member = test_event_handler._get_last_event(suppress_logs=True)
 
     assert end_date == datetime(2022, 10, 1)
     assert last_member == "Person B"
@@ -131,16 +138,27 @@ def test_get_last_event_support_steward(mock_upcoming_events):
 
     mock_upcoming_events.return_value = [
         {
+            "start": {
+                "date": "2022-08-24",
+            },
             "end": {
                 "date": "2022-09-21",
             },
             "summary": "Support Steward: Person A",
         },
-        {"end": {"date": "2022-10-05"}, "summary": "Support Steward: Person B"},
-        {"end": {"date": "2022-10-19"}, "summary": "Support Steward: Person C"},
+        {
+            "start": {"date": "2022-09-07"},
+            "end": {"date": "2022-10-05"},
+            "summary": "Support Steward: Person B",
+        },
+        {
+            "start": {"date": "2022-09-21"},
+            "end": {"date": "2022-10-19"},
+            "summary": "Support Steward: Person C",
+        },
     ]
 
-    end_date, last_member = test_event_handler.get_last_event(suppress_logs=True)
+    end_date, last_member = test_event_handler._get_last_event(suppress_logs=True)
 
     assert end_date == datetime(2022, 10, 5)
     assert last_member == "Person C"
