@@ -200,12 +200,17 @@ class CalendarEventHandler:
 
         return last_event_end_date, last_member
 
-    def get_upcoming_events(self, date=None):
+    def get_upcoming_events(self, date=None, nMaxResults=50):
         """Get the upcoming events in a Google calendar for a specific role
 
         Args:
             date (date obj, optional): The date from which to list events.
                 Defaults to TODAY in ISO format.
+            nMaxResults (int, optional): The maximum number of future events to
+                pull from the calendar. There will be 12 Meeting Facilitator events
+                per year and 26 Support Steward events per year - so 50 is enough
+                to cover both those event types together, plus some extra.
+                Defaults to 50.
 
         Returns:
             list[dict]: A list of event objects describing all the upcoming events in
@@ -226,10 +231,7 @@ class CalendarEventHandler:
                     timeMin=date,
                     singleEvents=True,
                     orderBy="startTime",
-                    # There will be 12 Meeting Facilitator events per year and 26 Support
-                    # Steward events per year - so 50 is enough to cover both those event
-                    # types together, plus some extra.
-                    maxResults=50,
+                    maxResults=nMaxResults,
                 )
                 .execute()
             )
