@@ -9,12 +9,12 @@
     },
     "support_steward": {
         "incoming": {
-            "name": "Sarah",
-            "id": "U01G3RJP1U3"
-        },
-        "current": {
             "name": "James Munroe",
             "id": "U03JY6QHQTY"
+        },
+        "current": {
+            "name": "Damian Avila",
+            "id": "U01GKCV6PBL"
         }
     }
 }
