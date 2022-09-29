@@ -90,7 +90,7 @@ class CalendarEventHandler:
 
         return next_event_start_date, next_event_end_date
 
-    def _find_next_team_member(self, last_member, offset=0):
+    def _find_next_team_member_manually(self, last_member, offset=0):
         """Find the next team member to serve in a given role
 
         Args:
@@ -358,7 +358,7 @@ class CalendarEventHandler:
         if not suppress_logs:
             logger.info("Generating metadata for next event...")
 
-        next_member = self._find_next_team_member(last_member, offset)
+        next_member = self._find_next_team_member_manually(last_member, offset)
         start_date, end_date = self._calculate_next_event_dates(last_end_date, offset)
 
         # This represents the minimum amount of information to POST to the Google
