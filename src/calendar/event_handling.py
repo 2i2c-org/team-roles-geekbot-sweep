@@ -142,21 +142,61 @@ class CalendarEventHandler:
         last_event = events[-1]
 
         # Extract the relevant metadata from the last event in the series
+        last_event_start_date = last_event.get(
+            "dateTime", last_event["start"].get("date")
+        )
+        last_event_start_date = datetime.strptime(last_event_start_date, "%Y-%m-%d")
         last_event_end_date = last_event.get("dateTime", last_event["end"].get("date"))
         last_event_end_date = datetime.strptime(last_event_end_date, "%Y-%m-%d")
         last_member = last_event.get("summary", "").split(":")[-1].strip()
 
+        if not suppress_logs:
+            log_msg = (
+                f"{self.role.replace('-', ' ').title()}: "
+                + f"{last_event_start_date.strftime('%Y-%m-%d')} -> "
+                + f"{last_event_end_date.strftime('%Y-%m-%d')}: "
+                + f"{last_member}"
+            )
+            if ((last_event_end_date - self.today).days > 0) and (
+                (last_event_start_date - self.today).days < 0
+            ):
+                log_msg += " (ongoing)"
+            elif ((last_event_end_date - self.today).days > 0) and (
+                (last_event_start_date - self.today).days > 0
+            ):
+                log_msg += " (future)"
+            logger.info(log_msg)
+
         if self.role == "support-steward":
-            # We use [-2] here because the support steward role overlaps by 2 two weeks. So for the last evet dates,
+            # We use [-2] here because the support steward role overlaps by 2 two weeks. So for the last event dates,
             # we need the second to last event in the list
             last_event = events[-2]
+            last_event_start_date = last_event.get(
+                "dateTime", last_event["start"].get("date")
+            )
+            last_event_start_date = datetime.strptime(last_event_start_date, "%Y-%m-%d")
             last_event_end_date = last_event.get(
                 "dateTime", last_event["end"].get("date")
             )
             last_event_end_date = datetime.strptime(last_event_end_date, "%Y-%m-%d")
+            member = last_event.get("summary", "").split(":")[-1].strip()
 
-        if not suppress_logs:
-            logger.info(f"Currently serving team member: {last_member}")
+            if not suppress_logs:
+                log_msg = (
+                    f"{self.role.replace('-', ' ').title()}: "
+                    + f"{last_event_start_date.strftime('%Y-%m-%d')} -> "
+                    + f"{last_event_end_date.strftime('%Y-%m-%d')}: "
+                    + f"{member}"
+                )
+                if ((last_event_end_date - self.today).days > 0) and (
+                    (last_event_start_date - self.today).days < 0
+                ):
+                    log_msg += " (ongoing)"
+                elif ((last_event_end_date - self.today).days > 0) and (
+                    (last_event_start_date - self.today).days > 0
+                ):
+                    log_msg += " (future)"
+                logger.info(log_msg)
 
         return last_event_end_date, last_member
 
