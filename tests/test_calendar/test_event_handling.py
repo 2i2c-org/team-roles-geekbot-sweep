@@ -111,12 +111,8 @@ def test_get_last_event_meeting_facilitator(mock_upcoming_events):
 
     mock_upcoming_events.return_value = [
         {
-            "start": {
-                "date": "2022-08-01",
-            },
-            "end": {
-                "date": "2022-09-01",
-            },
+            "start": {"date": "2022-08-01"},
+            "end": {"date": "2022-09-01"},
             "summary": "Meeting Facilitator: Person A",
         },
         {
@@ -138,12 +134,8 @@ def test_get_last_event_support_steward(mock_upcoming_events):
 
     mock_upcoming_events.return_value = [
         {
-            "start": {
-                "date": "2022-08-24",
-            },
-            "end": {
-                "date": "2022-09-21",
-            },
+            "start": {"date": "2022-08-24"},
+            "end": {"date": "2022-09-21"},
             "summary": "Support Steward: Person A",
         },
         {
@@ -162,3 +154,56 @@ def test_get_last_event_support_steward(mock_upcoming_events):
 
     assert end_date == datetime(2022, 10, 5)
     assert last_member == "Person C"
+
+
+@patch("src.calendar.event_handling.CalendarEventHandler.get_upcoming_events")
+def test_get_first_event_meeting_facilitator(mock_upcoming_events):
+    test_event_handler = EventHandlerSubClass(
+        "meeting-facilitator", "meeting-facilitators"
+    )
+
+    mock_upcoming_events.return_value = [
+        {
+            "start": {"date": "2022-08-01"},
+            "end": {"date": "2022-09-01"},
+            "summary": "Meeting Facilitator: Person A",
+        },
+        {
+            "start": {"date": "2022-09-01"},
+            "end": {"date": "2022-10-01"},
+            "summary": "Meeting Facilitator: Person B",
+        },
+    ]
+
+    end_date, last_member = test_event_handler.get_first_event()
+
+    assert end_date == datetime(2022, 9, 1)
+    assert last_member == "Person A"
+
+
+@patch("src.calendar.event_handling.CalendarEventHandler.get_upcoming_events")
+def test_get_first_event_support_steward(mock_upcoming_events):
+    test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
+
+    mock_upcoming_events.return_value = [
+        {
+            "start": {"date": "2022-08-24"},
+            "end": {"date": "2022-09-21"},
+            "summary": "Support Steward: Person A",
+        },
+        {
+            "start": {"date": "2022-09-07"},
+            "end": {"date": "2022-10-05"},
+            "summary": "Support Steward: Person B",
+        },
+        {
+            "start": {"date": "2022-09-21"},
+            "end": {"date": "2022-10-19"},
+            "summary": "Support Steward: Person C",
+        },
+    ]
+
+    end_date, last_member = test_event_handler.get_first_event()
+
+    assert end_date == datetime(2022, 9, 21)
+    assert last_member == "Person B"
