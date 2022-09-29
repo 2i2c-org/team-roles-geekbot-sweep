@@ -196,6 +196,7 @@ class CalendarEventHandler:
 
         return first_event_end_date, first_member
 
+    def _get_last_event(self, suppress_logs=False):
         """Extract the metadata of the last event in a series. Metadata extracted are: the
         member who served in the role, and the end date of the event.
 
@@ -349,7 +350,7 @@ class CalendarEventHandler:
                 and a summary
         """
         if (ref_date is None) and (member is None):
-            last_end_date, last_member = self.get_last_event(suppress_logs)
+            last_end_date, last_member = self._get_last_event(suppress_logs)
         else:
             last_member = member
             last_end_date = ref_date
