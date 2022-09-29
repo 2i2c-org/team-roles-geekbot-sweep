@@ -97,7 +97,7 @@ class TeamRoles:
         through 2i2c team members
         """
         # Find the current team member and next team member to serve in a role
-        _, current_member = self.event_handler.get_last_event()
+        _, current_member = self.event_handler.get_first_event()
         next_member = self.event_handler._find_next_team_member(current_member)
 
         logger.info(f"Next {' '.join(self.role.split('-')).title()}: {next_member}")

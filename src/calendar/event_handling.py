@@ -120,7 +120,82 @@ class CalendarEventHandler:
 
         return list(self.usergroup_members)[next_member_index]
 
-    def get_last_event(self, suppress_logs=False):
+    def get_first_event(self):
+        """Extract the metadata of the first event in a series. Metadata extracted are: the
+        member who served in the role, and the end date of the event.
+
+        Returns:
+            tuple(date obj, str): The end date of the first event in the series, and the team
+                member who served in the role during that event
+        """
+        # Find upcoming events. Set nMaxResults to 3 here since that should return
+        # one Meeting Facilitator event and two Support Steward events.
+        events = self.get_upcoming_events(nMaxResults=3)
+
+        # Find the first event in the series
+        first_event = events[0]
+
+        # Extract the relevant metadata from the first event in the series
+        first_event_start_date = first_event.get(
+            "dateTime", first_event["start"].get("date")
+        )
+        first_event_start_date = datetime.strptime(first_event_start_date, "%Y-%m-%d")
+        first_event_end_date = first_event.get(
+            "dateTime", first_event["end"].get("date")
+        )
+        first_event_end_date = datetime.strptime(first_event_end_date, "%Y-%m-%d")
+        first_member = first_event.get("summary", "").split(":")[-1].strip()
+
+        # Construct a logger message
+        log_msg = (
+            f"{self.role.replace('-', ' ').title()}: "
+            + f"{first_event_start_date.strftime('%Y-%m-%d')} -> "
+            + f"{first_event_end_date.strftime('%Y-%m-%d')}: "
+            + f"{first_member}"
+        )
+        if ((first_event_end_date - self.today).days > 0) and (
+            (first_event_start_date - self.today).days < 0
+        ):
+            log_msg += " (ongoing)"
+        elif ((first_event_end_date - self.today).days < 0) and (
+            (first_event_start_date - self.today).days < 0
+        ):
+            log_msg += " (past)"
+        logger.info(log_msg)
+
+        if self.role == "support-steward":
+            # We use [1] here because the support steward role overlaps by 2 two weeks. So for the team member
+            # serving in the role, we need to use the next event to calculate where to begin iterating from.
+            first_event = events[1]
+            first_event_start_date = first_event.get(
+                "dateTime", first_event["start"].get("date")
+            )
+            first_event_start_date = datetime.strptime(
+                first_event_start_date, "%Y-%m-%d"
+            )
+            end_date = first_event.get("dateTime", first_event["end"].get("date"))
+            end_date = datetime.strptime(end_date, "%Y-%m-%d")
+            first_member = first_event.get("summary", "").split(":")[-1].strip()
+
+            # Construct a logger message
+            log_msg = (
+                f"{self.role.replace('-', ' ').title()}: "
+                + f"{first_event_start_date.strftime('%Y-%m-%d')} -> "
+                + f"{end_date.strftime('%Y-%m-%d')}: "
+                + f"{first_member}"
+            )
+            if ((first_event_end_date - self.today).days > 0) and (
+                (first_event_start_date - self.today).days < 0
+            ):
+                log_msg += " (ongoing)"
+            elif ((first_event_end_date - self.today).days < 0) and (
+                (first_event_start_date - self.today).days < 0
+            ):
+                log_msg += " (past)"
+            logger.info(log_msg)
+
+        return first_event_end_date, first_member
+
         """Extract the metadata of the last event in a series. Metadata extracted are: the
         member who served in the role, and the end date of the event.
 
