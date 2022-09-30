@@ -25,9 +25,7 @@ def create_next_event(role):
     event_handler = CalendarEventHandler(role, usergroup_name)
 
     next_event_info = event_handler.calculate_next_event_data()
-    print(
-        f"{next_event_info['start']['date']} -> {next_event_info['end']['date']}: {next_event_info['summary']}"
-    )
+    event_handler.log_event_metadata(next_event_info)
 
     if not ci:
         confirm = Confirm.ask("Create the above event?", default=False)

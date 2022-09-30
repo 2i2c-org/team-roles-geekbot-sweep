@@ -97,8 +97,17 @@ class TeamRoles:
         through 2i2c team members
         """
         # Find the current team member and next team member to serve in a role
-        _, current_member = self.event_handler.get_first_event()
-        next_member = self.event_handler._find_next_team_member(current_member)
+        next_member = self.event_handler.find_next_team_member_from_calendar()
+
+        if next_member is None:
+            logger.warning(
+                "Couldn't extract the next team member from the calendar. "
+                "Falling back onto iteration."
+            )
+            _, current_member = self.event_handler.get_first_event()
+            next_member = self.event_handler._find_next_team_member_manually(
+                current_member
+            )
 
         logger.info(f"Next {' '.join(self.role.split('-')).title()}: {next_member}")
 

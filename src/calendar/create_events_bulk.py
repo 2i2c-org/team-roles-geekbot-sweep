@@ -167,7 +167,7 @@ def create_bulk_events(role, n_events=None, ref_date=None, member=None):
             )
 
     for event in events:
-        print(f"{event['start']['date']} -> {event['end']['date']}: {event['summary']}")
+        event_handler.log_event_metadata(event)
 
     confirm = Confirm.ask("Create these events?", default=False)
 

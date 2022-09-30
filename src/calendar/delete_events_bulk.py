@@ -52,7 +52,7 @@ def main():
     logger.info(f"{len(events)} events for {args.role.replace('-', ' ').title()} found")
 
     for event in events:
-        print(f"{event['start']['date']} -> {event['end']['date']}: {event['summary']}")
+        event_handler.log_event_metadata(event)
 
     # Prompt for confirmation
     confirm = Confirm.ask("Delete all these events?", default=False)
