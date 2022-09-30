@@ -127,7 +127,8 @@ class CalendarEventHandler:
         return next_event_start_date, next_event_end_date
 
     def _find_next_team_member_manually(self, last_member, offset=0):
-        """Find the next team member to serve in a given role
+        """Find the next team member to serve in a given role by iterating
+        through a list of team members
 
         Args:
             last_member (str): The last team member serving in the role
@@ -164,6 +165,8 @@ class CalendarEventHandler:
             tuple(date obj, str): The end date of the first event in the series, and the team
                 member who served in the role during that event
         """
+        logger.info("Extracting metadata for first event in the series...")
+
         # Find upcoming events. Set nMaxResults to 3 here since that should return
         # one Meeting Facilitator event and two Support Steward events.
         events = self.get_upcoming_events(nMaxResults=3)
@@ -180,8 +183,9 @@ class CalendarEventHandler:
         first_member = first_event.get("summary", "").split(":")[-1].strip()
 
         if self.role == "support-steward":
-            # We use [1] here because the support steward role overlaps by 2 two weeks. So for the team member
-            # serving in the role, we need to use the next event to calculate where to begin iterating from.
+            # We use [1] here because the support steward role overlaps by 2 two
+            # weeks. So for the team member serving in the role, we need to use
+            # the next event to calculate where to begin iterating from.
             first_event = events[1]
             self._log_event_metadata(first_event)
 
