@@ -21,12 +21,14 @@ ROLE_CYCLES = {
         "frequency": 1,  # Monthly
         "period": 1,
         "n_events": 12,  # Equates to 1 year
+        "index": 1,  # Index to extract next event from
     },
     "support-steward": {
         "unit": "days",
         "frequency": 14,  # Fortnightly
         "period": 28,  # 4 weeks
         "n_events": 26,  # Equates to 1 year
+        "index": 2,  # Index to extract next event from
     },
 }
 
@@ -156,6 +158,28 @@ class CalendarEventHandler:
             next_member_index = 0 + (offset % len(self.usergroup_members))
 
         return list(self.usergroup_members)[next_member_index]
+
+    def find_next_team_member_from_calendar(self):
+        """Extract the next team member to serve in a role from a calendar event
+
+        Returns:
+            str: The name of the next team member to serve in a role
+        """
+        events = self.get_upcoming_events(nMaxResults=5)
+
+        for indx in (
+            ROLE_CYCLES[self.role]["index"] - 1,
+            ROLE_CYCLES[self.role]["index"],
+        ):
+            self._log_event_metadata(events[indx])
+
+        try:
+            next_event = events[ROLE_CYCLES[self.role]["index"]]
+            next_member = next_event.get("summary", "").split(":")[-1].strip()
+        except IndexError:
+            next_member = None
+
+        return next_member
 
     def get_first_event(self):
         """Extract the metadata of the first event in a series. Metadata extracted are: the
