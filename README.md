@@ -2,6 +2,8 @@
 
 A Slack/Geekbot/Google Calendar App to sweep through 2i2c team members, assign Team Roles, and track them in our Team Roles calendar
 
+[![codecov](https://codecov.io/gh/2i2c-org/team-roles-geekbot-sweep/branch/main/graph/badge.svg?token=411D82WZOS)](https://codecov.io/gh/2i2c-org/team-roles-geekbot-sweep)
+
 ## Summary
 
 This repository is a collection of Python code that tracks which 2i2c team members are currently serving in our Team Roles (Meeting Facilitator and Support Steward).
