@@ -58,6 +58,59 @@ class CalendarEventHandler:
 
         self.calendar_id = contents["calendar_id"]
 
+        # Get list of upcoming events
+        self.upcoming_events = self._get_upcoming_events()
+
+    def _get_upcoming_events(self, date=None, nMaxResults=50):
+        """Get the upcoming events in a Google calendar for a specific role
+
+        Args:
+            date (date obj, optional): The date from which to list events.
+                Defaults to TODAY in ISO format.
+            nMaxResults (int, optional): The maximum number of future events to
+                pull from the calendar. There will be 12 Meeting Facilitator events
+                per year and 26 Support Steward events per year - so 50 is enough
+                to cover both those event types together, plus some extra.
+                Defaults to 50.
+
+        Returns:
+            list[dict]: A list of event objects describing all the upcoming events in
+                the calendar for the specified role
+        """
+        # 'Z' indicates UTC timezone
+        if date is None:
+            date = f"{self.today.isoformat()}Z"
+        else:
+            date = f"{date.isoformat()}Z"
+
+        try:
+            # Get all upcoming events in a calendar
+            events_results = (
+                self.gcal_api.events()
+                .list(
+                    calendarId=self.calendar_id,
+                    timeMin=date,
+                    singleEvents=True,
+                    orderBy="startTime",
+                    maxResults=nMaxResults,
+                )
+                .execute()
+            )
+        except HttpError as error:
+            logger.error(f"An error occurred: {error}")
+            sys.exit(1)
+
+        events = events_results.get("items", [])
+
+        # Filter the events for those that have the specified role in their summary
+        events = [
+            event
+            for event in events
+            if " ".join(self.role.split("-")).title() in event["summary"]
+        ]
+
+        return events
+
     def log_event_metadata(self, event_info):
         """Send metadata for a calendar event to the logger
 
@@ -167,19 +220,17 @@ class CalendarEventHandler:
         """
         logger.info("Extracting next team member from the calendar...")
 
-        events = self.get_upcoming_events(nMaxResults=5)
-
         for indx in (
             ROLE_CYCLES[self.role]["index"] - 1,
             ROLE_CYCLES[self.role]["index"],
         ):
             try:
-                self.log_event_metadata(events[indx])
+                self.log_event_metadata(self.upcoming_events[indx])
             except IndexError:
                 pass
 
         try:
-            next_event = events[ROLE_CYCLES[self.role]["index"]]
+            next_event = self.upcoming_events[ROLE_CYCLES[self.role]["index"]]
             next_member = next_event.get("summary", "").split(":")[-1].strip()
         except IndexError:
             next_member = None
@@ -196,12 +247,8 @@ class CalendarEventHandler:
         """
         logger.info("Extracting metadata for first event in the series...")
 
-        # Find upcoming events. Set nMaxResults to 3 here since that should return
-        # one Meeting Facilitator event and two Support Steward events.
-        events = self.get_upcoming_events(nMaxResults=3)
-
         # Find the first event in the series
-        first_event = events[0]
+        first_event = self.upcoming_events[0]
         self.log_event_metadata(first_event)
 
         # Extract the relevant metadata from the first event in the series
@@ -215,7 +262,7 @@ class CalendarEventHandler:
             # We use [1] here because the support steward role overlaps by 2 two
             # weeks. So for the team member serving in the role, we need to use
             # the next event to calculate where to begin iterating from.
-            first_event = events[1]
+            first_event = self.upcoming_events[1]
             self.log_event_metadata(first_event)
 
             first_member = first_event.get("summary", "").split(":")[-1].strip()
@@ -237,11 +284,8 @@ class CalendarEventHandler:
         if not suppress_logs:
             logger.info("Extracting metadata for last event in the series...")
 
-        # Get upcoming events for this role
-        events = self.get_upcoming_events()
-
         # Find the last event in this series
-        last_event = events[-1]
+        last_event = self.upcoming_events[-1]
         if not suppress_logs:
             self.log_event_metadata(last_event)
 
@@ -253,7 +297,7 @@ class CalendarEventHandler:
         if self.role == "support-steward":
             # We use [-2] here because the support steward role overlaps by 2 two weeks. So for the last event dates,
             # we need the second to last event in the list
-            last_event = events[-2]
+            last_event = self.upcoming_events[-2]
             if not suppress_logs:
                 self.log_event_metadata(last_event)
 
@@ -264,57 +308,7 @@ class CalendarEventHandler:
 
         return last_event_end_date, last_member
 
-    def get_upcoming_events(self, date=None, nMaxResults=50):
-        """Get the upcoming events in a Google calendar for a specific role
-
-        Args:
-            date (date obj, optional): The date from which to list events.
-                Defaults to TODAY in ISO format.
-            nMaxResults (int, optional): The maximum number of future events to
-                pull from the calendar. There will be 12 Meeting Facilitator events
-                per year and 26 Support Steward events per year - so 50 is enough
-                to cover both those event types together, plus some extra.
-                Defaults to 50.
-
-        Returns:
-            list[dict]: A list of event objects describing all the upcoming events in
-                the calendar for the specified role
-        """
-        # 'Z' indicates UTC timezone
-        if date is None:
-            date = f"{self.today.isoformat()}Z"
-        else:
-            date = f"{date.isoformat()}Z"
-
-        try:
-            # Get all upcoming events in a calendar
-            events_results = (
-                self.gcal_api.events()
-                .list(
-                    calendarId=self.calendar_id,
-                    timeMin=date,
-                    singleEvents=True,
-                    orderBy="startTime",
-                    maxResults=nMaxResults,
-                )
-                .execute()
-            )
-        except HttpError as error:
-            logger.error(f"An error occurred: {error}")
-            sys.exit(1)
-
-        events = events_results.get("items", [])
-
-        # Filter the events for those that have the specified role in their summary
-        events = [
-            event
-            for event in events
-            if " ".join(self.role.split("-")).title() in event["summary"]
-        ]
-
-        return events
-
-    def calculate_next_event_data(
+    def calculate_next_event_metadata(
         self, ref_date=None, member=None, offset=0, suppress_logs=False
     ):
         """Calculate the metadata for the next event in this role's series. Metadata are:

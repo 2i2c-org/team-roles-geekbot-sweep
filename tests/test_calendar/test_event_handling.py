@@ -109,7 +109,7 @@ def test_find_next_team_member_manually():
     assert next_member_loop_offset == "Person A"
 
 
-@patch("src.calendar.event_handling.CalendarEventHandler.get_upcoming_events")
+@patch("src.calendar.event_handling.CalendarEventHandler._get_upcoming_events")
 def test_get_last_event_meeting_facilitator(mock_upcoming_events):
     test_event_handler = EventHandlerSubClass(
         "meeting-facilitator", "meeting-facilitators"
@@ -134,7 +134,7 @@ def test_get_last_event_meeting_facilitator(mock_upcoming_events):
     assert last_member == "Person B"
 
 
-@patch("src.calendar.event_handling.CalendarEventHandler.get_upcoming_events")
+@patch("src.calendar.event_handling.CalendarEventHandler._get_upcoming_events")
 def test_get_last_event_support_steward(mock_upcoming_events):
     test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
 
@@ -162,7 +162,7 @@ def test_get_last_event_support_steward(mock_upcoming_events):
     assert last_member == "Person C"
 
 
-@patch("src.calendar.event_handling.CalendarEventHandler.get_upcoming_events")
+@patch("src.calendar.event_handling.CalendarEventHandler._get_upcoming_events")
 def test_get_first_event_meeting_facilitator(mock_upcoming_events):
     test_event_handler = EventHandlerSubClass(
         "meeting-facilitator", "meeting-facilitators"
@@ -187,7 +187,7 @@ def test_get_first_event_meeting_facilitator(mock_upcoming_events):
     assert last_member == "Person A"
 
 
-@patch("src.calendar.event_handling.CalendarEventHandler.get_upcoming_events")
+@patch("src.calendar.event_handling.CalendarEventHandler._get_upcoming_events")
 def test_get_first_event_support_steward(mock_upcoming_events):
     test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
 
@@ -215,7 +215,7 @@ def test_get_first_event_support_steward(mock_upcoming_events):
     assert last_member == "Person B"
 
 
-@patch("src.calendar.event_handling.CalendarEventHandler.get_upcoming_events")
+@patch("src.calendar.event_handling.CalendarEventHandler._get_upcoming_events")
 def test_find_next_team_member_from_calendar_meeting_facilitator(mock_upcoming_events):
     test_event_handler = EventHandlerSubClass(
         "meeting-facilitator", "meeting-facilitators"
@@ -239,7 +239,7 @@ def test_find_next_team_member_from_calendar_meeting_facilitator(mock_upcoming_e
     assert next_member == "Person B"
 
 
-@patch("src.calendar.event_handling.CalendarEventHandler.get_upcoming_events")
+@patch("src.calendar.event_handling.CalendarEventHandler._get_upcoming_events")
 def test_find_next_team_member_from_calendar_support_steward(mock_upcoming_events):
     test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
 
@@ -266,7 +266,7 @@ def test_find_next_team_member_from_calendar_support_steward(mock_upcoming_event
     assert next_member == "Person C"
 
 
-@patch("src.calendar.event_handling.CalendarEventHandler.get_upcoming_events")
+@patch("src.calendar.event_handling.CalendarEventHandler._get_upcoming_events")
 def test_find_next_team_member_from_calendar_not_found(mock_upcoming_events):
     test_event_handler = EventHandlerSubClass(
         "meeting-facilitator", "meeting-facilitators"
