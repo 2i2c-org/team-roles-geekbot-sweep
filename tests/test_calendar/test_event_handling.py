@@ -94,9 +94,15 @@ def test_create_next_event_dates_support_steward_with_offset():
 
 def test_find_next_team_member_manually():
     test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
-    next_member_no_offset = test_event_handler._find_next_team_member_manually("Person B")
-    next_member_with_offset = test_event_handler._find_next_team_member_manually("Person B", 3)
-    next_member_loop_offset = test_event_handler._find_next_team_member_manually("Person B", 7)
+    next_member_no_offset = test_event_handler._find_next_team_member_manually(
+        "Person B"
+    )
+    next_member_with_offset = test_event_handler._find_next_team_member_manually(
+        "Person B", 3
+    )
+    next_member_loop_offset = test_event_handler._find_next_team_member_manually(
+        "Person B", 7
+    )
 
     assert next_member_no_offset == "Person C"
     assert next_member_with_offset == "Person F"
