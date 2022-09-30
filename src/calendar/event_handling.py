@@ -165,6 +165,8 @@ class CalendarEventHandler:
         Returns:
             str: The name of the next team member to serve in a role
         """
+        logger.info("Extracting next team member from the calendar...")
+
         events = self.get_upcoming_events(nMaxResults=5)
 
         for indx in (
