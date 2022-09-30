@@ -58,7 +58,7 @@ class CalendarEventHandler:
 
         self.calendar_id = contents["calendar_id"]
 
-    def _log_event_metadata(self, event_info):
+    def log_event_metadata(self, event_info):
         """Send metadata for a calendar event to the logger
 
         Args:
@@ -173,7 +173,7 @@ class CalendarEventHandler:
             ROLE_CYCLES[self.role]["index"] - 1,
             ROLE_CYCLES[self.role]["index"],
         ):
-            self._log_event_metadata(events[indx])
+            self.log_event_metadata(events[indx])
 
         try:
             next_event = events[ROLE_CYCLES[self.role]["index"]]
@@ -199,7 +199,7 @@ class CalendarEventHandler:
 
         # Find the first event in the series
         first_event = events[0]
-        self._log_event_metadata(first_event)
+        self.log_event_metadata(first_event)
 
         # Extract the relevant metadata from the first event in the series
         first_event_end_date = first_event.get(
@@ -213,7 +213,7 @@ class CalendarEventHandler:
             # weeks. So for the team member serving in the role, we need to use
             # the next event to calculate where to begin iterating from.
             first_event = events[1]
-            self._log_event_metadata(first_event)
+            self.log_event_metadata(first_event)
 
             first_member = first_event.get("summary", "").split(":")[-1].strip()
 
@@ -240,7 +240,7 @@ class CalendarEventHandler:
         # Find the last event in this series
         last_event = events[-1]
         if not suppress_logs:
-            self._log_event_metadata(last_event)
+            self.log_event_metadata(last_event)
 
         # Extract the relevant metadata from the last event in the series
         last_event_end_date = last_event.get("dateTime", last_event["end"].get("date"))
@@ -252,7 +252,7 @@ class CalendarEventHandler:
             # we need the second to last event in the list
             last_event = events[-2]
             if not suppress_logs:
-                self._log_event_metadata(last_event)
+                self.log_event_metadata(last_event)
 
             last_event_end_date = last_event.get(
                 "dateTime", last_event["end"].get("date")
