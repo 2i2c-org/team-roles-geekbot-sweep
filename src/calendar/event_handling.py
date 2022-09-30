@@ -173,10 +173,6 @@ class CalendarEventHandler:
         self._log_event_metadata(first_event)
 
         # Extract the relevant metadata from the first event in the series
-        first_event_start_date = first_event.get(
-            "dateTime", first_event["start"].get("date")
-        )
-        first_event_start_date = datetime.strptime(first_event_start_date, "%Y-%m-%d")
         first_event_end_date = first_event.get(
             "dateTime", first_event["end"].get("date")
         )
@@ -188,6 +184,7 @@ class CalendarEventHandler:
             # serving in the role, we need to use the next event to calculate where to begin iterating from.
             first_event = events[1]
             self._log_event_metadata(first_event)
+
             first_member = first_event.get("summary", "").split(":")[-1].strip()
 
         return first_event_end_date, first_member
@@ -216,10 +213,6 @@ class CalendarEventHandler:
             self._log_event_metadata(last_event)
 
         # Extract the relevant metadata from the last event in the series
-        last_event_start_date = last_event.get(
-            "dateTime", last_event["start"].get("date")
-        )
-        last_event_start_date = datetime.strptime(last_event_start_date, "%Y-%m-%d")
         last_event_end_date = last_event.get("dateTime", last_event["end"].get("date"))
         last_event_end_date = datetime.strptime(last_event_end_date, "%Y-%m-%d")
         last_member = last_event.get("summary", "").split(":")[-1].strip()
@@ -230,6 +223,7 @@ class CalendarEventHandler:
             last_event = events[-2]
             if not suppress_logs:
                 self._log_event_metadata(last_event)
+
             last_event_end_date = last_event.get(
                 "dateTime", last_event["end"].get("date")
             )
