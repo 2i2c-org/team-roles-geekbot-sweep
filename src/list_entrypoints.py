@@ -2,9 +2,10 @@
 Helper script to list the entrypoints and their usage/help messages
 instead of inspecting pyproject.toml or README.md by hand
 """
-import toml
 import subprocess
 from pathlib import Path
+
+import toml
 from rich import print
 
 
