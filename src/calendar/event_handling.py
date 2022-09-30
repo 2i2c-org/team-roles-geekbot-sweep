@@ -173,7 +173,10 @@ class CalendarEventHandler:
             ROLE_CYCLES[self.role]["index"] - 1,
             ROLE_CYCLES[self.role]["index"],
         ):
-            self.log_event_metadata(events[indx])
+            try:
+                self.log_event_metadata(events[indx])
+            except IndexError:
+                pass
 
         try:
             next_event = events[ROLE_CYCLES[self.role]["index"]]

@@ -213,3 +213,73 @@ def test_get_first_event_support_steward(mock_upcoming_events):
 
     assert end_date == datetime(2022, 9, 21)
     assert last_member == "Person B"
+
+
+@patch("src.calendar.event_handling.CalendarEventHandler.get_upcoming_events")
+def test_find_next_team_member_from_calendar_meeting_facilitator(mock_upcoming_events):
+    test_event_handler = EventHandlerSubClass(
+        "meeting-facilitator", "meeting-facilitators"
+    )
+
+    mock_upcoming_events.return_value = [
+        {
+            "start": {"date": "2022-08-01"},
+            "end": {"date": "2022-09-01"},
+            "summary": "Meeting Facilitator: Person A",
+        },
+        {
+            "start": {"date": "2022-09-01"},
+            "end": {"date": "2022-10-01"},
+            "summary": "Meeting Facilitator: Person B",
+        },
+    ]
+
+    next_member = test_event_handler.find_next_team_member_from_calendar()
+
+    assert next_member == "Person B"
+
+
+@patch("src.calendar.event_handling.CalendarEventHandler.get_upcoming_events")
+def test_find_next_team_member_from_calendar_support_steward(mock_upcoming_events):
+    test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
+
+    mock_upcoming_events.return_value = [
+        {
+            "start": {"date": "2022-08-24"},
+            "end": {"date": "2022-09-21"},
+            "summary": "Support Steward: Person A",
+        },
+        {
+            "start": {"date": "2022-09-07"},
+            "end": {"date": "2022-10-05"},
+            "summary": "Support Steward: Person B",
+        },
+        {
+            "start": {"date": "2022-09-21"},
+            "end": {"date": "2022-10-19"},
+            "summary": "Support Steward: Person C",
+        },
+    ]
+
+    next_member = test_event_handler.find_next_team_member_from_calendar()
+
+    assert next_member == "Person C"
+
+
+@patch("src.calendar.event_handling.CalendarEventHandler.get_upcoming_events")
+def test_find_next_team_member_from_calendar_not_found(mock_upcoming_events):
+    test_event_handler = EventHandlerSubClass(
+        "meeting-facilitator", "meeting-facilitators"
+    )
+
+    mock_upcoming_events.return_value = [
+        {
+            "start": {"date": "2022-08-01"},
+            "end": {"date": "2022-09-01"},
+            "summary": "Meeting Facilitator: Person A",
+        },
+    ]
+
+    next_member = test_event_handler.find_next_team_member_from_calendar()
+
+    assert next_member is None
