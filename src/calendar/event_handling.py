@@ -167,7 +167,7 @@ class CalendarEventHandler:
         """
         logger.info("Extracting next team member from the calendar...")
 
-        events = self.get_upcoming_events(nMaxResults=5)
+        events = self.get_upcoming_events(nMaxResults=6)
 
         for indx in (
             ROLE_CYCLES[self.role]["index"] - 1,
