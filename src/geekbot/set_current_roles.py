@@ -40,6 +40,9 @@ def main():
     standup_manager = os.environ["STANDUP_MANAGER"]
     current_meeting_facilitator = os.environ.get("CURRENT_MEETING_FACILITATOR", None)
 
+    if current_meeting_facilitator == "":
+        current_meeting_facilitator = None
+
     usergroups = os.environ["USERGROUP_NAMES"]
     usergroups = split_string_by_char(usergroups)
 
