@@ -15,7 +15,7 @@ on:
           the Support Steward role (i.e. for less than two weeks)
       usergroup-name:
         required: false
-        default: meeting-facilitators,support-stewards
+        default: support-stewards
         description: |
           The Slack usergroup(s) our Team Roles are generated from. If providing multiple
           usergroups, separate them with a comma ",".
