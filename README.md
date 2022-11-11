@@ -197,7 +197,7 @@ This script requires the following environment variables to be set:
 
 This script is paired with the [`populate-current-roles` workflow](#populate-current-rolesyaml) to commit the updated `team-roles.json` file to the repo for future CI/CD runs of the bot.
 
-**Note:** You can additionally provide the following environment variable, but it is no longer required since the Meeting Favilitator role is now retired:
+**Note:** You can additionally provide the following environment variable, but it is no longer required since the Meeting Facilitator role is now retired:
 
 - `CURRENT_MEETING_FACILITATOR`: The Slack display name of the team member currently serving in the Meeting Facilitator role
 
