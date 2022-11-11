@@ -111,3 +111,4 @@ jobs:
         with:
           add: team-roles.json
           message: "Update the Team Roles JSON file"
+          default_author: github_actions
