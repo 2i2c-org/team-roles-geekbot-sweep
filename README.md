@@ -10,6 +10,9 @@ This repository is a collection of Python code that tracks which 2i2c team membe
 The code works out which team member is due to take over a given role, and dynamically generates Geekbot standups in Slack to visibly and explicitly notify the given team member that they are due to take over the role.
 It also creates events in the Team Roles Google Calendar to make the role changes more visible.
 
+:fire: **The Meeting Facilitator role has been retired.
+While the code still remains in this repository, it is no longer actively run as part of CI/CD.** :fire:
+
 ### Useful Documentation
 
 **API docs:**
@@ -338,6 +341,9 @@ This workflow runs the [`set_current_roles.py` script](#set_current_rolespy) to 
 It can be triggered manually and requires the environment variables required by `set_current_roles.py` and [`get_slack_usergroup_members.py`](#get_slack_usergroup_memberspy) to be provided as inputs.
 
 ### `meeting-facilitator.yaml`
+
+:fire: **The Meeting Facilitator role has been retired and, even though the workflow file still exists, it has been [manually disabled](https://docs.github.com/en/actions/managing-workflow-runs/disabling-and-enabling-a-workflow#disabling-a-workflow).
+If we wish to bring back the Meeting Facilitator role, we can [enable the workflow](https://docs.github.com/en/actions/managing-workflow-runs/disabling-and-enabling-a-workflow#enabling-a-workflow) again.** :fire:
 
 This workflow file contains two jobs: `create-standup` and `update-calendar`.
 It is scheduled to run at midnight UTC on the 28th of each month and can also be triggered manually using workflow dispatch.
