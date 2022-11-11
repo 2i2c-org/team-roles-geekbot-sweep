@@ -61,7 +61,7 @@ def main():
     team_roles = {
         "standup_manager": {
             "name": standup_manager,
-            "id": members["meeting-facilitators"][standup_manager],
+            "id": members["support-stewards"][standup_manager],
         },
         "meeting_facilitator": {
             "name": current_meeting_facilitator,
