@@ -42,9 +42,21 @@ on:
 jobs:
   populate-team-roles:
     runs-on: ubuntu-latest
+    environment: token-generator
     steps:
+      - name: Generate token
+        if: github.event.inputs.dry-run != 'true'
+        id: generate_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.PRIVATE_KEY }}
+
       - name: Checkout repo
         uses: actions/checkout@v3
+        with:
+          # Checkout the repo with the token from the App if available
+          token: ${{ steps.generate_token.outputs.token || github.token }}
 
       - name: Setup Python v3.9
         uses: actions/setup-python@v4.3.0
@@ -99,3 +111,4 @@ jobs:
         with:
           add: team-roles.json
           message: "Update the Team Roles JSON file"
+          default_author: github_actions
