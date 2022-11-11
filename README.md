@@ -189,7 +189,6 @@ This script requires the following environment variables to be set:
 
 - `USERGROUP_NAMES`: The name of the Slack usergroup to list members of, e.g., `meeting-facilitators` or `support-stewards`.
   Multiple usergroups can be provided by separating them with a comma.
-- `CURRENT_MEETING_FACILITATOR`: The Slack display name of the team member currently serving in the Meeting Facilitator role
 - `CURRENT_SUPPORT_STEWARD`: The Slack display name of the team member currently serving in the Support Steward role (i.e. for more than two weeks)
 - `INCOMING_SUPPORT_STEWARD`: The Slack display name of the team member most recently taking up service in the Support Steward role (i.e. for less than two weeks)
 - `STANDUP_MANAGER`: This is the Slack display name of the team member who created `geekbot_api_token.json` and will be added to all standups.
@@ -197,6 +196,10 @@ This script requires the following environment variables to be set:
   :fire: **If you are changing this role, you will need to recreate `geekbot_api_token.json`.** :fire:
 
 This script is paired with the [`populate-current-roles` workflow](#populate-current-rolesyaml) to commit the updated `team-roles.json` file to the repo for future CI/CD runs of the bot.
+
+**Note:** You can additionally provide the following environment variable, but it is no longer required since the Meeting Facilitator role is now retired:
+
+- `CURRENT_MEETING_FACILITATOR`: The Slack display name of the team member currently serving in the Meeting Facilitator role
 
 **Command line usage:**
 

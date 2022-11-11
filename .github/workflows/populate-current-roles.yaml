@@ -3,11 +3,6 @@ name: Populate a JSON file with members currently serving in our Team Roles
 on:
   workflow_dispatch:
     inputs:
-      current-meeting-facilitator:
-        required: true
-        description: |
-          The Slack display name of the team member currently serving in the Meeting
-          Facilitator role
       current-support-steward:
         required: true
         description: |
@@ -20,7 +15,7 @@ on:
           the Support Steward role (i.e. for less than two weeks)
       usergroup-name:
         required: false
-        default: meeting-facilitators,support-stewards
+        default: support-stewards
         description: |
           The Slack usergroup(s) our Team Roles are generated from. If providing multiple
           usergroups, separate them with a comma ",".
@@ -32,6 +27,17 @@ on:
           They should have generated the API key saved in GEEKBOT_API_KEY.
           This role is required so that the API can continue to 'see' all standups that
           it has created.
+      current-meeting-facilitator:
+        description: |
+          (Optional: This role is now retired so we will set this to null in the
+          code.) The Slack display name of the team member currently serving in
+          the Meeting Facilitator role
+      dry-run:
+        type: boolean
+        default: false
+        description: |
+          Run the workflow as a dry-run. If true, the action will not commit
+          the changed file to the branch.
 
 jobs:
   populate-team-roles:
@@ -88,6 +94,7 @@ jobs:
           STANDUP_MANAGER: "${{ github.event.inputs.standup-manager }}"
 
       - name: Add and Commit updated team-roles.json file
+        if: github.event.inputs.dry-run != 'true'
         uses: EndBug/add-and-commit@v9
         with:
           add: team-roles.json
