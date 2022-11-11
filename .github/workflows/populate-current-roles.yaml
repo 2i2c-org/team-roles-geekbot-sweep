@@ -94,7 +94,7 @@ jobs:
           STANDUP_MANAGER: "${{ github.event.inputs.standup-manager }}"
 
       - name: Add and Commit updated team-roles.json file
-        if: github.event.inputs.dry-run == 'true'
+        if: github.event.inputs.dry-run != 'true'
         uses: EndBug/add-and-commit@v9
         with:
           add: team-roles.json
