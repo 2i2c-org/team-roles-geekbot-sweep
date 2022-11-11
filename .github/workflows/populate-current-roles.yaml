@@ -32,6 +32,12 @@ on:
           (Optional: This role is now retired so we will set this to null in the
           code.) The Slack display name of the team member currently serving in
           the Meeting Facilitator role
+      dry-run:
+        type: boolean
+        default: false
+        description: |
+          Run the workflow as a dry-run. If true, the action will not commit
+          the changed file to the branch.
 
 jobs:
   populate-team-roles:
@@ -88,6 +94,7 @@ jobs:
           STANDUP_MANAGER: "${{ github.event.inputs.standup-manager }}"
 
       - name: Add and Commit updated team-roles.json file
+        if: github.event.inputs.dry-run == 'true'
         uses: EndBug/add-and-commit@v9
         with:
           add: team-roles.json
