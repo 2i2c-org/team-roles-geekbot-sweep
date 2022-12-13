@@ -144,7 +144,7 @@ uritemplate = ">=3.0.1,<5"
 
 [[package]]
 name = "google-auth"
-version = "2.13.0"
+version = "2.15.0"
 description = "Google Authentication Library"
 category = "main"
 optional = false
@@ -159,7 +159,7 @@ six = ">=1.9.0"
 [package.extras]
 aiohttp = ["aiohttp (>=3.6.2,<4.0.0dev)", "requests (>=2.20.0,<3.0.0dev)"]
 enterprise-cert = ["cryptography (==36.0.2)", "pyopenssl (==22.0.0)"]
-pyopenssl = ["pyopenssl (>=20.0.0)"]
+pyopenssl = ["cryptography (>=38.0.3)", "pyopenssl (>=20.0.0)"]
 reauth = ["pyu2f (>=0.1.5)"]
 
 [[package]]
@@ -177,14 +177,14 @@ six = "*"
 
 [[package]]
 name = "google-auth-oauthlib"
-version = "0.7.0"
+version = "0.8.0"
 description = "Google Authentication Library"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-google-auth = ">=2.13.0"
+google-auth = ">=2.15.0"
 requests-oauthlib = ">=0.7.0"
 
 [package.extras]
@@ -580,7 +580,7 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "024bb1090032ea90c3e1e08773724d6c9663ca58c49c815b7d17f33d7fb6788a"
+content-hash = "fa516be3999429259eb21b34060ac322578f0aa06edf39ca1fa9126c28681fd5"
 
 [metadata.files]
 attrs = [
@@ -684,16 +684,16 @@ google-api-python-client = [
     {file = "google_api_python_client-2.69.0-py2.py3-none-any.whl", hash = "sha256:bc2447a7479006d98927fb20faa74d892d3758ff68e99b621367632bc42b8af8"},
 ]
 google-auth = [
-    {file = "google-auth-2.13.0.tar.gz", hash = "sha256:9352dd6394093169157e6971526bab9a2799244d68a94a4a609f0dd751ef6f5e"},
-    {file = "google_auth-2.13.0-py2.py3-none-any.whl", hash = "sha256:99510e664155f1a3c0396a076b5deb6367c52ea04d280152c85ac7f51f50eb42"},
+    {file = "google-auth-2.15.0.tar.gz", hash = "sha256:72f12a6cfc968d754d7bdab369c5c5c16032106e52d32c6dfd8484e4c01a6d1f"},
+    {file = "google_auth-2.15.0-py2.py3-none-any.whl", hash = "sha256:6897b93556d8d807ad70701bb89f000183aea366ca7ed94680828b37437a4994"},
 ]
 google-auth-httplib2 = [
     {file = "google-auth-httplib2-0.1.0.tar.gz", hash = "sha256:a07c39fd632becacd3f07718dfd6021bf396978f03ad3ce4321d060015cc30ac"},
     {file = "google_auth_httplib2-0.1.0-py2.py3-none-any.whl", hash = "sha256:31e49c36c6b5643b57e82617cb3e021e3e1d2df9da63af67252c02fa9c1f4a10"},
 ]
 google-auth-oauthlib = [
-    {file = "google-auth-oauthlib-0.7.0.tar.gz", hash = "sha256:db11bce4b3effc99b518ec22a2903470e0853c0c92be57694e3684e738d22513"},
-    {file = "google_auth_oauthlib-0.7.0-py2.py3-none-any.whl", hash = "sha256:53019edbde83e08ff0740eefc5bded7e26a289941d12e7ae1f0f5bacf2faa031"},
+    {file = "google-auth-oauthlib-0.8.0.tar.gz", hash = "sha256:81056a310fb1c4a3e5a7e1a443e1eb96593c6bbc55b26c0261e4d3295d3e6593"},
+    {file = "google_auth_oauthlib-0.8.0-py2.py3-none-any.whl", hash = "sha256:40cc612a13c3336d5433e94e2adb42a0c88f6feb6c55769e44500fc70043a576"},
 ]
 googleapis-common-protos = [
     {file = "googleapis-common-protos-1.56.4.tar.gz", hash = "sha256:c25873c47279387cfdcbdafa36149887901d36202cb645a0e4f29686bf6e4417"},
