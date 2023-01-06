@@ -28,7 +28,7 @@ def main():
         "--date",
         type=str,
         default=None,
-        help="A reference date to begin creating events from. Defaults to the 1st of the next month.",
+        help="A reference date to begin creating events from. Defaults to TODAY.",
     )
 
     args = parser.parse_args()

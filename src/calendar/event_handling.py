@@ -308,6 +308,60 @@ class CalendarEventHandler:
 
         return last_event_end_date, last_member
 
+    def get_upcoming_events(self, date=None, nMaxResults=50):
+        """Get the upcoming events in a Google calendar for a specific role
+
+        Args:
+            date (date obj, optional): The date from which to list events.
+                Defaults to TODAY in ISO format.
+            nMaxResults (int, optional): The maximum number of future events to
+                pull from the calendar. There will be 12 Meeting Facilitator events
+                per year and 26 Support Steward events per year - so 50 is enough
+                to cover both those event types together, plus some extra.
+                Defaults to 50.
+
+        Returns:
+            list[dict]: A list of event objects describing all the upcoming events in
+                the calendar for the specified role
+        """
+        # 'Z' indicates UTC timezone
+        if date is None:
+            date = f"{self.today.isoformat()}Z"
+            str_date = self.today.strftime("%Y-%m-%d")
+        else:
+            str_date = date.strftime("%Y-%m-%d")
+            date = f"{date.isoformat()}Z"
+
+        logger.info(f"Pulling events starting after: {str_date}")
+
+        try:
+            # Get all upcoming events in a calendar
+            events_results = (
+                self.gcal_api.events()
+                .list(
+                    calendarId=self.calendar_id,
+                    timeMin=date,
+                    singleEvents=True,
+                    orderBy="startTime",
+                    maxResults=nMaxResults,
+                )
+                .execute()
+            )
+        except HttpError as error:
+            logger.error(f"An error occurred: {error}")
+            sys.exit(1)
+
+        events = events_results.get("items", [])
+
+        # Filter the events for those that have the specified role in their summary
+        events = [
+            event
+            for event in events
+            if " ".join(self.role.split("-")).title() in event["summary"]
+        ]
+
+        return events
+
     def calculate_next_event_metadata(
         self, ref_date=None, member=None, offset=0, suppress_logs=False
     ):
