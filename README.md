@@ -296,6 +296,9 @@ And so we can clear the upcoming events with this script, and regenerate events 
 A date from which to select events for deletion can be provided, and events whose start date is _after_ this reference date will be retrieved.
 For instance, if you run the program on 2022-09-15, events that have start dates after that date will be retrieved.
 
+This script requires parsing of the `USERGROUP_NAME` environment variable because the `CalendarEventHandler` class pulls members of a Slack usergroup when instantiated.
+In the future, we should allow this to be overridden since this script only needs to the interact with the Google Calendar API.
+
 **Command line usage:**
 
 ```bash
