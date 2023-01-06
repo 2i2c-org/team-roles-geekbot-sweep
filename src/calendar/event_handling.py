@@ -283,8 +283,12 @@ class CalendarEventHandler:
         # 'Z' indicates UTC timezone
         if date is None:
             date = f"{self.today.isoformat()}Z"
+            str_date = self.today.strftime("%Y-%m-%d")
         else:
+            str_date = date.strftime("%Y-%m-%d")
             date = f"{date.isoformat()}Z"
+
+        logger.info(f"Pulling events starting after: {str_date}")
 
         try:
             # Get all upcoming events in a calendar

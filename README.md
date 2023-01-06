@@ -276,18 +276,15 @@ positional arguments:
   {meeting-facilitator,support-steward}
                         The role to create events for
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -n N_EVENTS, --n-events N_EVENTS
-                        The number of role events to create. Defaults to 12 for Meeting Facilitator and 26
-                        for Support Steward (both 1 year's worth).
-  -d DATE, --date DATE  A reference date to begin creating events from. Defaults to appending events from the
-                        last in the series, or TODAY if no events exist. WARNING: EXPERIMENTAL FEATURE. This
-                        flag is MUTUALLY INCLUSIVE with --team-member [-m].
+                        The number of role events to create. Defaults to 12 for Meeting Facilitator and 26 for Support Steward (both 1 year's worth).
+  -d DATE, --date DATE  A reference date to begin creating events from. Defaults to appending events from the last in the series, or TODAY if no events exist. WARNING: EXPERIMENTAL
+                        FEATURE. This flag is MUTUALLY INCLUSIVE with --team-member [-m].
   -m TEAM_MEMBER, --team-member TEAM_MEMBER
-                        The name of the team member currently serving in the role. Defaults to being pulled
-                        from either the last calendar event, or team-roles.json if a calendar event doesn't
-                        not exist. This flag is MUTUALLY INCLUSIVE with --date [-d].
+                        The name of the team member currently serving in the role. Defaults to being pulled from either the last calendar event, or team-roles.json if a calendar event
+                        doesn't not exist. This flag is MUTUALLY INCLUSIVE with --date [-d].
 ```
 
 ### `delete_events_bulk.py`
@@ -296,8 +293,11 @@ This script is used to delete all upcoming events in the calendar for a role fro
 We may wish to run this script when a team member has been onboarded/off-boarded from a role and we need to update the calendar en masse.
 And so we can clear the upcoming events with this script, and regenerate events with [`create_events_bulk.py`](#create_events_bulkpy).
 
-A date from which to select events for deletion can be provided, and will default to the 1st of the month following that in which the program is run.
-I.e., if you run the program on 2022-09-15, events that have start dates after 2022-10-01 will be retrieved.
+A date from which to select events for deletion can be provided, and events whose start date is _after_ this reference date will be retrieved.
+For instance, if you run the program on 2022-09-15, events that have start dates after that date will be retrieved.
+
+This script requires parsing of the `USERGROUP_NAME` environment variable because the `CalendarEventHandler` class pulls members of a Slack usergroup when instantiated.
+In the future, we should allow this to be overridden since this script only needs to the interact with the Google Calendar API.
 
 **Command line usage:**
 
@@ -316,10 +316,9 @@ positional arguments:
   {meeting-facilitator,support-steward}
                         The role to delete events for
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
-  -d DATE, --date DATE  A reference date to begin creating events from. Defaults to the 1st of the next
-                        month.
+  -d DATE, --date DATE  A reference date to begin creating events from. Defaults to TODAY.
 ```
 
 ### `gcal_api_auth.py`
