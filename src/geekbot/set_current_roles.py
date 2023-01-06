@@ -35,16 +35,16 @@ def main():
         raise FileNotFoundError(f"File must exist to continue! {roles_path}")
 
     # Set environment variables
-    current_meeting_facilitator = os.environ["CURRENT_MEETING_FACILITATOR"]
     current_support_steward = os.environ["CURRENT_SUPPORT_STEWARD"]
     incoming_support_steward = os.environ["INCOMING_SUPPORT_STEWARD"]
     standup_manager = os.environ["STANDUP_MANAGER"]
+    current_meeting_facilitator = os.environ.get("CURRENT_MEETING_FACILITATOR", None)
+
+    if current_meeting_facilitator == "":
+        current_meeting_facilitator = None
 
     usergroups = os.environ["USERGROUP_NAMES"]
-    if "," in usergroups:
-        usergroups = split_string_by_char(usergroups)
-    else:
-        usergroups = [usergroups]
+    usergroups = split_string_by_char(usergroups)
 
     # Instantiate SlackUsergroupMembers class
     slack = SlackUsergroupMembers()
@@ -61,11 +61,13 @@ def main():
     team_roles = {
         "standup_manager": {
             "name": standup_manager,
-            "id": members["meeting-facilitators"][standup_manager],
+            "id": members["support-stewards"][standup_manager],
         },
         "meeting_facilitator": {
             "name": current_meeting_facilitator,
-            "id": members["meeting-facilitators"][current_meeting_facilitator],
+            "id": None
+            if current_meeting_facilitator is None
+            else members["meeting-facilitators"][current_meeting_facilitator],
         },
         "support_steward": {
             "incoming": {

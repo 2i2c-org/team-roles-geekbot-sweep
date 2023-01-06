@@ -63,7 +63,7 @@ def main():
             events,
             description=f"Deleting {args.role.replace('-', ' ').title()} events...",
         ):
-            event_handler.delete_event(event["id"])
+            event_handler._delete_event(event["id"])
         logger.info("Event deletion completed")
 
     else:

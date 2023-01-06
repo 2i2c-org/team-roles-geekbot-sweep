@@ -10,6 +10,9 @@ This repository is a collection of Python code that tracks which 2i2c team membe
 The code works out which team member is due to take over a given role, and dynamically generates Geekbot standups in Slack to visibly and explicitly notify the given team member that they are due to take over the role.
 It also creates events in the Team Roles Google Calendar to make the role changes more visible.
 
+:fire: **The Meeting Facilitator role has been retired.
+While the code still remains in this repository, it is no longer actively run as part of CI/CD.** :fire:
+
 ### Useful Documentation
 
 **API docs:**
@@ -186,7 +189,6 @@ This script requires the following environment variables to be set:
 
 - `USERGROUP_NAMES`: The name of the Slack usergroup to list members of, e.g., `meeting-facilitators` or `support-stewards`.
   Multiple usergroups can be provided by separating them with a comma.
-- `CURRENT_MEETING_FACILITATOR`: The Slack display name of the team member currently serving in the Meeting Facilitator role
 - `CURRENT_SUPPORT_STEWARD`: The Slack display name of the team member currently serving in the Support Steward role (i.e. for more than two weeks)
 - `INCOMING_SUPPORT_STEWARD`: The Slack display name of the team member most recently taking up service in the Support Steward role (i.e. for less than two weeks)
 - `STANDUP_MANAGER`: This is the Slack display name of the team member who created `geekbot_api_token.json` and will be added to all standups.
@@ -194,6 +196,10 @@ This script requires the following environment variables to be set:
   :fire: **If you are changing this role, you will need to recreate `geekbot_api_token.json`.** :fire:
 
 This script is paired with the [`populate-current-roles` workflow](#populate-current-rolesyaml) to commit the updated `team-roles.json` file to the repo for future CI/CD runs of the bot.
+
+**Note:** You can additionally provide the following environment variable, but it is no longer required since the Meeting Facilitator role is now retired:
+
+- `CURRENT_MEETING_FACILITATOR`: The Slack display name of the team member currently serving in the Meeting Facilitator role
 
 **Command line usage:**
 
@@ -338,6 +344,9 @@ This workflow runs the [`set_current_roles.py` script](#set_current_rolespy) to 
 It can be triggered manually and requires the environment variables required by `set_current_roles.py` and [`get_slack_usergroup_members.py`](#get_slack_usergroup_memberspy) to be provided as inputs.
 
 ### `meeting-facilitator.yaml`
+
+:fire: **The Meeting Facilitator role has been retired and, even though the workflow file still exists, it has been [manually disabled](https://docs.github.com/en/actions/managing-workflow-runs/disabling-and-enabling-a-workflow#disabling-a-workflow).
+If we wish to bring back the Meeting Facilitator role, we can [enable the workflow](https://docs.github.com/en/actions/managing-workflow-runs/disabling-and-enabling-a-workflow#enabling-a-workflow) again.** :fire:
 
 This workflow file contains two jobs: `create-standup` and `update-calendar`.
 It is scheduled to run at midnight UTC on the 28th of each month and can also be triggered manually using workflow dispatch.
