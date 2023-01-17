@@ -24,7 +24,7 @@ def create_next_event(role):
     # Instatiate the event handler
     event_handler = CalendarEventHandler(role, usergroup_name)
 
-    next_event_info = event_handler.calculate_next_event_data()
+    next_event_info = event_handler.calculate_next_event_metadata()
     event_handler.log_event_metadata(next_event_info)
 
     if not ci:

@@ -112,20 +112,23 @@ def create_bulk_events(role, n_events=None, ref_date=None, member=None):
     # Blank list to append events to
     events = []
 
-    # Get existing events from the calendar
-    ext_events = event_handler.get_upcoming_events()
-
     # Check which events need to be created
-    if ext_events and (ref_date is None) and (member is None):
+    if event_handler.upcoming_events and (ref_date is None) and (member is None):
         for i in range(n_events):
             events.append(
-                event_handler.calculate_next_event_data(offset=i, suppress_logs=True)
+                event_handler.calculate_next_event_metadata(
+                    offset=i, suppress_logs=True
+                )
             )
 
-    elif ext_events and (ref_date is not None) and (member is not None):
+    elif (
+        event_handler.upcoming_events
+        and (ref_date is not None)
+        and (member is not None)
+    ):
         for i in range(n_events):
             events.append(
-                event_handler.calculate_next_event_data(
+                event_handler.calculate_next_event_metadata(
                     ref_date=ref_date, member=member, offset=i, suppress_logs=True
                 )
             )
@@ -161,7 +164,7 @@ def create_bulk_events(role, n_events=None, ref_date=None, member=None):
 
         for i in range(n_events):
             events.append(
-                event_handler.calculate_next_event_data(
+                event_handler.calculate_next_event_metadata(
                     ref_date=ref_date, member=member, offset=i, suppress_logs=True
                 )
             )
