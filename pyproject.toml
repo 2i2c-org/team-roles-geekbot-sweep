@@ -27,7 +27,7 @@ create-bulk-events = "src.calendar.create_events_bulk:main"
 delete-bulk-events = "src.calendar.delete_events_bulk:main"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "^2.21.0"
+pre-commit = "^3.0.1"
 pytest = "^7.2.0"
 coverage = "^7.1.0"
 
