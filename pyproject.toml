@@ -7,7 +7,7 @@ authors = []
 
 [tool.poetry.dependencies]
 python = "^3.9"
-slack-sdk = "^3.19"
+slack-sdk = "^3.20"
 requests = "^2.27"
 rich = "^13.3"
 loguru = "^0.6.0"
