@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     ignore:
       # Ignore patch upgrades to reduce noise
       - update-types: ["version-update:semver-patch"]
@@ -11,7 +11,7 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     ignore:
       # Ignore patch upgrades to reduce noise
       - update-types: ["version-update:semver-patch"]
