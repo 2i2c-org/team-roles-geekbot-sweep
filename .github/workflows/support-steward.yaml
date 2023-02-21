@@ -40,6 +40,7 @@ jobs:
         id: decision
         shell: python
         run: |
+          import os
           from datetime import date
 
           # This is a Monday before our last support steward transfer (Apr 27, 2022),
@@ -52,7 +53,8 @@ jobs:
           is_two_weeks = (n_weeks_since % 2) == 0
 
           # Set output variable for use in further jobs
-          print(f"::set-output name=continue-workflow::{is_two_weeks}")
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as :
+              print(f'continue-workflow={is_two_weeks}', file=f)
 
       - name: Echo outputs
         run: |
