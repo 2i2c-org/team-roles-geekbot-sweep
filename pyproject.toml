@@ -29,7 +29,7 @@ delete-bulk-events = "src.calendar.delete_events_bulk:main"
 [tool.poetry.dev-dependencies]
 pre-commit = "^3.0.1"
 pytest = "^7.2.0"
-coverage = "^7.1.0"
+coverage = "^7.2.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
