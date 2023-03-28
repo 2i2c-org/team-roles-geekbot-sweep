@@ -28,7 +28,7 @@ ROLE_CYCLES = {
         "frequency": 7,  # Weekly
         "period": 14,  # 2 weeks
         "n_events": 52,  # Equates to 1 year
-        "index": 2,  # Index to extract next event from
+        "index": 2,  # Index to extract next event from. Allows for overlap of events.
     },
 }
 
