@@ -72,11 +72,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Setup Python v3.9
-        uses: actions/setup-python@v4.5.0
-        with:
-          python-version: "3.9"
-
       - name: Install and configure Poetry
         uses: snok/install-poetry@v1
         with:
@@ -140,11 +135,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-
-      - name: Setup Python v3.9
-        uses: actions/setup-python@v4.5.0
-        with:
-          python-version: "3.9"
 
       - name: Install and configure Poetry
         uses: snok/install-poetry@v1
