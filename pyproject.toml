@@ -6,7 +6,7 @@ license = "MIT"
 authors = []
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 slack-sdk = "^3.20"
 requests = "^2.27"
 rich = "^13.3"
