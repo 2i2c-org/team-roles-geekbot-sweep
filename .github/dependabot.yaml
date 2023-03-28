@@ -3,15 +3,11 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-    ignore:
-      # Ignore patch upgrades to reduce noise
-      - update-types: ["version-update:semver-patch"]
-        dependency-name: "*" # Match all packages
+      interval: "monthly"
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     ignore:
       # Ignore patch upgrades to reduce noise
       - update-types: ["version-update:semver-patch"]
