@@ -295,8 +295,9 @@ class CalendarEventHandler:
         last_member = last_event.get("summary", "").split(":")[-1].strip()
 
         if self.role == "support-steward":
-            # We use [-2] here because the support steward role overlaps by 2 two weeks. So for the last event dates,
-            # we need the second to last event in the list
+            # We use [-2] here because the support steward role overlaps itself.
+            # So for the last event dates, we need the second to last event in
+            # the list.
             last_event = self.upcoming_events[-2]
             if not suppress_logs:
                 self.log_event_metadata(last_event)

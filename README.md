@@ -189,8 +189,8 @@ This script requires the following environment variables to be set:
 
 - `USERGROUP_NAMES`: The name of the Slack usergroup to list members of, e.g., `meeting-facilitators` or `support-stewards`.
   Multiple usergroups can be provided by separating them with a comma.
-- `CURRENT_SUPPORT_STEWARD`: The Slack display name of the team member currently serving in the Support Steward role (i.e. for more than two weeks)
-- `INCOMING_SUPPORT_STEWARD`: The Slack display name of the team member most recently taking up service in the Support Steward role (i.e. for less than two weeks)
+- `CURRENT_SUPPORT_STEWARD`: The Slack display name of the team member currently serving in the Support Steward role (i.e. for more than one week)
+- `INCOMING_SUPPORT_STEWARD`: The Slack display name of the team member most recently taking up service in the Support Steward role (i.e. for less than one week)
 - `STANDUP_MANAGER`: This is the Slack display name of the team member who created `geekbot_api_token.json` and will be added to all standups.
   This role is required since Geekbot only offers personal API keys and the script won't be able to see any exisitng standups that the owner of the key is not a member of.
   :fire: **If you are changing this role, you will need to recreate `geekbot_api_token.json`.** :fire:
@@ -248,10 +248,10 @@ The desired usergroup is parsed to the script via the `USERGROUP_NAME` environme
 
 #### :fire: Reference Dates for the Support Steward :fire:
 
-Our Support Steward role starts and ends on Wednesdays for a period of 4 weeks with a team member rotating on/off the role every two weeks.
+Our Support Steward role starts and ends on Wednesdays for a period of 2 weeks with a team member rotating on/off the role every week.
 
 The `create_events_bulk.py` script accounts for this by adjusting the reference date to the next Wednesday in the calendar.
-However, the next Wednesday might not necessarily line up with the 2/4 weekly cycle of the Support Steward.
+However, the next Wednesday might not necessarily line up with the 1/2 weekly cycle of the Support Steward.
 So take caution when running this script and choose a reference date carefully before executing.
 
 The two `create_events_*.py` scripts can't delete events and so, if they are repeatedly run, will create duplicate events.
@@ -359,13 +359,9 @@ If running manually, this job can be skipped completely.
 
 ### `support-steward.yaml`
 
-This workflow file contains three jobs: `is-two-weeks`, `create-standup` and `update-calendar`.
+This workflow file contains two jobs: `create-standup` and `update-calendar`.
 It is scheduled to run at midnight UTC weekly on Mondays and can also be manually triggered using workflow dispatch.
-
-The `is-two-weeks` job determines if we are on a two-week cycle since a defined reference date.
-This is because we transfer the Support Steward role every two weeks, but writing a cronjob for every two weeks is tough!
-The Geekbot App is configured to notify the next Support Steward on every other Wednesday.
-If we are not on a two-week cycle the following jobs will not be triggered, unless specified to run using workflow dispatch inputs.
+The Geekbot App is configured to notify the next Support Steward every Wednesday.
 
 The `create-standup` job runs the [`create_geekbot_standup.py`](#create_geekbot_standuppy) to update the Support Steward role in the `team-roles.json` file and create/update a Geekbot Standup App to notify the new team member serving in the role.
 When manually triggered, updating the team roles file is optional, for example if you'd just like to reset the Geekbot App.
