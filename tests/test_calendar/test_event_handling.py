@@ -65,15 +65,15 @@ def test_create_next_event_dates_meeting_facilitator_no_offset():
 
 
 def test_create_next_event_dates_support_steward_no_offset():
-    end_date = datetime(2022, 9, 21)
+    end_date = datetime(2023, 3, 29)
 
     test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
     next_start_date, next_end_date = test_event_handler._calculate_next_event_dates(
         end_date, 0
     )
 
-    expected_start_date = datetime(2022, 9, 21)
-    expected_end_date = datetime(2022, 10, 19)
+    expected_start_date = datetime(2023, 3, 29)
+    expected_end_date = datetime(2023, 4, 12)
 
     assert next_start_date == expected_start_date
     assert next_end_date == expected_end_date
@@ -104,7 +104,7 @@ def test_create_next_event_dates_meeting_facilitator_with_offset():
 
 def test_create_next_event_dates_support_steward_with_offset():
     case = unittest.TestCase()
-    end_date = datetime(2022, 9, 21)
+    end_date = datetime(2023, 3, 29)
     offset = 3
     test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
 
@@ -115,9 +115,9 @@ def test_create_next_event_dates_support_steward_with_offset():
         )
 
     expected_event_dates = [
-        (datetime(2022, 9, 21), datetime(2022, 10, 19)),
-        (datetime(2022, 10, 5), datetime(2022, 11, 2)),
-        (datetime(2022, 10, 19), datetime(2022, 11, 16)),
+        (datetime(2023, 3, 29), datetime(2023, 4, 12)),
+        (datetime(2023, 4, 5), datetime(2023, 4, 19)),
+        (datetime(2023, 4, 12), datetime(2023, 4, 26)),
     ]
 
     case.assertCountEqual(next_event_dates, expected_event_dates)
