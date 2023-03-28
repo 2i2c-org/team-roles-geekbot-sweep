@@ -25,9 +25,9 @@ ROLE_CYCLES = {
     },
     "support-steward": {
         "unit": "days",
-        "frequency": 14,  # Fortnightly
-        "period": 28,  # 4 weeks
-        "n_events": 26,  # Equates to 1 year
+        "frequency": 7,  # Weekly
+        "period": 14,  # 2 weeks
+        "n_events": 52,  # Equates to 1 year
         "index": 2,  # Index to extract next event from
     },
 }
