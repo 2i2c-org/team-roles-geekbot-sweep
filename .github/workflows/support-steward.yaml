@@ -31,43 +31,10 @@ env:
   USERGROUP_NAME: support-stewards
 
 jobs:
-  is-two-weeks:
-    runs-on: ubuntu-latest
-    outputs:
-      continue-workflow: ${{ steps.decision.outputs.continue-workflow }}
-    steps:
-      - name: Decide if 2 weeks have passed and the workflow should continue
-        id: decision
-        shell: python
-        run: |
-          import os
-          from datetime import date
-
-          # This is a Monday before our last support steward transfer (Apr 27, 2022),
-          # so we'll calculate is_two_weeks relative to this
-          ref_date = date(2022, 4, 25)
-
-          diff_days = abs(date.today() - ref_date).days
-          n_days_since = diff_days % 14  # Because we transfer the role every 14 days
-          n_weeks_since = (n_days_since // 7) + 1  # Add 1 because we are effectively 0-indexed
-          is_two_weeks = (n_weeks_since % 2) == 0
-
-          # Set output variable for use in further jobs
-          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-              print(f'continue-workflow={is_two_weeks}', file=f)
-
-      - name: Echo outputs
-        run: |
-          echo "continue-workflow: ${{ steps.decision.outputs.continue-workflow }}"
-          echo "update-roles: ${{ github.event.inputs.update-roles }}"
-
   create-standup:
     permissions:
       contents: write
     runs-on: ubuntu-latest
-    needs:
-      - is-two-weeks
-    if: needs.is-two-weeks.outputs.continue-workflow == 'True' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -131,12 +98,10 @@ jobs:
   update-calendar:
     runs-on: ubuntu-latest
     needs:
-      - is-two-weeks
       - create-standup
     if: |
       github.event.inputs.update-calendar == 'true'
-      || (github.event_name == 'schedule'
-      && needs.is-two-weeks.outputs.continue-workflow == 'True')
+      || github.event_name == 'schedule'
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
