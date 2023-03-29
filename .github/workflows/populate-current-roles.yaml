@@ -7,12 +7,12 @@ on:
         required: true
         description: |
           The Slack display name of the team member currently serving in the Support
-          Steward role (i.e. for more than two weeks)
+          Steward role (i.e. for more than one week)
       incoming-support-steward:
         required: true
         description: |
           The Slack display name of the team member most recently taking up service in
-          the Support Steward role (i.e. for less than two weeks)
+          the Support Steward role (i.e. for less than one week)
       usergroup-name:
         required: false
         default: support-stewards
