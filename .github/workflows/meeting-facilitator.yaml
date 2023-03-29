@@ -33,11 +33,14 @@ env:
 jobs:
   create-standup:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+
+      - name: Setup Python v3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
 
       - name: Install and configure Poetry
         uses: snok/install-poetry@v1
