@@ -198,7 +198,7 @@ def main():
         default=None,
         help=(
             "The number of role events to create. "
-            "Defaults to 12 for Meeting Facilitator and 26 for Support Steward (both 1 year's worth)."
+            "Defaults to 12 for Meeting Facilitator and 52 for Support Steward (both 1 year's worth)."
         ),
     )
     parser.add_argument(
@@ -220,7 +220,7 @@ def main():
         default=None,
         help=(
             "The name of the team member currently serving in the role. "
-            "Defaults to being pulled from either the last calendar event, or team-roles.json if a calendar event doesn't not exist. "
+            "Defaults to being pulled from either the last calendar event, or team-roles.json if a calendar event does not exist. "
             "This flag is MUTUALLY INCLUSIVE with --date [-d]."
         ),
     )
