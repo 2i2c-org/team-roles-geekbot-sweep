@@ -8,7 +8,3 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    ignore:
-      # Ignore patch upgrades to reduce noise
-      - update-types: ["version-update:semver-patch"]
-        dependency-name: "*" # Match all packages
