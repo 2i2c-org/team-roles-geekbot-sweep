@@ -20,7 +20,7 @@ def main():
 
     parser.add_argument(
         "role",
-        choices=["meeting-facilitator", "support-steward"],
+        choices=["meeting-facilitator", "support-triager"],
         help="The role to delete events for",
     )
     parser.add_argument(

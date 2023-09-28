@@ -35,8 +35,8 @@ def main():
         raise FileNotFoundError(f"File must exist to continue! {roles_path}")
 
     # Set environment variables
-    current_support_steward = os.environ["CURRENT_SUPPORT_STEWARD"]
-    incoming_support_steward = os.environ["INCOMING_SUPPORT_STEWARD"]
+    current_support_triager = os.environ["CURRENT_SUPPORT_TRIAGER"]
+    incoming_support_triager = os.environ["INCOMING_SUPPORT_TRIAGER"]
     standup_manager = os.environ["STANDUP_MANAGER"]
     current_meeting_facilitator = os.environ.get("CURRENT_MEETING_FACILITATOR", None)
 
@@ -61,7 +61,7 @@ def main():
     team_roles = {
         "standup_manager": {
             "name": standup_manager,
-            "id": members["support-stewards"][standup_manager],
+            "id": members["support-triagers"][standup_manager],
         },
         "meeting_facilitator": {
             "name": current_meeting_facilitator,
@@ -69,14 +69,14 @@ def main():
             if current_meeting_facilitator is None
             else members["meeting-facilitators"][current_meeting_facilitator],
         },
-        "support_steward": {
+        "support_triager": {
             "incoming": {
-                "name": incoming_support_steward,
-                "id": members["support-stewards"][incoming_support_steward],
+                "name": incoming_support_triager,
+                "id": members["support-triagers"][incoming_support_triager],
             },
             "current": {
-                "name": current_support_steward,
-                "id": members["support-stewards"][current_support_steward],
+                "name": current_support_triager,
+                "id": members["support-triagers"][current_support_triager],
             },
         },
     }

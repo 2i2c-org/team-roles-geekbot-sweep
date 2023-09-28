@@ -66,17 +66,17 @@ class TeamRoles:
         self.team_roles["meeting_facilitator"]["name"] = next_member_name.split(" ")[0]
         self.team_roles["meeting_facilitator"]["id"] = next_member_id
 
-    def _update_support_steward_role(self, next_member_name):
-        """Update the Support Steward role metadata"""
+    def _update_support_triager_role(self, next_member_name):
+        """Update the Support Triager role metadata"""
         # The incoming team member becomes the current team member
-        self.team_roles["support_steward"]["current"]["name"] = self.team_roles[
-            "support_steward"
+        self.team_roles["support_triager"]["current"]["name"] = self.team_roles[
+            "support_triager"
         ]["incoming"]["name"]
-        self.team_roles["support_steward"]["current"]["id"] = self.team_roles[
-            "support_steward"
+        self.team_roles["support_triager"]["current"]["id"] = self.team_roles[
+            "support_triager"
         ]["incoming"]["id"]
 
-        # Find the ID of the next Support Steward
+        # Find the ID of the next Support Triager
         next_member_id = next(
             (
                 id
@@ -87,10 +87,10 @@ class TeamRoles:
         )
 
         # The next team member is assigned to "incoming"
-        self.team_roles["support_steward"]["incoming"]["name"] = next_member_name.split(
+        self.team_roles["support_triager"]["incoming"]["name"] = next_member_name.split(
             " "
         )[0]
-        self.team_roles["support_steward"]["incoming"]["id"] = next_member_id
+        self.team_roles["support_triager"]["incoming"]["id"] = next_member_id
 
     def update_roles(self):
         """Update our Team Roles by inspecting a Google Calendar and/or iterating
@@ -114,9 +114,9 @@ class TeamRoles:
         if self.role == "meeting-facilitator":
             logger.info("Updating the Meeting Facilitator role")
             self._update_meeting_facilitator_role(next_member)
-        elif self.role == "support-steward":
-            logger.info("Updating the Support Steward role")
-            self._update_support_steward_role(next_member)
+        elif self.role == "support-triager":
+            logger.info("Updating the Support Triager role")
+            self._update_support_triager_role(next_member)
 
         # Write the updated roles to a JSON file
         logger.info("Writing roles to team-roles.json")
@@ -131,7 +131,7 @@ def main():
     )
     parser.add_argument(
         "role",
-        choices=["meeting-facilitator", "support-steward"],
+        choices=["meeting-facilitator", "support-triager"],
         help="The role to update",
     )
     args = parser.parse_args()

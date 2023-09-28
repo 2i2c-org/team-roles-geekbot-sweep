@@ -15,7 +15,7 @@ def create_next_event(role):
 
     Args:
         role (str): Which role we wish to create a new event for. Can be either
-            'meeting-facilitator' or 'support-steward'.
+            'meeting-facilitator' or 'support-triager'.
     """
     # Set variables from environment
     ci = os.environ.get("CI", False)
@@ -43,7 +43,7 @@ def main():
     )
     parser.add_argument(
         "role",
-        choices=["meeting-facilitator", "support-steward"],
+        choices=["meeting-facilitator", "support-triager"],
         help="The role to create an event for",
     )
     args = parser.parse_args()

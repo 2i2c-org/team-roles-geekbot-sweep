@@ -23,7 +23,7 @@ ROLE_CYCLES = {
         "n_events": 12,  # Equates to 1 year
         "index": 1,  # Index to extract next event from
     },
-    "support-steward": {
+    "support-triager": {
         "unit": "days",
         "frequency": 7,  # Weekly
         "period": 14,  # 2 weeks
@@ -69,7 +69,7 @@ class CalendarEventHandler:
                 Defaults to TODAY in ISO format.
             nMaxResults (int, optional): The maximum number of future events to
                 pull from the calendar. There will be 12 Meeting Facilitator events
-                per year and 26 Support Steward events per year - so 50 is enough
+                per year and 26 Support Triager events per year - so 50 is enough
                 to cover both those event types together, plus some extra.
                 Defaults to 50.
 
@@ -171,7 +171,7 @@ class CalendarEventHandler:
                 months=ROLE_CYCLES[self.role]["period"]
             )
 
-        elif self.role == "support-steward":
+        elif self.role == "support-triager":
             next_event_start_date = event_end_date + relativedelta(
                 days=ROLE_CYCLES[self.role]["frequency"] * offset
             )
@@ -258,8 +258,8 @@ class CalendarEventHandler:
         first_event_end_date = datetime.strptime(first_event_end_date, "%Y-%m-%d")
         first_member = first_event.get("summary", "").split(":")[-1].strip()
 
-        if self.role == "support-steward":
-            # We use [1] here because the support steward role overlaps by 2 two
+        if self.role == "support-triager":
+            # We use [1] here because the support triager role overlaps by 2 two
             # weeks. So for the team member serving in the role, we need to use
             # the next event to calculate where to begin iterating from.
             first_event = self.upcoming_events[1]
@@ -294,8 +294,8 @@ class CalendarEventHandler:
         last_event_end_date = datetime.strptime(last_event_end_date, "%Y-%m-%d")
         last_member = last_event.get("summary", "").split(":")[-1].strip()
 
-        if self.role == "support-steward":
-            # We use [-2] here because the support steward role overlaps itself.
+        if self.role == "support-triager":
+            # We use [-2] here because the support triager role overlaps itself.
             # So for the last event dates, we need the second to last event in
             # the list.
             last_event = self.upcoming_events[-2]
@@ -317,7 +317,7 @@ class CalendarEventHandler:
                 Defaults to TODAY in ISO format.
             nMaxResults (int, optional): The maximum number of future events to
                 pull from the calendar. There will be 12 Meeting Facilitator events
-                per year and 26 Support Steward events per year - so 50 is enough
+                per year and 26 Support Triager events per year - so 50 is enough
                 to cover both those event types together, plus some extra.
                 Defaults to 50.
 
