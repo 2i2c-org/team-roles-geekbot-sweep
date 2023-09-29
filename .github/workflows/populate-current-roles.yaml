@@ -3,19 +3,19 @@ name: Populate a JSON file with members currently serving in our Team Roles
 on:
   workflow_dispatch:
     inputs:
-      current-support-steward:
+      current-support-triager:
         required: true
         description: |
           The Slack display name of the team member currently serving in the Support
-          Steward role (i.e. for more than one week)
-      incoming-support-steward:
+          Triager role (i.e. for more than one week)
+      incoming-support-triager:
         required: true
         description: |
           The Slack display name of the team member most recently taking up service in
-          the Support Steward role (i.e. for less than one week)
+          the Support Triager role (i.e. for less than one week)
       usergroup-name:
         required: false
-        default: support-stewards
+        default: support-triagers
         description: |
           The Slack usergroup(s) our Team Roles are generated from. If providing multiple
           usergroups, separate them with a comma ",".
@@ -90,8 +90,8 @@ jobs:
           poetry run populate-current-roles
         env:
           CURRENT_MEETING_FACILITATOR: "${{ github.event.inputs.current-meeting-facilitator }}"
-          CURRENT_SUPPORT_STEWARD: "${{ github.event.inputs.current-support-steward }}"
-          INCOMING_SUPPORT_STEWARD: "${{ github.event.inputs.incoming-support-steward }}"
+          CURRENT_SUPPORT_TRIAGER: "${{ github.event.inputs.current-support-triager }}"
+          INCOMING_SUPPORT_TRIAGER: "${{ github.event.inputs.incoming-support-triager }}"
           USERGROUP_NAMES: "${{ github.event.inputs.usergroup-name }}"
           STANDUP_MANAGER: "${{ github.event.inputs.standup-manager }}"
 

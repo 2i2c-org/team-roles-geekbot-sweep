@@ -23,17 +23,17 @@ class EventHandlerSubClass(CalendarEventHandler):
             {
                 "start": {"date": "2022-08-24"},
                 "end": {"date": "2022-09-21"},
-                "summary": "Support Steward: Person A",
+                "summary": "Support Triager: Person A",
             },
             {
                 "start": {"date": "2022-09-07"},
                 "end": {"date": "2022-10-05"},
-                "summary": "Support Steward: Person B",
+                "summary": "Support Triager: Person B",
             },
             {
                 "start": {"date": "2022-09-21"},
                 "end": {"date": "2022-10-19"},
-                "summary": "Support Steward: Person C",
+                "summary": "Support Triager: Person C",
             },
         ]
 
@@ -64,10 +64,10 @@ def test_create_next_event_dates_meeting_facilitator_no_offset():
     assert next_end_date == expected_end_date
 
 
-def test_create_next_event_dates_support_steward_no_offset():
+def test_create_next_event_dates_support_triager_no_offset():
     end_date = datetime(2023, 3, 29)
 
-    test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
+    test_event_handler = EventHandlerSubClass("support-triager", "support-triagers")
     next_start_date, next_end_date = test_event_handler._calculate_next_event_dates(
         end_date, 0
     )
@@ -102,11 +102,11 @@ def test_create_next_event_dates_meeting_facilitator_with_offset():
     case.assertCountEqual(next_event_dates, expected_event_dates)
 
 
-def test_create_next_event_dates_support_steward_with_offset():
+def test_create_next_event_dates_support_triager_with_offset():
     case = unittest.TestCase()
     end_date = datetime(2023, 3, 29)
     offset = 3
-    test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
+    test_event_handler = EventHandlerSubClass("support-triager", "support-triagers")
 
     next_event_dates = []
     for i in range(offset):
@@ -124,7 +124,7 @@ def test_create_next_event_dates_support_steward_with_offset():
 
 
 def test_find_next_team_member_manually():
-    test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
+    test_event_handler = EventHandlerSubClass("support-triager", "support-triagers")
     next_member_no_offset = test_event_handler._find_next_team_member_manually(
         "Person B"
     )
@@ -150,8 +150,8 @@ def test_get_last_event_meeting_facilitator():
     assert last_member == "Person B"
 
 
-def test_get_last_event_support_steward():
-    test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
+def test_get_last_event_support_triager():
+    test_event_handler = EventHandlerSubClass("support-triager", "support-triagers")
     end_date, last_member = test_event_handler._get_last_event(suppress_logs=True)
 
     assert end_date == datetime(2022, 10, 5)
@@ -168,8 +168,8 @@ def test_get_first_event_meeting_facilitator():
     assert last_member == "Person A"
 
 
-def test_get_first_event_support_steward():
-    test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
+def test_get_first_event_support_triager():
+    test_event_handler = EventHandlerSubClass("support-triager", "support-triagers")
     end_date, last_member = test_event_handler.get_first_event()
 
     assert end_date == datetime(2022, 9, 21)
@@ -185,8 +185,8 @@ def test_find_next_team_member_from_calendar_meeting_facilitator():
     assert next_member == "Person B"
 
 
-def test_find_next_team_member_from_calendar_support_steward():
-    test_event_handler = EventHandlerSubClass("support-steward", "support-stewards")
+def test_find_next_team_member_from_calendar_support_triager():
+    test_event_handler = EventHandlerSubClass("support-triager", "support-triagers")
     next_member = test_event_handler.find_next_team_member_from_calendar()
 
     assert next_member == "Person C"

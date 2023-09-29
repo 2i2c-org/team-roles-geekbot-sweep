@@ -6,7 +6,7 @@ A Slack/Geekbot/Google Calendar App to sweep through 2i2c team members, assign T
 
 ## Summary
 
-This repository is a collection of Python code that tracks which 2i2c team members are currently serving in our Team Roles (Meeting Facilitator and Support Steward).
+This repository is a collection of Python code that tracks which 2i2c team members are currently serving in our Team Roles (Meeting Facilitator and Support Triager).
 The code works out which team member is due to take over a given role, and dynamically generates Geekbot standups in Slack to visibly and explicitly notify the given team member that they are due to take over the role.
 It also creates events in the Team Roles Google Calendar to make the role changes more visible.
 
@@ -51,7 +51,7 @@ Which 2i2c teams members are serving (or have served) in a given role are stored
 We keep track of both a team member's Slack display name and user ID.
 This is because interacting with the Slack and Geekbot APIs requires the user ID, but it is more human-readable to also have the names.
 
-For the Support Steward, we track both the current and incoming team members as we have two people overlapping in this role.
+For the Support Triager, we track both the current and incoming team members as we have two people overlapping in this role.
 
 We have an extra role here called `standup_manager`.
 This is the team member who created `GEEKBOT_API_KEY` and will be added to all standups.
@@ -68,7 +68,7 @@ This is because Geekbot only provides personal API keys and these keys do not ha
         "name": "display_name",
         "id": "slack_id"
     },
-    "support_steward": {
+    "support_triager": {
         "incoming": {
             "name": "display_name",
             "id": "slack_id"
@@ -88,7 +88,7 @@ All scripts are written in Python and are located in the [`src`](src/) folder.
 ### `get_slack_usergroup_members.py`
 
 This script interacts with the Slack API to produce a dictionary of Slack users who are members of a given Slack usergroup and their IDs.
-The script requires the `usergroup_name` variable to be set, which is the name of the Slack usergroup to list members of, e.g., `meeting-facilitators` or `support-stewards`.
+The script requires the `usergroup_name` variable to be set, which is the name of the Slack usergroup to list members of, e.g., `meeting-facilitators` or `support-triagers`.
 
 The script will generate a dictionary of members of `usergroup_name` where the keys are the users' display names, and the values are their associated user IDs.
 The dictionary is ordered alphabetically by its keys.
@@ -117,7 +117,7 @@ optional arguments:
 
 ### `update_team_roles.py`
 
-This script generates the next team member to serve in a given role by iterating one place through the appropriate Slack usergroup (either `meeting-facilitators` or `support-stewards`).
+This script generates the next team member to serve in a given role by iterating one place through the appropriate Slack usergroup (either `meeting-facilitators` or `support-triagers`).
 It depends on [`get_slack_usergroup_members.py`](#get_slack_usergroup_memberspy) to pull the list of usergroup members from Slack.
 The desired usergroup to pull the members of is parsed to the script via the `USERGROUP_NAME` environment variable.
 
@@ -131,18 +131,18 @@ There are command line options to determine which role is to be updated.
 To execute, run the following command:
 
 ```bash
-poetry run update-team-role { meeting-facilitator | support-steward }
+poetry run update-team-role { meeting-facilitator | support-triager }
 ```
 
 **Help info:**
 
 ```bash
-usage: update-team-role [-h] {meeting-facilitator,support-steward}
+usage: update-team-role [-h] {meeting-facilitator,support-triager}
 
 Update our Team Roles by iterating through 2i2c team members
 
 positional arguments:
-  {meeting-facilitator,support-steward}
+  {meeting-facilitator,support-triager}
                         The role to update
 
 optional arguments:
@@ -153,7 +153,7 @@ optional arguments:
 
 This script reads in [`team-roles.json`](#team-roles-json-file-structure) after it has been modified by [`update_team_roles.py`](#update_team_rolespy) and generates a Geekbot standup to notify the incoming team member for their upcoming role.
 
-The `MeetingFacilitatorStandup` broadcasts to the `team-updates` Slack channel, and the `SupportStewardStandup` broadcasts to the `support-freshdesk` channel.
+The `MeetingFacilitatorStandup` broadcasts to the `team-updates` Slack channel, and the `SupportTriagerStandup` broadcasts to the `support-freshdesk` channel.
 The [Geekbot app](https://geekbot.com/) needs to be installed to the Slack workspace and invited to the channels to which it will broadcast.
 Command line options are provided to select which role a standup should be created for.
 
@@ -162,18 +162,18 @@ Command line options are provided to select which role a standup should be creat
 To execute, run the following command:
 
 ```bash
-poetry run create-standup { meeting-facilitator | support-steward }
+poetry run create-standup { meeting-facilitator | support-triager }
 ```
 
 **Help info:**
 
 ```bash
-usage: create-standup [-h] {meeting-facilitator,support-steward}
+usage: create-standup [-h] {meeting-facilitator,support-triager}
 
 Create Geekbot standup apps to manage the transition of Team Roles through 2i2c team members
 
 positional arguments:
-  {meeting-facilitator,support-steward}
+  {meeting-facilitator,support-triager}
                         The role to create a Geekbot Standup to transition
 
 optional arguments:
@@ -187,10 +187,10 @@ It depends upon [`get_slack_usergroup_members.py`](#get_slack_usergroup_membersp
 
 This script requires the following environment variables to be set:
 
-- `USERGROUP_NAMES`: The name of the Slack usergroup to list members of, e.g., `meeting-facilitators` or `support-stewards`.
+- `USERGROUP_NAMES`: The name of the Slack usergroup to list members of, e.g., `meeting-facilitators` or `support-triagers`.
   Multiple usergroups can be provided by separating them with a comma.
-- `CURRENT_SUPPORT_STEWARD`: The Slack display name of the team member currently serving in the Support Steward role (i.e. for more than one week)
-- `INCOMING_SUPPORT_STEWARD`: The Slack display name of the team member most recently taking up service in the Support Steward role (i.e. for less than one week)
+- `CURRENT_SUPPORT_TRIAGER`: The Slack display name of the team member currently serving in the Support Triager role (i.e. for more than one week)
+- `INCOMING_SUPPORT_TRIAGER`: The Slack display name of the team member most recently taking up service in the Support Triager role (i.e. for less than one week)
 - `STANDUP_MANAGER`: This is the Slack display name of the team member who created `geekbot_api_token.json` and will be added to all standups.
   This role is required since Geekbot only offers personal API keys and the script won't be able to see any exisitng standups that the owner of the key is not a member of.
   :fire: **If you are changing this role, you will need to recreate `geekbot_api_token.json`.** :fire:
@@ -221,18 +221,18 @@ The desired usergroup is parsed to the script via the `USERGROUP_NAME` environme
 To execute this script, run:
 
 ```bash
-poetry run create-next-event { meeting-facilitator | support-steward }
+poetry run create-next-event { meeting-facilitator | support-triager }
 ```
 
 **Help info:**
 
 ```bash
-usage: create-next-event [-h] {meeting-facilitator,support-steward}
+usage: create-next-event [-h] {meeting-facilitator,support-triager}
 
 Create the next event in a series for a Team Role in a Google Calendar
 
 positional arguments:
-  {meeting-facilitator,support-steward}
+  {meeting-facilitator,support-triager}
                         The role to create an event for
 
 optional arguments:
@@ -246,12 +246,12 @@ It begins generating events either from the day the script is executed or from a
 It depends upon [`get_slack_usergroup_members.py`](#get_slack_usergroup_memberspy) to get an ordered list of the team members who fulfil these roles.
 The desired usergroup is parsed to the script via the `USERGROUP_NAME` environment variable.
 
-#### :fire: Reference Dates for the Support Steward :fire:
+#### :fire: Reference Dates for the Support Triager :fire:
 
-Our Support Steward role starts and ends on Wednesdays for a period of 2 weeks with a team member rotating on/off the role every week.
+Our Support Triager role starts and ends on Wednesdays for a period of 2 weeks with a team member rotating on/off the role every week.
 
 The `create_events_bulk.py` script accounts for this by adjusting the reference date to the next Wednesday in the calendar.
-However, the next Wednesday might not necessarily line up with the 1/2 weekly cycle of the Support Steward.
+However, the next Wednesday might not necessarily line up with the 1/2 weekly cycle of the Support Triager.
 So take caution when running this script and choose a reference date carefully before executing.
 
 The two `create_events_*.py` scripts can't delete events and so, if they are repeatedly run, will create duplicate events.
@@ -262,24 +262,24 @@ See [`delete_events_bulk.py`](#delete_events_bulkpy) for information on deleting
 To execute this script, run:
 
 ```bash
-poetry run create-bulk-events { meeting-facilitator | support-steward }
+poetry run create-bulk-events { meeting-facilitator | support-triager }
 ```
 
 **Help info:**
 
 ```bash
-usage: create-bulk-events [-h] [-n N_EVENTS] [-d DATE] [-m TEAM_MEMBER] {meeting-facilitator,support-steward}
+usage: create-bulk-events [-h] [-n N_EVENTS] [-d DATE] [-m TEAM_MEMBER] {meeting-facilitator,support-triager}
 
 Bulk create a series of Team Role events in a Google Calendar
 
 positional arguments:
-  {meeting-facilitator,support-steward}
+  {meeting-facilitator,support-triager}
                         The role to create events for
 
 options:
   -h, --help            show this help message and exit
   -n N_EVENTS, --n-events N_EVENTS
-                        The number of role events to create. Defaults to 12 for Meeting Facilitator and 26 for Support Steward (both 1 year's worth).
+                        The number of role events to create. Defaults to 12 for Meeting Facilitator and 26 for Support Triager (both 1 year's worth).
   -d DATE, --date DATE  A reference date to begin creating events from. Defaults to appending events from the last in the series, or TODAY if no events exist. WARNING: EXPERIMENTAL
                         FEATURE. This flag is MUTUALLY INCLUSIVE with --team-member [-m].
   -m TEAM_MEMBER, --team-member TEAM_MEMBER
@@ -302,18 +302,18 @@ In the future, we should allow this to be overridden since this script only need
 **Command line usage:**
 
 ```bash
-poetry run delete-bulk-events { meeting-facilitator | support-steward }
+poetry run delete-bulk-events { meeting-facilitator | support-triager }
 ```
 
 **Help info:**
 
 ```bash
-usage: delete-bulk-events [-h] [-d DATE] {meeting-facilitator,support-steward}
+usage: delete-bulk-events [-h] [-d DATE] {meeting-facilitator,support-triager}
 
 Bulk delete all upcoming Team Role events in a Google Calendar
 
 positional arguments:
-  {meeting-facilitator,support-steward}
+  {meeting-facilitator,support-triager}
                         The role to delete events for
 
 options:
@@ -357,13 +357,13 @@ The Geekbot App is configured to notify the next Meeting Facilitator on the firs
 The `update-calendar` job runs the [`create_events_rolling_update.py`](#create_events_rolling_updatepy) script to create the next event in the series, keeping the calendar populated roughly one year in advance.
 If running manually, this job can be skipped completely.
 
-### `support-steward.yaml`
+### `support-triager.yaml`
 
 This workflow file contains two jobs: `create-standup` and `update-calendar`.
 It is scheduled to run at midnight UTC weekly on Mondays and can also be manually triggered using workflow dispatch.
-The Geekbot App is configured to notify the next Support Steward every Wednesday.
+The Geekbot App is configured to notify the next Support Triager every Wednesday.
 
-The `create-standup` job runs the [`create_geekbot_standup.py`](#create_geekbot_standuppy) to update the Support Steward role in the `team-roles.json` file and create/update a Geekbot Standup App to notify the new team member serving in the role.
+The `create-standup` job runs the [`create_geekbot_standup.py`](#create_geekbot_standuppy) to update the Support Triager role in the `team-roles.json` file and create/update a Geekbot Standup App to notify the new team member serving in the role.
 When manually triggered, updating the team roles file is optional, for example if you'd just like to reset the Geekbot App.
 
 The `update-calendar` job runs the [`create_events_rolling_update.py`](#create_events_rolling_updatepy) script to create the next event in the series, keeping the calendar populated roughly one year in advance.

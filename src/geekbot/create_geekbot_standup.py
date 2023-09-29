@@ -145,26 +145,26 @@ class GeekbotStandup:
         )
         return question
 
-    def _generate_question_support_steward(self):
-        """Generate the question that will be asked of the the new Support Steward
+    def _generate_question_support_triager(self):
+        """Generate the question that will be asked of the the new Support Triager
         in the standup. It will be added to the metadata generated in
         _generate_standup_metadata.
 
         Returns:
-            str: The question to be posed to the new Support Steward
+            str: The question to be posed to the new Support Triager
         """
         logger.info(f"Generating question for standup: {self.standup_name}")
 
         question = (
-            f"{self.roles['name'].split()[0]} - it is your turn to be the support steward! "
+            f"{self.roles['name'].split()[0]} - it is your turn to be the support triager! "
             + "Please make sure to watch for any incoming tickets here:\n\n"
             + "https://2i2c.freshdesk.com/a/tickets/filters/all_tickets"
             + "\n\n"
             + "Reply 'ok' to this message to acknowledge your role. "
-            + "Or if you are going to be away for a large part of your stewardship, please arrange cover with another member of the team. "
+            + "Or if you are going to be away for a large part of your rotation, please arrange cover with another member of the team. "
             + "If you have already swapped with someone, please tag them in your response."
             + "\n\n"
-            + f"Your support steward buddy is: {self.steward_buddy.split()[0]}"
+            + f"Your support triager buddy is: {self.triager_buddy.split()[0]}"
         )
         return question
 
@@ -212,17 +212,17 @@ class GeekbotStandup:
 
         response.raise_for_status()
 
-    def create_support_steward_standup(self):
+    def create_support_triager_standup(self):
         """
-        Create a Geekbot standup to transition the Support Steward role
+        Create a Geekbot standup to transition the Support Triager role
         """
         # Set variables
-        self.standup_name = "SupportStewardStandup"
+        self.standup_name = "SupportTriagerStandup"
         self.standup_day = "Wed"
         self.broadcast_channel = "#support-freshdesk"
         self.standup_manager = self.roles["standup_manager"]
-        self.steward_buddy = self.roles["support_steward"]["current"]["name"]
-        self.roles = self.roles["support_steward"]["incoming"]
+        self.triager_buddy = self.roles["support_triager"]["current"]["name"]
+        self.roles = self.roles["support_triager"]["incoming"]
 
         # First, check if a standup exists
         standup_id = self._check_standup_exists()
@@ -231,7 +231,7 @@ class GeekbotStandup:
         metadata = self._generate_standup_metadata()
 
         # Generate the standup question
-        question = self._generate_question_support_steward()
+        question = self._generate_question_support_triager()
         metadata["questions"] = [{"question": question}]
 
         if self.standup_exists:
@@ -267,7 +267,7 @@ def main():
     )
     parser.add_argument(
         "role",
-        choices=["meeting-facilitator", "support-steward"],
+        choices=["meeting-facilitator", "support-triager"],
         help="The role to create a Geekbot Standup to transition",
     )
     args = parser.parse_args()
@@ -278,8 +278,8 @@ def main():
     # Create a standup for the chosen role
     if args.role == "meeting-facilitator":
         standup.create_meeting_facilitator_standup()
-    elif args.role == "support-steward":
-        standup.create_support_steward_standup()
+    elif args.role == "support-triager":
+        standup.create_support_triager_standup()
 
 
 if __name__ == "__main__":

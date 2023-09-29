@@ -1,4 +1,4 @@
-name: Support Steward
+name: Support Triager
 
 on:
   workflow_dispatch:
@@ -21,14 +21,14 @@ on:
           event will be added.
       usergroup-name:
         required: false
-        default: support-stewards
+        default: support-triagers
         description: |
-          The Slack usergroup our Support Stewards are generated from
+          The Slack usergroup our Support Triagers are generated from
   schedule:
     - cron: "0 0 * * MON"  # Run at 00:00 UTC weekly on Mondays
 
 env:
-  USERGROUP_NAME: support-stewards
+  USERGROUP_NAME: support-triagers
 
 jobs:
   create-standup:
@@ -79,7 +79,7 @@ jobs:
         if: github.event_name == 'schedule' || github.event.inputs.update-roles == 'true'
         run: |
           source .venv/bin/activate
-          poetry run update-team-role support-steward
+          poetry run update-team-role support-triager
         env:
           USERGROUP_NAME: "${{ github.event.inputs.usergroup-name || env.USERGROUP_NAME }}"
 
@@ -90,10 +90,10 @@ jobs:
           add: team-roles.json
           message: "Update the Team Roles JSON file"
 
-      - name: Create a standup for the Support Steward
+      - name: Create a standup for the Support Triager
         run: |
           source .venv/bin/activate
-          poetry run create-standup support-steward
+          poetry run create-standup support-triager
 
   update-calendar:
     runs-on: ubuntu-latest
@@ -142,9 +142,9 @@ jobs:
         with:
           credentials_json: "${{ secrets.GCP_KMS_DECRYPTOR_KEY }}"
 
-      - name: Create next Support Steward event in the calendar
+      - name: Create next Support Triager event in the calendar
         run: |
           source .venv/bin/activate
-          poetry run create-next-event support-steward
+          poetry run create-next-event support-triager
         env:
           USERGROUP_NAME: "${{ github.event.inputs.usergroup-name || env.USERGROUP_NAME }}"

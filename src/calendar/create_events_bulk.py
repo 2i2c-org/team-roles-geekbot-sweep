@@ -19,7 +19,7 @@ class MutuallyInclusiveArgumentError(Exception):
 
 
 def adjust_reference_date(reference_date):
-    """The Support Steward Role is transferred on Wednesdays. We adjust the reference
+    """The Support Triager Role is transferred on Wednesdays. We adjust the reference
     date to be the next Wednesday from the given date for the calculations.
 
     Args:
@@ -38,7 +38,7 @@ def adjust_reference_date(reference_date):
         reference_date = reference_date + timedelta(days=(7 + (3 - weekday_num)))
 
     logger.info(
-        "Adjusting reference date for Support Steward role to: {}",
+        "Adjusting reference date for Support Triager role to: {}",
         reference_date.strftime("%Y-%m-%d"),
     )
 
@@ -52,7 +52,7 @@ def read_team_roles_from_file(role):
 
     Args:
         role (str): The role we are interested in learning about. Can be either
-            'meeting-facilitator' or 'support-steward'.
+            'meeting-facilitator' or 'support-triager'.
 
     Raises:
         FileNotFoundError: If the file does not exist at the expected location,
@@ -74,7 +74,7 @@ def read_team_roles_from_file(role):
 
     if role == "meeting-facilitator":
         member = team_roles[role.replace("-", "_")]["name"]
-    elif role == "support-steward":
+    elif role == "support-triager":
         member = team_roles[role.replace("-", "_")]["current"]["name"]
 
     return member
@@ -101,7 +101,7 @@ def create_bulk_events(role, n_events=None, ref_date=None, member=None):
 
     if ref_date is not None:
         ref_date = datetime.strptime(ref_date, "%Y-%m-%d")
-        if role == "support-steward":
+        if role == "support-triager":
             ref_date = adjust_reference_date(ref_date)
 
     # Instantiate the event handler
@@ -152,7 +152,7 @@ def create_bulk_events(role, n_events=None, ref_date=None, member=None):
             if role == "meeting-facilitator":
                 ref_date = ref_date.replace(month=ref_date.month + 1)
                 ref_date = ref_date.replace(day=1)
-            elif role == "support-steward":
+            elif role == "support-triager":
                 ref_date = adjust_reference_date(ref_date)
 
             logger.warning(
@@ -188,7 +188,7 @@ def main():
 
     parser.add_argument(
         "role",
-        choices=["meeting-facilitator", "support-steward"],
+        choices=["meeting-facilitator", "support-triager"],
         help="The role to create events for",
     )
     parser.add_argument(
@@ -198,7 +198,7 @@ def main():
         default=None,
         help=(
             "The number of role events to create. "
-            "Defaults to 12 for Meeting Facilitator and 52 for Support Steward (both 1 year's worth)."
+            "Defaults to 12 for Meeting Facilitator and 52 for Support Triager (both 1 year's worth)."
         ),
     )
     parser.add_argument(
