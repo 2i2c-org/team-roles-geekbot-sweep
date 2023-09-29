@@ -102,12 +102,25 @@ class CalendarEventHandler:
 
         events = events_results.get("items", [])
 
-        # Filter the events for those that have the specified role in their summary
-        events = [
-            event
-            for event in events
-            if " ".join(self.role.split("-")).title() in event["summary"]
-        ]
+        # Filter the events for those that have the specified role in their summary.
+        # We support finding events that have the old role name "Support Steward"
+        # in their summary so that the calendar did not have to be updated at the
+        # time the role switch took place. We should deprecated this if statement
+        # once all the "Support Steward" entries have passed, somewhere around
+        # October 2024.
+        if self.role == "support-triager":
+            events = [
+                event
+                for event in events
+                if (" ".join(self.role.split("-")).title() in event["summary"])
+                or ("Support Steward" in event["summary"])
+            ]
+        else:
+            events = [
+                event
+                for event in events
+                if " ".join(self.role.split("-")).title() in event["summary"]
+            ]
 
         return events
 
