@@ -12,7 +12,7 @@ requests = "^2.31"
 rich = "^13.7"
 loguru = "^0.7.2"
 python-dateutil = "^2.8"
-google-api-python-client = "^2.109"
+google-api-python-client = "^2.111"
 google-auth-httplib2 = "^0.2"
 google-auth-oauthlib = "^1.2"
 
