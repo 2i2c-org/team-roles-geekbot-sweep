@@ -2,6 +2,7 @@
 Functions to create Geekbot Standups in Slack to aid the transition of our Team Roles
 through 2i2c team members
 """
+
 import argparse
 import json
 import os
@@ -102,9 +103,11 @@ class GeekbotStandup:
 
         metadata = {
             "wait_time": 10,
-            "users": [self.roles["id"]]
-            if self.roles["id"] == self.standup_manager["id"]
-            else [self.roles["id"], self.standup_manager["id"]],
+            "users": (
+                [self.roles["id"]]
+                if self.roles["id"] == self.standup_manager["id"]
+                else [self.roles["id"], self.standup_manager["id"]]
+            ),
             "sync_channel_members": False,
             "personalized": False,
         }

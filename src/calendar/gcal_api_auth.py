@@ -1,6 +1,7 @@
 """
 Authenticate with Google's Calendar API using a Service Account
 """
+
 import json
 import sys
 from pathlib import Path

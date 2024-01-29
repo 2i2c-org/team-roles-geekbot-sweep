@@ -1,6 +1,7 @@
 """
 Functions that iterate through a list of team members in order to transition our roles
 """
+
 import argparse
 import json
 import os
@@ -44,11 +45,11 @@ class TeamRoles:
         if (self.team_roles["standup_manager"].get("id") is None) or (
             self.team_roles["standup_manager"]["id"] == ""
         ):
-            self.team_roles["standup_manager"][
-                "id"
-            ] = self.event_handler.usergroup_dict[
-                self.team_roles["standup_manager"]["name"]
-            ]
+            self.team_roles["standup_manager"]["id"] = (
+                self.event_handler.usergroup_dict[
+                    self.team_roles["standup_manager"]["name"]
+                ]
+            )
 
     def _update_meeting_facilitator_role(self, next_member_name):
         """Update the Meeting Facilitator role metadata"""

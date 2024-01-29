@@ -1,6 +1,7 @@
 """
 Functions to get Slack members who are in a given usergroup
 """
+
 import json
 from collections import OrderedDict
 from pathlib import Path
