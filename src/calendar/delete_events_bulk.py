@@ -1,6 +1,7 @@
 """
 Delete Team Role Events in a Calendar in bulk
 """
+
 import argparse
 import os
 import sys

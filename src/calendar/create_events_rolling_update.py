@@ -1,6 +1,7 @@
 """
 Create the next event in a series based on the data for the last event in a calendar
 """
+
 import argparse
 import os
 

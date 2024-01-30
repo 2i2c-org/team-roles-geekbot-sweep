@@ -1,6 +1,7 @@
 """
 Function to populate team-roles.json with the current team members serving in our Team Roles
 """
+
 import json
 import os
 from pathlib import Path
@@ -65,9 +66,11 @@ def main():
         },
         "meeting_facilitator": {
             "name": current_meeting_facilitator,
-            "id": None
-            if current_meeting_facilitator is None
-            else members["meeting-facilitators"][current_meeting_facilitator],
+            "id": (
+                None
+                if current_meeting_facilitator is None
+                else members["meeting-facilitators"][current_meeting_facilitator]
+            ),
         },
         "support_triager": {
             "incoming": {

@@ -1,6 +1,7 @@
 """
 Handle the generation, creation and deletion of events in a Google Calendar
 """
+
 import json
 import sys
 from datetime import datetime
