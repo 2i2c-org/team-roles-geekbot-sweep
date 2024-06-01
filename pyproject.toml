@@ -12,7 +12,7 @@ requests = "^2.32"
 rich = "^13.7"
 loguru = "^0.7.2"
 python-dateutil = "^2.9"
-google-api-python-client = "^2.127"
+google-api-python-client = "^2.131"
 google-auth-httplib2 = "^0.2"
 google-auth-oauthlib = "^1.2"
 
@@ -27,9 +27,9 @@ create-bulk-events = "src.calendar.create_events_bulk:main"
 delete-bulk-events = "src.calendar.delete_events_bulk:main"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "^3.7.0"
-pytest = "^8.2.0"
-coverage = "^7.5.0"
+pre-commit = "^3.7.1"
+pytest = "^8.2.1"
+coverage = "^7.5.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
